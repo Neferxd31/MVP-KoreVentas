@@ -1,0 +1,53 @@
+# ═══════════════════════════════════════════════════════════════
+# KoreVentas — Producción-like (todo dockerizado)
+# Uso: docker compose up --build
+# Accede a http://localhost:3000
+# ═══════════════════════════════════════════════════════════════
+
+services:
+  # ── Base de datos ─────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: koreventas-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: koreventas
+      POSTGRES_USER: koreventas
+      POSTGRES_PASSWORD: koreventas
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U koreventas -d koreventas"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ── Backend (Spring Boot) ─────────────────────────────────
+  backend:
+    build: ./backend
+    container_name: koreventas-backend
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/koreventas
+      SPRING_DATASOURCE_USERNAME: koreventas
+      SPRING_DATASOURCE_PASSWORD: koreventas
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ── Frontend (React + Nginx) ──────────────────────────────
+  frontend:
+    build: ./frontend
+    container_name: koreventas-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

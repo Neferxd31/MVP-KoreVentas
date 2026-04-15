@@ -1,0 +1,64 @@
+# ═══════════════════════════════════════════════════════════════
+# KoreVentas — Desarrollo con hot-reload
+# Uso: docker compose -f docker-compose.dev.yml up
+# Frontend: http://localhost:5173  |  Backend: http://localhost:8080
+# ═══════════════════════════════════════════════════════════════
+
+services:
+  # ── Base de datos ─────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: koreventas-postgres-dev
+    environment:
+      POSTGRES_DB: koreventas
+      POSTGRES_USER: koreventas
+      POSTGRES_PASSWORD: koreventas
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata-dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U koreventas -d koreventas"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ── Backend (Maven con hot-reload via spring-boot-devtools) ──
+  backend:
+    image: maven:3.9-eclipse-temurin-21
+    container_name: koreventas-backend-dev
+    working_dir: /app
+    command: mvn spring-boot:run
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/koreventas
+      SPRING_DATASOURCE_USERNAME: koreventas
+      SPRING_DATASOURCE_PASSWORD: koreventas
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend:/app
+      - maven-cache:/root/.m2
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ── Frontend (Vite dev server con hot-reload) ─────────────
+  frontend:
+    image: node:20-alpine
+    container_name: koreventas-frontend-dev
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    environment:
+      VITE_API_URL: http://backend:8080
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - frontend-node-modules:/app/node_modules
+    depends_on:
+      - backend
+
+volumes:
+  pgdata-dev:
+  maven-cache:
+  frontend-node-modules:

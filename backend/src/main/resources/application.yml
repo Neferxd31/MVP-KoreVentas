@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: koreventas-backend
+  datasource:
+    url: jdbc:postgresql://localhost:5432/koreventas
+    username: koreventas
+    password: koreventas
+    hikari:
+      maximum-pool-size: 10
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+koreventas:
+  security:
+    jwt:
+      # Clave de desarrollo. En producción se inyecta por variable de entorno.
+      secret: dev-secret-change-me-please-make-it-long-enough-for-hs256-32b
+      access-ttl-minutes: 60
+      refresh-ttl-days: 7
+
+logging:
+  level:
+    org.springframework.security: INFO
+    org.hibernate.SQL: INFO
