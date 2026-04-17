@@ -1,6 +1,7 @@
 package com.koreventas.app.sale;
 
 import com.koreventas.app.sale.dto.CreateSaleRequest;
+import com.koreventas.app.sale.dto.DashboardResumenDTO;
 import com.koreventas.app.sale.dto.SaleResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -44,5 +45,10 @@ public class SaleController {
   @GetMapping("/customer/{customerId}")
   public List<SaleResponse> byCustomer(@PathVariable UUID customerId) {
     return service.findByCustomer(customerId).stream().map(SaleResponse::from).toList();
+  }
+  
+  @GetMapping("/resumen")
+  public DashboardResumenDTO resumen() {
+    return service.obtenerResumenDashboard();
   }
 }

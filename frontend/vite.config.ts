@@ -15,6 +15,10 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true,
+    watch: {
+      usePolling: true, // ¡Esto soluciona el HMR en Docker!
+      interval: 1000,   // Revisa los cambios cada 1 segundo
+    },
     proxy: {
       '/api': {
         target: apiTarget,

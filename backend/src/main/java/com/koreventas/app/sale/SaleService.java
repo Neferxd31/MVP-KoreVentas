@@ -6,12 +6,15 @@ import com.koreventas.app.product.Product;
 import com.koreventas.app.product.ProductNotFoundException;
 import com.koreventas.app.product.ProductRepository;
 import com.koreventas.app.sale.dto.CreateSaleRequest;
+// Importamos tu nuevo DTO
+import com.koreventas.app.sale.dto.DashboardResumenDTO; 
 import com.koreventas.app.tenant.TenantContext;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.LocalTime;
@@ -42,14 +45,6 @@ public class SaleService {
     em.createNativeQuery("SET LOCAL app.tenant_id = '" + tenantId + "'").executeUpdate();
   }
 
-  /**
-   * Crear una venta completa atómicamente:
-   * 1. Validar que todos los productos existen y tienen stock
-   * 2. Descontar stock de cada producto
-   * 3. Vincular cliente por ID o por teléfono automáticamente (RF-06)
-   * 4. Calcular IVA por línea según tarifa del producto
-   * 5. Registrar compra en el cliente (actualiza métricas y auto-etiqueta)
-   */
   @Transactional
   public Sale createSale(CreateSaleRequest req) {
     applyTenant();
@@ -127,18 +122,37 @@ public class SaleService {
     applyTenant();
     OffsetDateTime startOfDay = LocalDate.now().atTime(LocalTime.MIN).atOffset(ZoneOffset.UTC);
     OffsetDateTime endOfDay = startOfDay.plusDays(1);
-    return sales.findByDateRange(startOfDay, endOfDay);
+    return sales.findByDateRangeAndTenantId(TenantContext.get(), startOfDay, endOfDay);
   }
 
   @Transactional(readOnly = true)
   public List<Sale> findByCustomer(UUID customerId) {
     applyTenant();
-    return sales.findByCustomerId(customerId);
+    return sales.findByCustomerIdAndTenantId(customerId, TenantContext.get());
   }
 
   @Transactional(readOnly = true)
   public List<Sale> findByDateRange(OffsetDateTime from, OffsetDateTime to) {
     applyTenant();
-    return sales.findByDateRange(from, to);
+    return sales.findByDateRangeAndTenantId(TenantContext.get(), from, to);
+  }
+
+  @Transactional(readOnly = true)
+  public DashboardResumenDTO obtenerResumenDashboard() {
+    applyTenant(); // Aplica seguridad RLS
+    UUID tenantId = TenantContext.get();
+
+    OffsetDateTime startOfDay = LocalDate.now().atTime(LocalTime.MIN).atOffset(ZoneOffset.UTC);
+    OffsetDateTime endOfDay = startOfDay.plusDays(1);
+
+    OffsetDateTime startOfMonth = LocalDate.now().withDayOfMonth(1).atTime(LocalTime.MIN).atOffset(ZoneOffset.UTC);
+    OffsetDateTime endOfMonth = startOfMonth.plusMonths(1);
+
+    BigDecimal ventasDia = sales.sumSalesByTenantAndDateRange(tenantId, startOfDay, endOfDay);
+    BigDecimal ventasMes = sales.sumSalesByTenantAndDateRange(tenantId, startOfMonth, endOfMonth);
+    BigDecimal ventasTotales = sales.sumTotalSalesByTenant(tenantId);
+    long ordenesHoy = sales.countSalesByTenantAndDateRange(tenantId, startOfDay, endOfDay);
+
+    return new DashboardResumenDTO(ventasDia, ventasMes, ventasTotales, ordenesHoy);
   }
 }
