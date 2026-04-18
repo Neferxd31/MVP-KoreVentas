@@ -7,7 +7,6 @@ type Health = {
   timestamp: string
 }
 
-// Definimos la estructura de datos que nos enviará el backend
 type DashboardResumen = {
   ventasDia: number
   ventasMes: number
@@ -16,19 +15,16 @@ type DashboardResumen = {
 }
 
 export default function HomePage() {
-  // Estado de salud del sistema
   const { data: healthData, isLoading: isHealthLoading, isError: isHealthError } = useQuery<Health>({
     queryKey: ['health'],
     queryFn: async () => (await api.get<Health>('/health')).data
   })
 
-  // Consulta al backend para obtener las métricas del dashboard
   const { data: resumen, isLoading: isResumenLoading } = useQuery<DashboardResumen>({
     queryKey: ['dashboard-resumen'],
     queryFn: async () => (await api.get<DashboardResumen>('/sales/resumen')).data
   })
 
-  // Función auxiliar para formatear valores a moneda (Pesos)
   const formatearMoneda = (valor: number | undefined) => {
     if (valor === undefined) return '$0'
     return new Intl.NumberFormat('es-CO', { 
@@ -40,10 +36,8 @@ export default function HomePage() {
 
   return (
     <div className="mx-auto max-w-5xl p-6">
-      {/* Encabezado Principal */}
       <h1 className="text-2xl font-bold text-slate-800">KoreVentas</h1>
       <p className="text-slate-500 mt-1">Panel del negocio</p>
-
       {/* Tarjeta de Estado del Sistema */}
       <div className="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-sm font-semibold text-slate-600 uppercase tracking-wide">
