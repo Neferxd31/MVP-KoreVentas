@@ -15,10 +15,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.UUID;
 
@@ -136,23 +139,44 @@ public class SaleService {
     applyTenant();
     return sales.findByDateRangeAndTenantId(TenantContext.get(), from, to);
   }
-
-  @Transactional(readOnly = true)
+@Transactional(readOnly = true)
   public DashboardResumenDTO obtenerResumenDashboard() {
     applyTenant(); // Aplica seguridad RLS
     UUID tenantId = TenantContext.get();
 
-    OffsetDateTime startOfDay = LocalDate.now().atTime(LocalTime.MIN).atOffset(ZoneOffset.UTC);
-    OffsetDateTime endOfDay = startOfDay.plusDays(1);
+    // 1. Establecemos la zona horaria correcta para los cortes de caja
+    ZoneId zoneId = ZoneId.of("America/Bogota");
+    LocalDate today = LocalDate.now(zoneId);
 
-    OffsetDateTime startOfMonth = LocalDate.now().withDayOfMonth(1).atTime(LocalTime.MIN).atOffset(ZoneOffset.UTC);
-    OffsetDateTime endOfMonth = startOfMonth.plusMonths(1);
+    // 2. DÍA (Desde las 00:00:00 hasta las 23:59:59 de hoy)
+    OffsetDateTime startOfDay = today.atTime(LocalTime.MIN).atOffset(ZoneOffset.UTC);
+    OffsetDateTime endOfDay = today.atTime(LocalTime.MAX).atOffset(ZoneOffset.UTC);
 
+    // 3. SEMANA (Desde el Lunes a las 00:00:00 hasta el Domingo a las 23:59:59)
+    LocalDate startOfWeekDate = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+    OffsetDateTime startOfWeek = startOfWeekDate.atTime(LocalTime.MIN).atOffset(ZoneOffset.UTC);
+    OffsetDateTime endOfWeek = startOfWeekDate.plusDays(6).atTime(LocalTime.MAX).atOffset(ZoneOffset.UTC);
+
+    // 4. MES (Desde el día 1 a las 00:00:00 hasta el último día del mes a las 23:59:59)
+    LocalDate startOfMonthDate = today.with(TemporalAdjusters.firstDayOfMonth());
+    OffsetDateTime startOfMonth = startOfMonthDate.atTime(LocalTime.MIN).atOffset(ZoneOffset.UTC);
+    
+    LocalDate endOfMonthDate = today.with(TemporalAdjusters.lastDayOfMonth());
+    OffsetDateTime endOfMonth = endOfMonthDate.atTime(LocalTime.MAX).atOffset(ZoneOffset.UTC);
+
+    // 5. Consultas a la base de datos
+    // Nota: Es buena práctica asegurar que no devuelvan null si no hay ventas.
+    // Si tu query en SQL ya usa COALESCE(SUM(total), 0), esto está perfecto.
     BigDecimal ventasDia = sales.sumSalesByTenantAndDateRange(tenantId, startOfDay, endOfDay);
+    BigDecimal ventasSemana = sales.sumSalesByTenantAndDateRange(tenantId, startOfWeek, endOfWeek);
     BigDecimal ventasMes = sales.sumSalesByTenantAndDateRange(tenantId, startOfMonth, endOfMonth);
     BigDecimal ventasTotales = sales.sumTotalSalesByTenant(tenantId);
-    long ordenesHoy = sales.countSalesByTenantAndDateRange(tenantId, startOfDay, endOfDay);
 
-    return new DashboardResumenDTO(ventasDia, ventasMes, ventasTotales, ordenesHoy);
+    return new DashboardResumenDTO(
+        ventasDia != null ? ventasDia : BigDecimal.ZERO, 
+        ventasSemana != null ? ventasSemana : BigDecimal.ZERO, 
+        ventasMes != null ? ventasMes : BigDecimal.ZERO, 
+        ventasTotales != null ? ventasTotales : BigDecimal.ZERO
+    );
   }
 }

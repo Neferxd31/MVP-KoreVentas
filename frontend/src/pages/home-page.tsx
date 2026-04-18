@@ -11,7 +11,7 @@ type DashboardResumen = {
   ventasDia: number
   ventasMes: number
   ventasTotales: number
-  ordenesHoy: number
+  ventasSemana: number
 }
 
 export default function HomePage() {
@@ -74,7 +74,15 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* Tarjeta 2: Ventas del mes */}
+            {/* Tarjeta 2: Ventas de la semana */}
+            <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h3 className="text-sm font-medium text-slate-500">Ventas de la semana</h3>
+              <p className="mt-2 text-3xl font-bold text-slate-800">
+                {formatearMoneda(resumen?.ventasSemana)}
+              </p>
+            </div>
+
+            {/* Tarjeta 3: Ventas del mes */}
             <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
               <h3 className="text-sm font-medium text-slate-500">Ventas del mes</h3>
               <p className="mt-2 text-3xl font-bold text-slate-800">
@@ -82,7 +90,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* Tarjeta 3: Ventas totales */}
+            {/* Tarjeta 4: Ventas totales */}
             <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
               <h3 className="text-sm font-medium text-slate-500">Ventas totales</h3>
               <p className="mt-2 text-3xl font-bold text-slate-800">
@@ -90,13 +98,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* Tarjeta 4: Dato adicional sugerido */}
-            <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h3 className="text-sm font-medium text-slate-500">Órdenes de hoy</h3>
-              <p className="mt-2 text-3xl font-bold text-slate-800">
-                {resumen?.ordenesHoy || 0}
-              </p>
-            </div>
+            
 
           </div>
         )}
