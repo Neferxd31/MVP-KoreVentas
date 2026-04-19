@@ -12,12 +12,40 @@ export default function ProductForm({ initial, onSubmit, onCancel, loading }: Pr
   const [name, setName] = useState(initial?.name ?? '')
   const [description, setDescription] = useState(initial?.description ?? '')
   const [barcode, setBarcode] = useState(initial?.barcode ?? '')
-  const [price, setPrice] = useState(initial?.price?.toString() ?? '')
-  const [cost, setCost] = useState(initial?.cost?.toString() ?? '')
+  
+  // CAMBIO 1: El estado ahora guarda números o un string vacío (para cuando el usuario borra todo), 
+  // ya no usamos .toString() en la inicialización.
+  const [price, setPrice] = useState<number | ''>(initial?.price ?? '')
+  const [cost, setCost] = useState<number | ''>(initial?.cost ?? '')
+  
   const [taxRate, setTaxRate] = useState(initial?.taxRate?.toString() ?? '19')
   const [stock, setStock] = useState(initial?.stock?.toString() ?? '0')
   const [stockAlert, setStockAlert] = useState(initial?.stockAlert?.toString() ?? '5')
   const [favorite, setFavorite] = useState(initial?.favorite ?? false)
+
+  // CAMBIO 2: Funciones para formatear y manejar los cambios de los inputs de moneda
+  const formatCurrency = (value: number | string) => {
+    if (value === '') return '';
+    const numericValue = value.toString().replace(/\D/g, "");
+    if (!numericValue) return '';
+    
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(Number(numericValue));
+  };
+
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/\D/g, "");
+    setPrice(rawValue ? Number(rawValue) : '');
+  };
+
+  const handleCostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/\D/g, "");
+    setCost(rawValue ? Number(rawValue) : '');
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -25,8 +53,9 @@ export default function ProductForm({ initial, onSubmit, onCancel, loading }: Pr
       name,
       description: description || undefined,
       barcode: barcode || undefined,
-      price: parseFloat(price),
-      cost: cost ? parseFloat(cost) : undefined,
+      // CAMBIO 3: Como price y cost ya son números, solo nos aseguramos de enviarlos correctamente
+      price: Number(price),
+      cost: cost !== '' ? Number(cost) : undefined,
       taxRate: parseFloat(taxRate),
       stock: parseInt(stock),
       stockAlert: parseInt(stockAlert),
@@ -50,13 +79,27 @@ export default function ProductForm({ initial, onSubmit, onCancel, loading }: Pr
       </div>
 
       <div className="grid grid-cols-2 gap-4">
+        {/* CAMBIO 4: Inputs de Precio y Costo actualizados a type="text" y enlazados a los formateadores */}
         <div>
           <label className={labelClass}>Precio *</label>
-          <input className={inputClass} type="number" min="0" step="100" value={price} onChange={e => setPrice(e.target.value)} required />
+          <input 
+            className={inputClass} 
+            type="text" 
+            inputMode="numeric"
+            value={formatCurrency(price)} 
+            onChange={handlePriceChange} 
+            required 
+          />
         </div>
         <div>
           <label className={labelClass}>Costo</label>
-          <input className={inputClass} type="number" min="0" step="100" value={cost} onChange={e => setCost(e.target.value)} />
+          <input 
+            className={inputClass} 
+            type="text" 
+            inputMode="numeric"
+            value={formatCurrency(cost)} 
+            onChange={handleCostChange} 
+          />
         </div>
       </div>
 
