@@ -1,9 +1,21 @@
 import { useState } from 'react'
+import {
+  Badge,
+  Button,
+  Card,
+  EmptyState,
+  Icon,
+  Input,
+  SkeletonRows,
+  useToast
+} from '@/components/ui'
 import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from '@/hooks/use-products'
 import ProductForm from '@/components/product-form'
+import { formatCop } from '@/lib/utils'
 import type { Product, CreateProductRequest } from '@/types/product'
 
 export default function ProductsPage() {
+  const toast = useToast()
   const { data: products, isLoading, isError } = useProducts()
   const createProduct = useCreateProduct()
   const updateProduct = useUpdateProduct()
@@ -20,159 +32,194 @@ export default function ProductsPage() {
 
   const handleCreate = (data: CreateProductRequest) => {
     createProduct.mutate(data, {
-      onSuccess: () => setShowForm(false)
+      onSuccess: () => {
+        toast.success('Producto creado', data.name)
+        setShowForm(false)
+      },
+      onError: () => toast.error('No se pudo crear el producto')
     })
   }
 
   const handleUpdate = (data: CreateProductRequest) => {
     if (!editing) return
     updateProduct.mutate({ id: editing.id, data }, {
-      onSuccess: () => { setEditing(null); setShowForm(false) }
+      onSuccess: () => {
+        toast.success('Producto actualizado')
+        setEditing(null)
+        setShowForm(false)
+      },
+      onError: () => toast.error('No se pudo actualizar')
     })
   }
 
-  const handleDelete = (id: string) => {
-    if (confirm('¿Desactivar este producto?')) {
-      deleteProduct.mutate(id)
-    }
+  const handleDelete = (product: Product) => {
+    if (!confirm(`¿Desactivar "${product.name}"?`)) return
+    deleteProduct.mutate(product.id, {
+      onSuccess: () => toast.success('Producto desactivado'),
+      onError: () => toast.error('No se pudo desactivar')
+    })
   }
 
-  const handleEdit = (product: Product) => {
-    setEditing(product)
-    setShowForm(true)
-  }
-
-  const handleCancel = () => {
-    setEditing(null)
-    setShowForm(false)
-  }
-
-  const formatCop = (n: number) =>
-    new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(n)
-
-  if (isLoading) return <div className="p-6 text-slate-500">Cargando productos...</div>
-  if (isError) return <div className="p-6 text-red-600">Error al cargar productos. ¿El backend está corriendo?</div>
+  const lowStockCount = products?.filter(p => p.lowStock).length ?? 0
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
+    <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Productos</h1>
-          <p className="text-sm text-slate-500">{products?.length ?? 0} productos activos</p>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+            Productos
+          </h1>
+          <p className="mt-1 text-sm text-slate-500">
+            {products?.length ?? 0} productos activos
+            {lowStockCount > 0 && (
+              <>
+                {' · '}
+                <span className="text-danger-600 font-medium">
+                  {lowStockCount} con stock bajo
+                </span>
+              </>
+            )}
+          </p>
         </div>
         {!showForm && (
-          <button
+          <Button
             onClick={() => { setEditing(null); setShowForm(true) }}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+            leftIcon={<Icon.Plus className="h-4 w-4" />}
           >
-            + Nuevo producto
-          </button>
+            Nuevo producto
+          </Button>
         )}
       </div>
 
       {/* Formulario */}
       {showForm && (
-        <div className="mb-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-700 mb-4">
+        <Card className="mb-6 animate-fade-in">
+          <h2 className="mb-4 text-lg font-semibold text-slate-800">
             {editing ? 'Editar producto' : 'Nuevo producto'}
           </h2>
           <ProductForm
             initial={editing ?? undefined}
             onSubmit={editing ? handleUpdate : handleCreate}
-            onCancel={handleCancel}
+            onCancel={() => { setEditing(null); setShowForm(false) }}
             loading={createProduct.isPending || updateProduct.isPending}
           />
-        </div>
+        </Card>
       )}
 
       {/* Búsqueda */}
       <div className="mb-4">
-        <input
-          type="text"
+        <Input
+          leftIcon={<Icon.Search className="h-4 w-4" />}
           placeholder="Buscar por nombre o código de barras..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
-      {/* Tabla */}
-      {filtered.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-slate-300 p-12 text-center text-slate-500">
-          {products?.length === 0
-            ? 'No hay productos aún. ¡Crea el primero!'
-            : 'No se encontraron productos con esa búsqueda.'}
-        </div>
-      ) : (
-        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-              <tr>
-                <th className="px-4 py-3">Producto</th>
-                <th className="px-4 py-3">Precio</th>
-                <th className="px-4 py-3">IVA</th>
-                <th className="px-4 py-3 text-center">Stock</th>
-                <th className="px-4 py-3 text-center">Fav</th>
-                <th className="px-4 py-3">Acciones</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filtered.map(p => (
-                <tr key={p.id} className="hover:bg-slate-50">
-                  <td className="px-4 py-3">
-                    <div className="font-medium text-slate-800">{p.name}</div>
-                    {p.barcode && <div className="text-xs text-slate-400">{p.barcode}</div>}
-                  </td>
-                  <td className="px-4 py-3 text-slate-700">{formatCop(p.price)}</td>
-                  <td className="px-4 py-3 text-slate-500">{p.taxRate}%</td>
-                  <td className="px-4 py-3 text-center">
-                    <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${
-                      p.lowStock
-                        ? 'bg-red-100 text-red-700'
-                        : 'bg-green-100 text-green-700'
-                    }`}>
-                      {p.stock}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    {p.favorite ? '⭐' : '—'}
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleEdit(p)}
-                        className="text-blue-600 hover:text-blue-800 text-xs font-medium"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        onClick={() => handleDelete(p.id)}
-                        className="text-red-500 hover:text-red-700 text-xs font-medium"
-                      >
-                        Eliminar
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      {/* Lista */}
+      {isLoading && (
+        <Card padding="sm">
+          <SkeletonRows rows={5} cols={5} />
+        </Card>
       )}
 
-      {/* Alerta de stock bajo */}
-      {products && products.filter(p => p.lowStock).length > 0 && (
-        <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
-          <p className="text-sm font-semibold text-amber-800">
-            ⚠️ {products.filter(p => p.lowStock).length} producto(s) con stock bajo
-          </p>
-          <ul className="mt-1 text-xs text-amber-700">
-            {products.filter(p => p.lowStock).map(p => (
-              <li key={p.id}>{p.name}: {p.stock} unidades (alerta en {p.stockAlert})</li>
-            ))}
-          </ul>
-        </div>
+      {isError && (
+        <EmptyState
+          icon={<Icon.AlertTriangle className="h-6 w-6" />}
+          title="Error al cargar productos"
+          description="¿El backend está corriendo?"
+        />
+      )}
+
+      {!isLoading && !isError && filtered.length === 0 && (
+        <EmptyState
+          icon={<Icon.Package className="h-6 w-6" />}
+          title={products?.length === 0 ? 'No tienes productos aún' : 'Sin resultados'}
+          description={
+            products?.length === 0
+              ? 'Crea tu primer producto para empezar a vender.'
+              : 'Intenta con otra búsqueda.'
+          }
+          action={
+            products?.length === 0 && (
+              <Button
+                onClick={() => setShowForm(true)}
+                leftIcon={<Icon.Plus className="h-4 w-4" />}
+              >
+                Crear primer producto
+              </Button>
+            )
+          }
+        />
+      )}
+
+      {!isLoading && !isError && filtered.length > 0 && (
+        <Card padding="none" className="overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-slate-50/80 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                <tr>
+                  <th className="px-5 py-3.5">Producto</th>
+                  <th className="px-5 py-3.5">Precio</th>
+                  <th className="px-5 py-3.5">IVA</th>
+                  <th className="px-5 py-3.5 text-center">Stock</th>
+                  <th className="px-5 py-3.5 text-center">Favorito</th>
+                  <th className="px-5 py-3.5 text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {filtered.map(p => (
+                  <tr key={p.id} className="transition-colors hover:bg-slate-50/60">
+                    <td className="px-5 py-3">
+                      <div className="font-medium text-slate-800">{p.name}</div>
+                      {p.barcode && (
+                        <div className="text-xs text-slate-400">{p.barcode}</div>
+                      )}
+                    </td>
+                    <td className="px-5 py-3 font-medium text-slate-800 tabular-nums">
+                      {formatCop(p.price)}
+                    </td>
+                    <td className="px-5 py-3 text-slate-500">{p.taxRate}%</td>
+                    <td className="px-5 py-3 text-center">
+                      <Badge tone={p.lowStock ? 'danger' : 'success'} size="sm">
+                        {p.stock}
+                      </Badge>
+                    </td>
+                    <td className="px-5 py-3 text-center">
+                      {p.favorite ? (
+                        <Icon.Star className="mx-auto h-4 w-4 fill-warning-500 text-warning-500" />
+                      ) : (
+                        <span className="text-slate-300">—</span>
+                      )}
+                    </td>
+                    <td className="px-5 py-3">
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => { setEditing(p); setShowForm(true) }}
+                          leftIcon={<Icon.Edit className="h-3.5 w-3.5" />}
+                        >
+                          Editar
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDelete(p)}
+                          leftIcon={<Icon.Trash className="h-3.5 w-3.5" />}
+                          className="hover:bg-danger-50 hover:text-danger-600"
+                        >
+                          Quitar
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
       )}
     </div>
   )

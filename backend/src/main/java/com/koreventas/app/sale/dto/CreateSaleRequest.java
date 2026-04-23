@@ -11,12 +11,20 @@ import java.util.UUID;
 public record CreateSaleRequest(
     @NotNull String paymentMethod,
     UUID customerId,
-    String customerPhone,  // Para vinculación automática por teléfono (RF-06)
+    String customerPhone,  // Vinculación automática por teléfono (RF-06)
     String notes,
     @NotEmpty @Valid List<ItemRequest> items
 ) {
+  /**
+   * Un ítem puede ser PRODUCT o SERVICE. Exactamente uno de los dos IDs
+   * debe venir poblado. Se valida en SaleService.
+   */
   public record ItemRequest(
-      @NotNull UUID productId,
+      UUID productId,      // nullable si itemType=SERVICE
+      UUID serviceId,      // nullable si itemType=PRODUCT
       @Min(1) int quantity
-  ) {}
+  ) {
+    public boolean isService() { return serviceId != null; }
+    public boolean isProduct() { return productId != null; }
+  }
 }
