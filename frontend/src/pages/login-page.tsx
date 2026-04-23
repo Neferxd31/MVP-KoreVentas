@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Button, Input, Icon } from '@/components/ui'
 import { cn } from '@/lib/utils'
 import type { LoginRequest, RegisterRequest } from '@/types/auth'
+import { useTheme } from '@/context/ThemeContext'
 
 interface Props {
   onLogin: (data: LoginRequest) => Promise<void>
@@ -19,6 +20,7 @@ const businessTypes = [
 ]
 
 export default function LoginPage({ onLogin, onRegister, loading, error }: Props) {
+  const { theme, toggleTheme } = useTheme()
   const [mode, setMode] = useState<'login' | 'register'>('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -40,9 +42,20 @@ export default function LoginPage({ onLogin, onRegister, loading, error }: Props
   }
 
   return (
-    <div className="min-h-screen grid lg:grid-cols-2">
+    <div className="min-h-screen grid lg:grid-cols-2 bg-white dark:bg-slate-950 transition-colors duration-300">
+      
+      {/* ── Botón Flotante de Tema ─────────────────────────── */}
+      <button 
+        onClick={toggleTheme}
+        type="button"
+        className="fixed top-4 right-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-slate-200 text-slate-800 shadow-lg transition-colors hover:bg-slate-300 dark:bg-slate-800 dark:text-yellow-400 dark:hover:bg-slate-700"
+        aria-label="Alternar tema"
+      >
+        {theme === 'light' ? <Icon.Moon className="h-5 w-5" /> : <Icon.Sun className="h-5 w-5" />}
+      </button>
+
       {/* ── Panel izquierdo: marca / pitch ─────────────────── */}
-      <div className="relative hidden lg:flex flex-col justify-between overflow-hidden bg-gradient-to-br from-brand-700 via-brand-600 to-brand-800 p-12 text-white">
+      <div className="relative hidden lg:flex flex-col justify-between overflow-hidden bg-gradient-to-br from-brand-700 via-brand-600 to-brand-900 p-12 text-white">
         {/* Decorative blobs */}
         <div className="pointer-events-none absolute -top-24 -right-24 h-96 w-96 rounded-full bg-white/10 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-32 -left-20 h-96 w-96 rounded-full bg-brand-400/20 blur-3xl" />
@@ -86,21 +99,21 @@ export default function LoginPage({ onLogin, onRegister, loading, error }: Props
       </div>
 
       {/* ── Panel derecho: formulario ──────────────────────── */}
-      <div className="flex items-center justify-center bg-white p-6 sm:p-12">
+      <div className="flex items-center justify-center p-6 sm:p-12">
         <div className="w-full max-w-md">
           {/* Logo mobile */}
-          <div className="lg:hidden mb-8 flex items-center justify-center gap-2.5">
+          <div className="mb-8 flex items-center justify-center gap-2.5 lg:hidden">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-soft">
               <span className="font-bold">K</span>
             </div>
-            <span className="text-lg font-bold text-slate-800">KoreVentas</span>
+            <span className="text-lg font-bold text-slate-800 transition-colors dark:text-white">KoreVentas</span>
           </div>
 
           <div className="mb-7">
-            <h1 className="text-2xl font-bold text-slate-800">
+            <h1 className="text-2xl font-bold text-slate-800 transition-colors dark:text-white">
               {mode === 'login' ? 'Bienvenido de vuelta' : 'Crea tu negocio'}
             </h1>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-slate-500 transition-colors dark:text-slate-400">
               {mode === 'login'
                 ? 'Ingresa para administrar tu día a día.'
                 : 'En menos de un minuto tienes todo listo.'}
@@ -108,7 +121,7 @@ export default function LoginPage({ onLogin, onRegister, loading, error }: Props
           </div>
 
           {/* Tabs */}
-          <div className="mb-6 grid grid-cols-2 gap-1 rounded-lg bg-slate-100 p-1">
+          <div className="mb-6 grid grid-cols-2 gap-1 rounded-lg bg-slate-100 p-1 transition-colors dark:bg-slate-900">
             {(['login', 'register'] as const).map(m => (
               <button
                 key={m}
@@ -117,8 +130,8 @@ export default function LoginPage({ onLogin, onRegister, loading, error }: Props
                 className={cn(
                   'rounded-md py-2 text-sm font-medium transition-all',
                   mode === m
-                    ? 'bg-white text-slate-800 shadow-soft'
-                    : 'text-slate-500 hover:text-slate-700'
+                    ? 'bg-white text-slate-800 shadow-soft dark:bg-slate-800 dark:text-white'
+                    : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'
                 )}
               >
                 {m === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}
@@ -136,10 +149,11 @@ export default function LoginPage({ onLogin, onRegister, loading, error }: Props
                   onChange={e => setBusinessName(e.target.value)}
                   required
                   placeholder="Ej: Barbería Don Andrés"
+                  className="dark:border-slate-800 dark:bg-slate-900 dark:text-white"
                 />
 
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                  <label className="mb-1.5 block text-sm font-medium text-slate-700 transition-colors dark:text-slate-300">
                     Tipo de negocio
                   </label>
                   <div className="grid grid-cols-5 gap-2">
@@ -151,8 +165,8 @@ export default function LoginPage({ onLogin, onRegister, loading, error }: Props
                         className={cn(
                           'flex flex-col items-center gap-1 rounded-lg border px-2 py-2.5 text-xs transition-all',
                           businessType === bt.value
-                            ? 'border-brand-500 bg-brand-50 text-brand-700 shadow-sm'
-                            : 'border-slate-200 text-slate-600 hover:border-slate-300'
+                            ? 'border-brand-500 bg-brand-50 text-brand-700 shadow-sm dark:border-brand-500 dark:bg-brand-900/30 dark:text-brand-400'
+                            : 'border-slate-200 text-slate-600 hover:border-slate-300 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-900'
                         )}
                       >
                         <span className="text-lg leading-none">{bt.emoji}</span>
@@ -168,6 +182,7 @@ export default function LoginPage({ onLogin, onRegister, loading, error }: Props
                   onChange={e => setFullName(e.target.value)}
                   required
                   placeholder="Andrés López"
+                  className="dark:border-slate-800 dark:bg-slate-900 dark:text-white"
                 />
               </>
             )}
@@ -179,6 +194,7 @@ export default function LoginPage({ onLogin, onRegister, loading, error }: Props
               onChange={e => setEmail(e.target.value)}
               required
               placeholder="tu@email.com"
+              className="dark:border-slate-800 dark:bg-slate-900 dark:text-white"
             />
 
             <Input
@@ -190,16 +206,23 @@ export default function LoginPage({ onLogin, onRegister, loading, error }: Props
               minLength={8}
               placeholder="Mínimo 8 caracteres"
               hint={mode === 'register' ? 'Usa al menos 8 caracteres.' : undefined}
+              className="dark:border-slate-800 dark:bg-slate-900 dark:text-white"
             />
 
             {error && (
-              <div className="flex items-start gap-2 rounded-lg border border-danger-200 bg-danger-50 px-3 py-2.5 text-sm text-danger-700">
+              <div className="flex items-start gap-2 rounded-lg border border-danger-200 bg-danger-50 px-3 py-2.5 text-sm text-danger-700 dark:border-danger-800/50 dark:bg-danger-900/20 dark:text-danger-400">
                 <Icon.AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
                 <span>{error}</span>
               </div>
             )}
 
-            <Button type="submit" size="lg" fullWidth loading={loading}>
+            <Button 
+              type="submit" 
+              size="lg" 
+              fullWidth 
+              loading={loading}
+              className="transition-colors dark:bg-brand-600 dark:hover:bg-brand-500"
+            >
               {mode === 'login' ? 'Entrar' : 'Crear mi negocio'}
             </Button>
           </form>

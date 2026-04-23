@@ -1,55 +1,60 @@
-import { forwardRef, type InputHTMLAttributes, type ReactNode, useId } from 'react'
+import { InputHTMLAttributes, ReactNode, forwardRef } from 'react'
 import { cn } from '@/lib/utils'
 
-interface Props extends InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string
   hint?: string
-  error?: string
   leftIcon?: ReactNode
-  rightSlot?: ReactNode
 }
 
-export const Input = forwardRef<HTMLInputElement, Props>(function Input(
-  { label, hint, error, leftIcon, rightSlot, className, id, ...rest },
-  ref
-) {
-  const autoId = useId()
-  const inputId = id ?? autoId
-
-  return (
-    <div className="w-full">
-      {label && (
-        <label htmlFor={inputId} className="mb-1.5 block text-sm font-medium text-slate-700">
-          {label}
-        </label>
-      )}
-      <div
-        className={cn(
-          'group flex items-center rounded-lg border bg-white transition-colors',
-          'focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/20',
-          error ? 'border-danger-400' : 'border-slate-300 hover:border-slate-400'
+export const Input = forwardRef<HTMLInputElement, InputProps>(
+  ({ className, label, hint, leftIcon, ...props }, ref) => {
+    return (
+      <div className="w-full space-y-1.5">
+        {/* Label */}
+        {label && (
+          <label className="text-sm font-medium text-slate-700 transition-colors dark:text-slate-300">
+            {label}
+          </label>
         )}
-      >
-        {leftIcon && (
-          <span className="pl-3 text-slate-400 group-focus-within:text-brand-500">{leftIcon}</span>
-        )}
-        <input
-          ref={ref}
-          id={inputId}
+        
+        {/* Contenedor del Input */}
+        <div
           className={cn(
-            'flex-1 bg-transparent px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400',
-            'focus:outline-none disabled:cursor-not-allowed disabled:text-slate-400',
+            "relative flex items-center overflow-hidden rounded-xl border bg-slate-50 transition-all duration-200 dark:bg-slate-900/50",
+            // Estado Normal
+            "border-slate-200 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700",
+            // Estado Enfocado (Focus) -> Aquí ocurre la magia
+            "focus-within:border-brand-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-brand-500/10 dark:focus-within:border-brand-400 dark:focus-within:bg-slate-950 dark:focus-within:ring-brand-400/10",
             className
           )}
-          {...rest}
-        />
-        {rightSlot && <span className="pr-3">{rightSlot}</span>}
+        >
+          {/* Ícono Izquierdo (si existe) */}
+          {leftIcon && (
+            <div className="flex items-center justify-center pl-3.5 text-slate-400 transition-colors dark:text-slate-500 group-focus-within:text-brand-500">
+              {leftIcon}
+            </div>
+          )}
+          
+          {/* El Input real */}
+          <input
+            ref={ref}
+            className={cn(
+              "w-full bg-transparent px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none dark:text-white dark:placeholder:text-slate-500",
+              leftIcon ? "pl-2.5" : ""
+            )}
+            {...props}
+          />
+        </div>
+
+        {/* Texto de ayuda (Hint) */}
+        {hint && (
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            {hint}
+          </p>
+        )}
       </div>
-      {(hint || error) && (
-        <p className={cn('mt-1 text-xs', error ? 'text-danger-600' : 'text-slate-500')}>
-          {error || hint}
-        </p>
-      )}
-    </div>
-  )
-})
+    )
+  }
+)
+Input.displayName = 'Input'
