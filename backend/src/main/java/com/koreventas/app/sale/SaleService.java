@@ -1,5 +1,6 @@
 package com.koreventas.app.sale;
 
+import com.koreventas.app.catalog.ServiceRepository;
 import com.koreventas.app.customer.Customer;
 import com.koreventas.app.customer.CustomerRepository;
 import com.koreventas.app.product.Product;
@@ -28,15 +29,17 @@ public class SaleService {
   private final SaleRepository sales;
   private final ProductRepository products;
   private final CustomerRepository customers;
+  private final ServiceRepository services;
 
   @PersistenceContext
   private EntityManager em;
 
   public SaleService(SaleRepository sales, ProductRepository products,
-                     CustomerRepository customers) {
+                     CustomerRepository customers, ServiceRepository services) {
     this.sales = sales;
     this.products = products;
     this.customers = customers;
+    this.services = services;
   }
 
   private void applyTenant() {
@@ -60,26 +63,39 @@ public class SaleService {
       sale.setCustomerId(customerId);
     }
 
-    // Procesar cada item del carrito
+    // Procesar cada item del carrito (producto o servicio)
     for (CreateSaleRequest.ItemRequest itemReq : req.items()) {
-      Product product = products.findById(itemReq.productId())
-          .orElseThrow(() -> new ProductNotFoundException(itemReq.productId()));
+      if (itemReq.isService()) {
+        var service = services.findById(itemReq.serviceId())
+            .orElseThrow(() -> new IllegalStateException("Servicio no encontrado: " + itemReq.serviceId()));
+        SaleItem item = SaleItem.forService(
+            tenantId,
+            sale.getId(),
+            service.getId(),
+            service.getName(),
+            service.getPrice(),
+            service.getTaxRate()
+        );
+        sale.addItem(item);
+      } else {
+        Product product = products.findById(itemReq.productId())
+            .orElseThrow(() -> new ProductNotFoundException(itemReq.productId()));
 
-      // Descontar stock (lanza excepción si no hay suficiente)
-      product.decrementStock(itemReq.quantity());
-      products.save(product);
+        // Descontar stock (lanza excepción si no hay suficiente)
+        product.decrementStock(itemReq.quantity());
+        products.save(product);
 
-      // Crear línea de venta con snapshot del precio y nombre
-      SaleItem item = new SaleItem(
-          tenantId,
-          sale.getId(),
-          product.getId(),
-          product.getName(),
-          itemReq.quantity(),
-          product.getPrice(),
-          product.getTaxRate()
-      );
-      sale.addItem(item);
+        SaleItem item = SaleItem.forProduct(
+            tenantId,
+            sale.getId(),
+            product.getId(),
+            product.getName(),
+            itemReq.quantity(),
+            product.getPrice(),
+            product.getTaxRate()
+        );
+        sale.addItem(item);
+      }
     }
 
     Sale saved = sales.save(sale);

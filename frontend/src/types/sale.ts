@@ -1,5 +1,7 @@
 export interface CartItem {
-  productId: string
+  productId?: string
+  serviceId?: string
+  itemType: 'PRODUCT' | 'SERVICE'
   name: string
   price: number
   taxRate: number
@@ -11,7 +13,7 @@ export interface CreateSaleRequest {
   customerId?: string
   customerPhone?: string
   notes?: string
-  items: { productId: string; quantity: number }[]
+  items: { productId?: string; serviceId?: string; quantity: number }[]
 }
 
 export interface SaleResponse {
@@ -29,7 +31,9 @@ export interface SaleResponse {
 
 export interface SaleItemResponse {
   id: string
-  productId: string
+  productId: string | null
+  serviceId: string | null
+  itemType: 'PRODUCT' | 'SERVICE'
   productName: string
   quantity: number
   unitPrice: number

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Button, Input, Icon } from '@/components/ui'
 import type { Customer, CreateCustomerRequest } from '@/types/customer'
 
 interface Props {
@@ -41,58 +42,82 @@ export default function CustomerForm({ initial, onSubmit, onCancel, loading }: P
     setManualTags(manualTags.filter(t => t !== tag))
   }
 
-  const inputClass = 'w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
-  const labelClass = 'block text-sm font-medium text-slate-700 mb-1'
-
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className={labelClass}>Nombre *</label>
-          <input className={inputClass} value={fullName} onChange={e => setFullName(e.target.value)} required />
-        </div>
-        <div>
-          <label className={labelClass}>Teléfono</label>
-          <input className={inputClass} value={phone} onChange={e => setPhone(e.target.value)} placeholder="3001234567" />
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Input
+          label="Nombre *"
+          value={fullName}
+          onChange={e => setFullName(e.target.value)}
+          required
+          placeholder="Ej: María Pérez"
+        />
+        <Input
+          label="Teléfono"
+          leftIcon={<Icon.Phone className="h-4 w-4" />}
+          value={phone}
+          onChange={e => setPhone(e.target.value)}
+          placeholder="3001234567"
+          hint="Se usa para vincular ventas automáticamente."
+        />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className={labelClass}>Email</label>
-          <input className={inputClass} type="email" value={email} onChange={e => setEmail(e.target.value)} />
-        </div>
-        <div>
-          <label className={labelClass}>Cumpleaños</label>
-          <input className={inputClass} type="date" value={birthday} onChange={e => setBirthday(e.target.value)} />
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Input
+          label="Email"
+          type="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          placeholder="opcional"
+        />
+        <Input
+          label="Cumpleaños"
+          type="date"
+          value={birthday}
+          onChange={e => setBirthday(e.target.value)}
+        />
       </div>
 
       <div>
-        <label className={labelClass}>Notas</label>
-        <textarea className={inputClass} value={notes} onChange={e => setNotes(e.target.value)} rows={2} placeholder="Notas sobre el cliente..." />
+        <label className="mb-1.5 block text-sm font-medium text-slate-700">Notas</label>
+        <textarea
+          value={notes}
+          onChange={e => setNotes(e.target.value)}
+          rows={2}
+          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 transition-colors hover:border-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+          placeholder="Preferencias, anécdotas, etc."
+        />
       </div>
 
       <div>
-        <label className={labelClass}>Etiquetas manuales</label>
+        <label className="mb-1.5 block text-sm font-medium text-slate-700">Etiquetas manuales</label>
         <div className="flex gap-2">
-          <input
-            className={inputClass}
+          <Input
             value={tagInput}
             onChange={e => setTagInput(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTag() } }}
-            placeholder="Ej: mayorista, referido..."
+            placeholder="Ej: mayorista, referido, prefiere corte..."
           />
-          <button type="button" onClick={addTag} className="rounded-lg bg-slate-100 px-3 py-2 text-sm text-slate-600 hover:bg-slate-200">
+          <Button type="button" variant="secondary" onClick={addTag}>
             Agregar
-          </button>
+          </Button>
         </div>
         {manualTags.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-1">
+          <div className="mt-2 flex flex-wrap gap-1.5">
             {manualTags.map(tag => (
-              <span key={tag} className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-xs text-slate-700">
+              <span
+                key={tag}
+                className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700"
+              >
                 {tag}
-                <button type="button" onClick={() => removeTag(tag)} className="text-slate-400 hover:text-red-500">&times;</button>
+                <button
+                  type="button"
+                  onClick={() => removeTag(tag)}
+                  className="text-slate-400 hover:text-danger-500 transition"
+                  aria-label={`Quitar etiqueta ${tag}`}
+                >
+                  <Icon.X className="h-3 w-3" />
+                </button>
               </span>
             ))}
           </div>
@@ -100,16 +125,12 @@ export default function CustomerForm({ initial, onSubmit, onCancel, loading }: P
       </div>
 
       <div className="flex gap-3 pt-2">
-        <button
-          type="submit"
-          disabled={loading}
-          className="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
-        >
-          {loading ? 'Guardando...' : initial ? 'Actualizar' : 'Crear cliente'}
-        </button>
-        <button type="button" onClick={onCancel} className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">
+        <Button type="submit" loading={loading} fullWidth>
+          {initial ? 'Actualizar' : 'Crear cliente'}
+        </Button>
+        <Button type="button" variant="outline" onClick={onCancel}>
           Cancelar
-        </button>
+        </Button>
       </div>
     </form>
   )

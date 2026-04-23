@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { Button, Input } from '@/components/ui'
+import { cn } from '@/lib/utils'
 import type { Product, CreateProductRequest } from '@/types/product'
 
 interface Props {
@@ -34,76 +36,109 @@ export default function ProductForm({ initial, onSubmit, onCancel, loading }: Pr
     })
   }
 
-  const inputClass = 'w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
-  const labelClass = 'block text-sm font-medium text-slate-700 mb-1'
-
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label className={labelClass}>Nombre *</label>
-        <input className={inputClass} value={name} onChange={e => setName(e.target.value)} required />
-      </div>
+      <Input
+        label="Nombre *"
+        value={name}
+        onChange={e => setName(e.target.value)}
+        required
+        placeholder="Ej: Coca-Cola 400ml"
+      />
 
       <div>
-        <label className={labelClass}>Descripción</label>
-        <textarea className={inputClass} value={description} onChange={e => setDescription(e.target.value)} rows={2} />
+        <label className="mb-1.5 block text-sm font-medium text-slate-700">Descripción</label>
+        <textarea
+          value={description}
+          onChange={e => setDescription(e.target.value)}
+          rows={2}
+          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 transition-colors hover:border-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+          placeholder="Opcional"
+        />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className={labelClass}>Precio *</label>
-          <input className={inputClass} type="number" min="0" step="100" value={price} onChange={e => setPrice(e.target.value)} required />
-        </div>
-        <div>
-          <label className={labelClass}>Costo</label>
-          <input className={inputClass} type="number" min="0" step="100" value={cost} onChange={e => setCost(e.target.value)} />
-        </div>
+        <Input
+          label="Precio *"
+          type="number"
+          min="0"
+          step="100"
+          value={price}
+          onChange={e => setPrice(e.target.value)}
+          required
+          placeholder="0"
+        />
+        <Input
+          label="Costo"
+          type="number"
+          min="0"
+          step="100"
+          value={cost}
+          onChange={e => setCost(e.target.value)}
+          hint="Para calcular margen"
+          placeholder="0"
+        />
       </div>
 
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <label className={labelClass}>IVA %</label>
-          <select className={inputClass} value={taxRate} onChange={e => setTaxRate(e.target.value)}>
+          <label className="mb-1.5 block text-sm font-medium text-slate-700">IVA %</label>
+          <select
+            value={taxRate}
+            onChange={e => setTaxRate(e.target.value)}
+            className="h-[38px] w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800 hover:border-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+          >
             <option value="19">19%</option>
             <option value="5">5%</option>
             <option value="0">0% (Excluido)</option>
           </select>
         </div>
-        <div>
-          <label className={labelClass}>Stock</label>
-          <input className={inputClass} type="number" min="0" value={stock} onChange={e => setStock(e.target.value)} />
-        </div>
-        <div>
-          <label className={labelClass}>Alerta stock</label>
-          <input className={inputClass} type="number" min="0" value={stockAlert} onChange={e => setStockAlert(e.target.value)} />
-        </div>
+        <Input
+          label="Stock"
+          type="number"
+          min="0"
+          value={stock}
+          onChange={e => setStock(e.target.value)}
+        />
+        <Input
+          label="Alerta stock"
+          type="number"
+          min="0"
+          value={stockAlert}
+          onChange={e => setStockAlert(e.target.value)}
+        />
       </div>
 
-      <div>
-        <label className={labelClass}>Código de barras</label>
-        <input className={inputClass} value={barcode} onChange={e => setBarcode(e.target.value)} placeholder="Opcional" />
-      </div>
+      <Input
+        label="Código de barras"
+        value={barcode}
+        onChange={e => setBarcode(e.target.value)}
+        placeholder="Opcional"
+      />
 
-      <div className="flex items-center gap-2">
-        <input type="checkbox" id="favorite" checked={favorite} onChange={e => setFavorite(e.target.checked)} className="h-4 w-4 rounded border-slate-300" />
-        <label htmlFor="favorite" className="text-sm text-slate-700">Marcar como favorito (aparece en POS)</label>
-      </div>
+      <label className={cn(
+        'flex items-center gap-3 rounded-lg border p-3 cursor-pointer transition-colors',
+        favorite ? 'border-brand-400 bg-brand-50/60' : 'border-slate-200 hover:border-slate-300'
+      )}>
+        <input
+          type="checkbox"
+          checked={favorite}
+          onChange={e => setFavorite(e.target.checked)}
+          className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+        />
+        <div>
+          <span className="text-sm font-medium text-slate-700">Marcar como favorito</span>
+          <p className="text-xs text-slate-500">Aparecerá fijo en el POS para venta rápida.</p>
+        </div>
+      </label>
 
       <div className="flex gap-3 pt-2">
-        <button
-          type="submit"
-          disabled={loading}
-          className="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
-        >
-          {loading ? 'Guardando...' : initial ? 'Actualizar' : 'Crear producto'}
-        </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
-        >
+        <Button type="submit" loading={loading} fullWidth>
+          {initial ? 'Actualizar' : 'Crear producto'}
+        </Button>
+        <Button type="button" variant="outline" onClick={onCancel}>
           Cancelar
-        </button>
+        </Button>
       </div>
     </form>
   )
