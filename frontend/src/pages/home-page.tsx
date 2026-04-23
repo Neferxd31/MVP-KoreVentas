@@ -10,6 +10,7 @@ import {
   SkeletonCard
 } from '@/components/ui'
 import { cn, formatCop } from '@/lib/utils'
+import { waLink, waTemplates } from '@/lib/whatsapp'
 
 type ClienteEnfriandose = {
   id: string
@@ -163,6 +164,36 @@ export default function HomePage() {
             />
           </div>
 
+          {/* Atajos rápidos a gestión financiera */}
+          <div className="mt-8">
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-500">
+              Gestión del día
+            </h2>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <ShortcutCard
+                to="/cash"
+                title="Caja diaria"
+                subtitle="Abrir / cerrar arqueo"
+                icon={<Icon.DollarSign className="h-5 w-5" />}
+                tone="brand"
+              />
+              <ShortcutCard
+                to="/expenses"
+                title="Gastos"
+                subtitle="Registrar costos"
+                icon={<Icon.Receipt className="h-5 w-5" />}
+                tone="warning"
+              />
+              <ShortcutCard
+                to="/reports"
+                title="Reportes"
+                subtitle="Análisis del negocio"
+                icon={<Icon.BarChart className="h-5 w-5" />}
+                tone="success"
+              />
+            </div>
+          </div>
+
           {/* Tarjetas accionables */}
           <div className="mt-8">
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-500">
@@ -179,7 +210,8 @@ export default function HomePage() {
                 items={pulso.clientesEnfriandose.map(c => ({
                   key: c.id,
                   left: c.fullName,
-                  right: `${c.diasSinVisita}d`
+                  right: `${c.diasSinVisita}d`,
+                  waHref: waLink(c.phone, waTemplates.reactivation(c.fullName))
                 }))}
                 emptyLabel="Sin clientes inactivos."
                 actionLabel={pulso.totalClientesInactivos > 0 ? 'Contactarlos ahora' : undefined}
@@ -214,10 +246,11 @@ export default function HomePage() {
                 items={pulso.cumpleanosSemana.map(c => ({
                   key: c.id,
                   left: c.fullName,
-                  right: c.birthday.substring(5)
+                  right: c.birthday.substring(5),
+                  waHref: waLink(c.phone, waTemplates.birthday(c.fullName))
                 }))}
                 emptyLabel="Sin cumpleaños esta semana."
-                actionLabel={pulso.cumpleanosSemana.length > 0 ? 'Enviar mensaje' : undefined}
+                actionLabel={pulso.cumpleanosSemana.length > 0 ? 'Ver todos' : undefined}
                 actionHref="/customers"
               />
             </div>
@@ -225,6 +258,42 @@ export default function HomePage() {
         </>
       )}
     </div>
+  )
+}
+
+// ─── ShortcutCard: atajo compacto a otra página ───────────
+function ShortcutCard({
+  to,
+  title,
+  subtitle,
+  icon,
+  tone
+}: {
+  to: string
+  title: string
+  subtitle: string
+  icon: React.ReactNode
+  tone: 'brand' | 'warning' | 'success'
+}) {
+  const toneMap = {
+    brand: 'bg-brand-50 text-brand-600 group-hover:bg-brand-100',
+    warning: 'bg-warning-50 text-warning-700 group-hover:bg-warning-100',
+    success: 'bg-success-50 text-success-700 group-hover:bg-success-100'
+  }
+  return (
+    <Link to={to} className="group">
+      <Card className="h-full transition-shadow hover:shadow-soft-md">
+        <div className="flex items-center gap-3">
+          <div className={cn('flex h-10 w-10 items-center justify-center rounded-xl transition-colors', toneMap[tone])}>
+            {icon}
+          </div>
+          <div className="min-w-0">
+            <p className="font-semibold text-slate-800">{title}</p>
+            <p className="text-xs text-slate-500">{subtitle}</p>
+          </div>
+        </div>
+      </Card>
+    </Link>
   )
 }
 
@@ -237,7 +306,7 @@ interface ActionCardProps {
   title: string
   count: number
   subtitle: string
-  items: { key: string; left: string; right: string; rightDanger?: boolean }[]
+  items: { key: string; left: string; right: string; rightDanger?: boolean; waHref?: string | null }[]
   emptyLabel: string
   actionLabel?: string
   actionHref?: string
@@ -299,8 +368,8 @@ function ActionCard({
       {items.length > 0 ? (
         <ul className="mt-4 divide-y divide-slate-100">
           {items.map(it => (
-            <li key={it.key} className="flex items-center justify-between py-2 text-sm">
-              <span className="truncate max-w-[65%] text-slate-700">{it.left}</span>
+            <li key={it.key} className="flex items-center justify-between gap-2 py-2 text-sm">
+              <span className="truncate flex-1 text-slate-700">{it.left}</span>
               <span
                 className={cn(
                   'font-semibold tabular-nums',
@@ -309,6 +378,18 @@ function ActionCard({
               >
                 {it.right}
               </span>
+              {it.waHref && (
+                <a
+                  href={it.waHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg text-[#25D366] hover:bg-[#25D366]/10 transition"
+                  title="Enviar WhatsApp"
+                  onClick={e => e.stopPropagation()}
+                >
+                  <Icon.WhatsApp className="h-4 w-4" />
+                </a>
+              )}
             </li>
           ))}
         </ul>

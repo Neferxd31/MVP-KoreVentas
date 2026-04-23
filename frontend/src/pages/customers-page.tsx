@@ -17,6 +17,7 @@ import {
 } from '@/hooks/use-customers'
 import CustomerForm from '@/components/customer-form'
 import { cn, formatCop } from '@/lib/utils'
+import { waLink, waTemplates } from '@/lib/whatsapp'
 import type { Customer, CreateCustomerRequest } from '@/types/customer'
 
 type TagKey = 'NUEVO' | 'FRECUENTE' | 'VIP' | 'INACTIVO'
@@ -237,6 +238,26 @@ export default function CustomersPage() {
                       </td>
                       <td className="px-5 py-3">
                         <div className="flex justify-end gap-1">
+                          {c.phone && (() => {
+                            // Plantilla según etiqueta: reactivación para INACTIVO, genérico para el resto
+                            const template = c.autoTag === 'INACTIVO'
+                              ? waTemplates.reactivation(c.fullName)
+                              : waTemplates.generic(c.fullName)
+                            const link = waLink(c.phone, template)
+                            if (!link) return null
+                            return (
+                              <a
+                                href={link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title="Escribir por WhatsApp"
+                                className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-[#25D366] hover:bg-[#25D366]/10 transition"
+                              >
+                                <Icon.WhatsApp className="h-3.5 w-3.5" />
+                                <span className="hidden sm:inline">WhatsApp</span>
+                              </a>
+                            )
+                          })()}
                           <Button
                             size="sm"
                             variant="ghost"

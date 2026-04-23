@@ -9,6 +9,9 @@ import HomePage from './pages/home-page'
 import ServicesPage from './pages/services-page'
 import EmployeesPage from './pages/employees-page'
 import AgendaPage from './pages/agenda-page'
+import CashPage from './pages/cash-page'
+import ExpensesPage from './pages/expenses-page'
+import ReportsPage from './pages/reports-page'
 
 export default function App() {
   const { isAuthenticated, loading, error, login, register, logout } = useAuth()
@@ -34,6 +37,9 @@ export default function App() {
         <Route path="/services" element={<ServicesPage />} />
         <Route path="/customers" element={<CustomersPage />} />
         <Route path="/employees" element={<EmployeesPage />} />
+        <Route path="/cash" element={<CashPage />} />
+        <Route path="/expenses" element={<ExpensesPage />} />
+        <Route path="/reports" element={<ReportsPage />} />
       </Routes>
     </AppLayout>
   )

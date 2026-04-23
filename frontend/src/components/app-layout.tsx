@@ -16,7 +16,10 @@ const navItems: NavItem[] = [
   { path: '/products', label: 'Productos', icon: <Icon.Package className="h-5 w-5" /> },
   { path: '/services', label: 'Servicios', icon: <Icon.Scissors className="h-5 w-5" /> },
   { path: '/customers', label: 'Clientes', icon: <Icon.Users className="h-5 w-5" /> },
-  { path: '/employees', label: 'Equipo', icon: <Icon.UserCheck className="h-5 w-5" /> }
+  { path: '/employees', label: 'Equipo', icon: <Icon.UserCheck className="h-5 w-5" /> },
+  { path: '/cash', label: 'Caja', icon: <Icon.DollarSign className="h-5 w-5" /> },
+  { path: '/expenses', label: 'Gastos', icon: <Icon.Receipt className="h-5 w-5" /> },
+  { path: '/reports', label: 'Reportes', icon: <Icon.BarChart className="h-5 w-5" /> }
 ]
 
 interface Props {
