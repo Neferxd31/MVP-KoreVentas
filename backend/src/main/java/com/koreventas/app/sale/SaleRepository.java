@@ -61,4 +61,21 @@ public interface SaleRepository extends JpaRepository<Sale, UUID> {
       + "GROUP BY s.paymentMethod")
   List<Object[]> salesByPaymentMethod(@Param("from") OffsetDateTime from,
                                       @Param("to") OffsetDateTime to);
+
+  // ── Historial de ventas con filtros opcionales ────────────────────────────
+  // Cualquier parámetro nullo se ignora (con COALESCE/IS NULL OR).
+
+  @Query("SELECT DISTINCT s FROM Sale s LEFT JOIN s.items i "
+      + "WHERE s.createdAt >= :from AND s.createdAt <= :to "
+      + "AND (:customerId IS NULL OR s.customerId = :customerId) "
+      + "AND (:paymentMethod IS NULL OR s.paymentMethod = :paymentMethod) "
+      + "AND (:productId IS NULL OR i.productId = :productId) "
+      + "AND (:serviceId IS NULL OR i.serviceId = :serviceId) "
+      + "ORDER BY s.createdAt DESC")
+  List<Sale> searchSales(@Param("from") OffsetDateTime from,
+                         @Param("to") OffsetDateTime to,
+                         @Param("customerId") UUID customerId,
+                         @Param("paymentMethod") PaymentMethod paymentMethod,
+                         @Param("productId") UUID productId,
+                         @Param("serviceId") UUID serviceId);
 }

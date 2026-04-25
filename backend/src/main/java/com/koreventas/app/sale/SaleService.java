@@ -153,6 +153,18 @@ public class SaleService {
     return sales.findByDateRangeAndTenantId(TenantContext.get(), from, to);
   }
 
+  /** Búsqueda con filtros opcionales para historial de ventas. */
+  @Transactional(readOnly = true)
+  public List<Sale> searchSales(OffsetDateTime from,
+                                OffsetDateTime to,
+                                UUID customerId,
+                                PaymentMethod paymentMethod,
+                                UUID productId,
+                                UUID serviceId) {
+    applyTenant();
+    return sales.searchSales(from, to, customerId, paymentMethod, productId, serviceId);
+  }
+
   @Transactional(readOnly = true)
   public DashboardResumenDTO obtenerResumenDashboard() {
     applyTenant(); // Aplica seguridad RLS
