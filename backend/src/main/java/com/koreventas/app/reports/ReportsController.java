@@ -300,6 +300,59 @@ public class ReportsController {
     }).toList();
   }
 
+  /**
+   * Rentabilidad por producto: utilidad bruta = (precio_venta - costo) * cantidad_vendida.
+   * Solo productos con costo definido. Devuelve top N ordenados por utilidad bruta DESC.
+   */
+  @GetMapping("/profitability")
+  @Transactional(readOnly = true)
+  @SuppressWarnings("unchecked")
+  public List<Map<String, Object>> profitability(
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+      @RequestParam(defaultValue = "10") int limit) {
+    applyTenant();
+
+    List<Object[]> rows = em.createNativeQuery(
+        "SELECT p.id, p.name, p.price, p.cost, "
+            + "       COALESCE(SUM(si.quantity), 0) AS qty, "
+            + "       COALESCE(SUM(si.subtotal), 0) AS revenue, "
+            + "       COALESCE(SUM(si.quantity * (p.price - COALESCE(p.cost, 0))), 0) AS gross_profit "
+            + "FROM products p "
+            + "JOIN sale_items si ON si.product_id = p.id "
+            + "JOIN sales s ON s.id = si.sale_id "
+            + "WHERE s.status = 'COMPLETADA' "
+            + "  AND s.created_at >= ?1 AND s.created_at < ?2 "
+            + "  AND p.cost IS NOT NULL "
+            + "GROUP BY p.id, p.name, p.price, p.cost "
+            + "ORDER BY gross_profit DESC "
+            + "LIMIT ?3")
+        .setParameter(1, atStart(from)).setParameter(2, atEnd(to)).setParameter(3, limit)
+        .getResultList();
+
+    return rows.stream().map(r -> {
+      Map<String, Object> m = new HashMap<>();
+      m.put("id", r[0].toString());
+      m.put("name", (String) r[1]);
+      BigDecimal price = toBD(r[2]);
+      BigDecimal cost = toBD(r[3]);
+      m.put("price", price);
+      m.put("cost", cost);
+      m.put("quantity", ((Number) r[4]).longValue());
+      m.put("revenue", toBD(r[5]));
+      BigDecimal grossProfit = toBD(r[6]);
+      m.put("grossProfit", grossProfit);
+      // Margen unitario en %
+      BigDecimal marginPct = price.compareTo(BigDecimal.ZERO) > 0
+          ? price.subtract(cost)
+              .multiply(BigDecimal.valueOf(100))
+              .divide(price, 2, java.math.RoundingMode.HALF_UP)
+          : BigDecimal.ZERO;
+      m.put("marginPct", marginPct);
+      return m;
+    }).toList();
+  }
+
   private BigDecimal toBD(Object o) {
     if (o == null) return BigDecimal.ZERO;
     if (o instanceof BigDecimal bd) return bd;

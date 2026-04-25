@@ -20,7 +20,8 @@ const navItems: NavItem[] = [
   { path: '/employees', label: 'Equipo', icon: <Icon.UserCheck className="h-5 w-5" /> },
   { path: '/cash', label: 'Caja', icon: <Icon.DollarSign className="h-5 w-5" /> },
   { path: '/expenses', label: 'Gastos', icon: <Icon.TrendingDown className="h-5 w-5" /> },
-  { path: '/reports', label: 'Reportes', icon: <Icon.BarChart className="h-5 w-5" /> }
+  { path: '/reports', label: 'Reportes', icon: <Icon.BarChart className="h-5 w-5" /> },
+  { path: '/goals', label: 'Metas', icon: <Icon.Star className="h-5 w-5" /> }
 ]
 
 interface Props {

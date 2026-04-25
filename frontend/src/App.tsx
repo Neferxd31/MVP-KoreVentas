@@ -13,6 +13,7 @@ import CashPage from './pages/cash-page'
 import ExpensesPage from './pages/expenses-page'
 import ReportsPage from './pages/reports-page'
 import SalesPage from './pages/sales-page'
+import GoalsPage from './pages/goals-page'
 
 export default function App() {
   const { isAuthenticated, loading, error, login, register, logout } = useAuth()
@@ -42,6 +43,7 @@ export default function App() {
         <Route path="/expenses" element={<ExpensesPage />} />
         <Route path="/reports" element={<ReportsPage />} />
         <Route path="/sales" element={<SalesPage />} />
+        <Route path="/goals" element={<GoalsPage />} />
       </Routes>
     </AppLayout>
   )

@@ -32,6 +32,8 @@ import {
   useEmployeePerformance,
   useAgendaHeatmap
 } from '@/hooks/use-reports'
+import { useProfitability } from '@/hooks/use-insights'
+import { Badge } from '@/components/ui'
 import { formatCop } from '@/lib/utils'
 
 // Paleta consistente con el design system
@@ -66,6 +68,7 @@ export default function ReportsPage() {
   const byPayment = usePaymentBreakdown(range)
   const employees = useEmployeePerformance(range)
   const heatmap = useAgendaHeatmap(range)
+  const profitability = useProfitability({ ...range, limit: 10 })
 
   const netProfitTone =
     (overview.data?.netProfit ?? 0) >= 0 ? 'text-success-700' : 'text-danger-600'
@@ -359,6 +362,56 @@ export default function ReportsPage() {
                               {rate.toFixed(0)}%
                             </span>
                           </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </Card>
+
+      {/* Rentabilidad por producto */}
+      <Card className="mb-6">
+        <CardHeader
+          icon={<ChartIconBox tone="success"><Icon.DollarSign className="h-5 w-5" /></ChartIconBox>}
+          title="Productos más rentables"
+          subtitle="Ordenados por utilidad bruta (margen × cantidad vendida). Solo aparecen productos con costo definido."
+        />
+        <div className="mt-5">
+          {profitability.isLoading && <SkeletonCard />}
+          {!profitability.isLoading && (profitability.data?.length ?? 0) === 0 && (
+            <EmptyInline label="Define el costo de tus productos para ver utilidad real" />
+          )}
+          {profitability.data && profitability.data.length > 0 && (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  <tr>
+                    <th className="pb-3">Producto</th>
+                    <th className="pb-3 text-center">Cant.</th>
+                    <th className="pb-3 text-right">Ingresos</th>
+                    <th className="pb-3 text-center">Margen</th>
+                    <th className="pb-3 text-right">Utilidad bruta</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {profitability.data.map(p => {
+                    const m = Number(p.marginPct)
+                    const tone: 'success' | 'warning' | 'danger' =
+                      m >= 30 ? 'success' : m >= 15 ? 'warning' : 'danger'
+                    return (
+                      <tr key={p.id}>
+                        <td className="py-3 font-medium text-slate-800">{p.name}</td>
+                        <td className="py-3 text-center tabular-nums text-slate-700">{p.quantity}</td>
+                        <td className="py-3 text-right tabular-nums text-slate-600">{formatCop(p.revenue)}</td>
+                        <td className="py-3 text-center">
+                          <Badge tone={tone} size="sm">{m.toFixed(0)}%</Badge>
+                        </td>
+                        <td className="py-3 text-right font-semibold tabular-nums text-success-700">
+                          {formatCop(p.grossProfit)}
                         </td>
                       </tr>
                     )

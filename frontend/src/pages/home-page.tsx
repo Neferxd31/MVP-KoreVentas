@@ -11,6 +11,10 @@ import {
 } from '@/components/ui'
 import { cn, formatCop } from '@/lib/utils'
 import { waLink, waTemplates } from '@/lib/whatsapp'
+import { useInsights } from '@/hooks/use-insights'
+import { useCurrentGoal } from '@/hooks/use-goal'
+import type { Insights } from '@/types/insights'
+import type { GoalProgress } from '@/types/goal'
 
 type ClienteEnfriandose = {
   id: string
@@ -102,6 +106,8 @@ export default function HomePage() {
     queryKey: ['dashboard-pulso'],
     queryFn: async () => (await api.get<Pulso>('/dashboard/pulso')).data
   })
+  const { data: insights } = useInsights()
+  const { data: goal } = useCurrentGoal()
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
@@ -164,12 +170,29 @@ export default function HomePage() {
             />
           </div>
 
+          {/* Meta del mes */}
+          {goal && (
+            <div className="mt-8">
+              <GoalCard goal={goal} />
+            </div>
+          )}
+
+          {/* Qué vender hoy — insights accionables */}
+          {insights && (insights.champion || insights.slowMover || insights.bundle) && (
+            <div className="mt-8">
+              <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-500">
+                Qué vender hoy
+              </h2>
+              <InsightsRow insights={insights} />
+            </div>
+          )}
+
           {/* Atajos rápidos a gestión financiera */}
           <div className="mt-8">
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-500">
               Gestión del día
             </h2>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               <ShortcutCard
                 to="/cash"
                 title="Caja diaria"
@@ -190,6 +213,13 @@ export default function HomePage() {
                 subtitle="Análisis del negocio"
                 icon={<Icon.BarChart className="h-5 w-5" />}
                 tone="success"
+              />
+              <ShortcutCard
+                to="/goals"
+                title="Metas del mes"
+                subtitle="Avance vs objetivo"
+                icon={<Icon.Star className="h-5 w-5" />}
+                tone="brand"
               />
             </div>
           </div>
@@ -410,5 +440,202 @@ function ActionCard({
         </Link>
       )}
     </Card>
+  )
+}
+
+// ─── GoalCard: progreso del mes con proyección ────────────────
+function GoalCard({ goal }: { goal: GoalProgress }) {
+  if (!goal.goalSet) {
+    return (
+      <Card className="flex items-center justify-between gap-4 border-2 border-dashed border-brand-200 bg-brand-50/40">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-100 text-brand-700">
+            <Icon.Star className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="font-semibold text-slate-800">Define tu meta del mes</p>
+            <p className="text-sm text-slate-500">
+              Mide tu avance día a día y proyecta el cierre del mes.
+            </p>
+          </div>
+        </div>
+        <Link to="/goals">
+          <Button size="sm">Fijar meta</Button>
+        </Link>
+      </Card>
+    )
+  }
+
+  const revenuePct = goal.revenueTarget > 0
+    ? Math.min(100, (goal.revenueSoFar / goal.revenueTarget) * 100)
+    : 0
+  const expectedPct = (goal.dayOfMonth / goal.daysInMonth) * 100
+  const isAhead = revenuePct >= expectedPct
+  const projectionPct = goal.revenueTarget > 0
+    ? (goal.projectedRevenue / goal.revenueTarget) * 100
+    : 0
+
+  return (
+    <Card>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-4 ring-brand-100">
+            <Icon.Star className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-wider text-slate-500">
+              Meta del mes
+            </p>
+            <p className="text-2xl font-bold text-slate-900 tabular-nums">
+              {formatCop(goal.revenueSoFar)}
+              <span className="ml-2 text-sm font-medium text-slate-400">
+                de {formatCop(goal.revenueTarget)}
+              </span>
+            </p>
+          </div>
+        </div>
+        <Link to="/goals" className="text-xs font-semibold text-brand-600 hover:underline">
+          Ajustar
+        </Link>
+      </div>
+
+      <div className="mt-4">
+        <div className="relative h-3 overflow-hidden rounded-full bg-slate-100">
+          <div
+            className="absolute top-0 h-full w-px bg-slate-400/60"
+            style={{ left: `${expectedPct}%` }}
+            title={`Día ${goal.dayOfMonth}/${goal.daysInMonth}`}
+          />
+          <div
+            className={cn(
+              'h-full rounded-full transition-all',
+              isAhead ? 'bg-success-500' : 'bg-warning-500'
+            )}
+            style={{ width: `${revenuePct}%` }}
+          />
+        </div>
+        <div className="mt-2 flex items-center justify-between text-xs">
+          <span className={cn(
+            'font-semibold',
+            isAhead ? 'text-success-700' : 'text-warning-700'
+          )}>
+            {revenuePct.toFixed(0)}% completado
+          </span>
+          <span className="text-slate-500">
+            Proyectado: <span className="font-semibold text-slate-700 tabular-nums">
+              {formatCop(goal.projectedRevenue)}
+            </span>{' '}
+            ({projectionPct.toFixed(0)}%)
+          </span>
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+// ─── InsightsRow: 3 sugerencias accionables ────────────────────
+function InsightsRow({ insights }: { insights: Insights }) {
+  const cards: Array<{
+    key: string
+    tone: 'success' | 'warning' | 'brand'
+    icon: React.ReactNode
+    label: string
+    title: string
+    body: React.ReactNode
+  }> = []
+
+  if (insights.champion) {
+    cards.push({
+      key: 'champion',
+      tone: 'success',
+      icon: <Icon.TrendingUp className="h-5 w-5" />,
+      label: 'Tu campeón de la semana',
+      title: insights.champion.name,
+      body: (
+        <>
+          <span className="font-semibold text-slate-800 tabular-nums">
+            {insights.champion.quantity}
+          </span>{' '}
+          unidades · {formatCop(insights.champion.revenue)} de ingresos. Empújalo otra vez.
+        </>
+      )
+    })
+  }
+
+  if (insights.slowMover) {
+    cards.push({
+      key: 'slow',
+      tone: 'warning',
+      icon: <Icon.AlertTriangle className="h-5 w-5" />,
+      label: 'Tiene stock pero no se mueve',
+      title: insights.slowMover.name,
+      body: (
+        <>
+          <span className="font-semibold text-slate-800 tabular-nums">
+            {insights.slowMover.stock} unidades
+          </span>{' '}
+          en bodega y 0 ventas en 14 días. Considera ofrecerlo con descuento.
+        </>
+      )
+    })
+  }
+
+  if (insights.bundle) {
+    cards.push({
+      key: 'bundle',
+      tone: 'brand',
+      icon: <Icon.Sparkles className="h-5 w-5" />,
+      label: 'Combinan bien juntos',
+      title: `${insights.bundle.first} + ${insights.bundle.second}`,
+      body: (
+        <>
+          Se han comprado juntos{' '}
+          <span className="font-semibold text-slate-800 tabular-nums">
+            {insights.bundle.timesTogether} veces
+          </span>
+          . Cuando vendas uno, ofrece el otro.
+        </>
+      )
+    })
+  }
+
+  if (cards.length === 0) {
+    return (
+      <Card padding="sm">
+        <p className="text-sm text-slate-500">
+          Vuelve cuando tengas algunas ventas registradas — necesito datos para sugerirte qué empujar.
+        </p>
+      </Card>
+    )
+  }
+
+  const toneMap: Record<string, string> = {
+    success: 'bg-success-50 text-success-700 ring-success-100',
+    warning: 'bg-warning-50 text-warning-700 ring-warning-100',
+    brand: 'bg-brand-50 text-brand-600 ring-brand-100'
+  }
+
+  return (
+    <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+      {cards.map(c => (
+        <Card key={c.key} className="flex flex-col gap-3">
+          <div className="flex items-start gap-3">
+            <div className={cn(
+              'flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl ring-4',
+              toneMap[c.tone]
+            )}>
+              {c.icon}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                {c.label}
+              </p>
+              <p className="font-semibold text-slate-800">{c.title}</p>
+            </div>
+          </div>
+          <p className="text-sm text-slate-600">{c.body}</p>
+        </Card>
+      ))}
+    </div>
   )
 }

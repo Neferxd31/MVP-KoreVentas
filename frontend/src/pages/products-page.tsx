@@ -162,6 +162,7 @@ export default function ProductsPage() {
                 <tr>
                   <th className="px-5 py-3.5">Producto</th>
                   <th className="px-5 py-3.5">Precio</th>
+                  <th className="px-5 py-3.5">Margen</th>
                   <th className="px-5 py-3.5">IVA</th>
                   <th className="px-5 py-3.5 text-center">Stock</th>
                   <th className="px-5 py-3.5 text-center">Favorito</th>
@@ -179,6 +180,20 @@ export default function ProductsPage() {
                     </td>
                     <td className="px-5 py-3 font-medium text-slate-800 tabular-nums">
                       {formatCop(p.price)}
+                    </td>
+                    <td className="px-5 py-3">
+                      {p.cost && Number(p.cost) > 0 ? (() => {
+                        const margin = ((Number(p.price) - Number(p.cost)) / Number(p.price)) * 100
+                        const tone: 'success' | 'warning' | 'danger' =
+                          margin >= 30 ? 'success' : margin >= 15 ? 'warning' : 'danger'
+                        return (
+                          <Badge tone={tone} size="sm">
+                            {margin.toFixed(0)}%
+                          </Badge>
+                        )
+                      })() : (
+                        <span className="text-xs text-slate-400">Sin costo</span>
+                      )}
                     </td>
                     <td className="px-5 py-3 text-slate-500">{p.taxRate}%</td>
                     <td className="px-5 py-3 text-center">
