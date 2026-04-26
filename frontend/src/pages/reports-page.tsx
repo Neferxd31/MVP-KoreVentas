@@ -33,8 +33,9 @@ import {
   useAgendaHeatmap
 } from '@/hooks/use-reports'
 import { useProfitability } from '@/hooks/use-insights'
-import { Badge } from '@/components/ui'
+import { Badge, Button } from '@/components/ui'
 import { formatCop } from '@/lib/utils'
+import { exportCsv } from '@/lib/export'
 
 // Paleta consistente con el design system
 const CHART_COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6']
@@ -70,6 +71,121 @@ export default function ReportsPage() {
   const heatmap = useAgendaHeatmap(range)
   const profitability = useProfitability({ ...range, limit: 10 })
 
+  // Exporta cada sección a un CSV. El navegador descarga varios archivos seguidos.
+  const handleExportCsv = () => {
+    const suffix = `${from}_${to}`
+
+    if (overview.data) {
+      exportCsv(
+        [{
+          ingresos: overview.data.revenue,
+          gastos: overview.data.expenses,
+          utilidadNeta: overview.data.netProfit,
+          ordenes: overview.data.orderCount,
+          ticketPromedio: overview.data.averageTicket
+        }],
+        `reporte-resumen-${suffix}.csv`,
+        [
+          { key: 'ingresos', label: 'Ingresos' },
+          { key: 'gastos', label: 'Gastos' },
+          { key: 'utilidadNeta', label: 'Utilidad neta' },
+          { key: 'ordenes', label: 'Órdenes' },
+          { key: 'ticketPromedio', label: 'Ticket promedio' }
+        ]
+      )
+    }
+
+    if (salesByDay.data && salesByDay.data.length > 0) {
+      exportCsv(
+        salesByDay.data,
+        `reporte-ventas-por-dia-${suffix}.csv`,
+        [
+          { key: 'date', label: 'Fecha' },
+          { key: 'count', label: 'Ventas' },
+          { key: 'total', label: 'Total' }
+        ]
+      )
+    }
+
+    if (topProducts.data && topProducts.data.length > 0) {
+      exportCsv(
+        topProducts.data,
+        `reporte-top-productos-${suffix}.csv`,
+        [
+          { key: 'name', label: 'Producto' },
+          { key: 'quantity', label: 'Cantidad' },
+          { key: 'total', label: 'Total' }
+        ]
+      )
+    }
+
+    if (topServices.data && topServices.data.length > 0) {
+      exportCsv(
+        topServices.data,
+        `reporte-top-servicios-${suffix}.csv`,
+        [
+          { key: 'name', label: 'Servicio' },
+          { key: 'quantity', label: 'Cantidad' },
+          { key: 'total', label: 'Total' }
+        ]
+      )
+    }
+
+    if (topCustomers.data && topCustomers.data.length > 0) {
+      exportCsv(
+        topCustomers.data,
+        `reporte-top-clientes-${suffix}.csv`,
+        [
+          { key: 'name', label: 'Cliente' },
+          { key: 'phone', label: 'Teléfono' },
+          { key: 'orders', label: 'Órdenes' },
+          { key: 'total', label: 'Total' }
+        ]
+      )
+    }
+
+    if (byPayment.data && byPayment.data.length > 0) {
+      exportCsv(
+        byPayment.data,
+        `reporte-metodos-pago-${suffix}.csv`,
+        [
+          { key: 'method', label: 'Método' },
+          { key: 'count', label: 'Ventas' },
+          { key: 'total', label: 'Total' }
+        ]
+      )
+    }
+
+    if (employees.data && employees.data.length > 0) {
+      exportCsv(
+        employees.data,
+        `reporte-empleados-${suffix}.csv`,
+        [
+          { key: 'name', label: 'Empleado' },
+          { key: 'completed', label: 'Completadas' },
+          { key: 'total', label: 'Total citas' }
+        ]
+      )
+    }
+
+    if (profitability.data && profitability.data.length > 0) {
+      exportCsv(
+        profitability.data,
+        `reporte-rentabilidad-${suffix}.csv`,
+        [
+          { key: 'name', label: 'Producto' },
+          { key: 'quantity', label: 'Cantidad' },
+          { key: 'price', label: 'Precio' },
+          { key: 'cost', label: 'Costo' },
+          { key: 'marginPct', label: 'Margen %' },
+          { key: 'revenue', label: 'Ingresos' },
+          { key: 'grossProfit', label: 'Utilidad bruta' }
+        ]
+      )
+    }
+
+  }
+
   const netProfitTone =
     (overview.data?.netProfit ?? 0) >= 0 ? 'text-success-700' : 'text-danger-600'
 
@@ -85,8 +201,8 @@ export default function ReportsPage() {
         </p>
       </div>
 
-      {/* Rango */}
-      <Card className="mb-6" padding="sm">
+      {/* Rango + exportación */}
+      <Card className="mb-6 no-print" padding="sm">
         <div className="flex flex-wrap items-end gap-3">
           <Input
             type="date"
@@ -100,6 +216,24 @@ export default function ReportsPage() {
             value={to}
             onChange={e => setTo(e.target.value)}
           />
+          <div className="ml-auto flex flex-wrap items-end gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              leftIcon={<Icon.Receipt className="h-4 w-4" />}
+              onClick={() => window.print()}
+            >
+              Exportar PDF
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              leftIcon={<Icon.BarChart className="h-4 w-4" />}
+              onClick={() => handleExportCsv()}
+            >
+              Exportar Excel
+            </Button>
+          </div>
         </div>
       </Card>
 

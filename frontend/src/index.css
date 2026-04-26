@@ -24,8 +24,13 @@
   }
   ::-webkit-scrollbar-thumb:hover { background: rgb(148 163 184 / 0.8); }
 
-  /* Focus visible accesible */
-  *:focus-visible {
+  /* Focus visible accesible — solo para botones, links y elementos interactivos.
+     Inputs/selects/textareas tienen su propio focus styling vía focus-within del wrapper,
+     evitamos doble ring. */
+  button:focus-visible,
+  a:focus-visible,
+  [role="button"]:focus-visible,
+  [tabindex]:focus-visible {
     @apply outline-none ring-2 ring-brand-500 ring-offset-2 ring-offset-white;
   }
 }
@@ -46,13 +51,25 @@
   }
 }
 
-/* ── Print styles para recibo de venta ─────────────────────────────
-   Soporta impresoras térmicas 58mm y fallback A4.
-   Los elementos con .no-print se ocultan al imprimir.
+/* ── Print styles ─────────────────────────────────────────────
+   Casos cubiertos:
+   1. Recibos de venta (.print-receipt) — térmica 58mm
+   2. Reportes y otras páginas — A4 normal sin chrome
+   Los elementos con .no-print se ocultan siempre al imprimir.
 */
 @media print {
   body { background: white !important; }
   .no-print { display: none !important; }
+
+  /* Quita el padding del main que existe para el bottom-nav mobile */
+  main { padding-bottom: 0 !important; padding-left: 0 !important; }
+
+  /* Tarjetas: quitar sombras y bordes excesivos al imprimir */
+  .shadow-soft, .shadow-soft-md, .shadow-soft-lg {
+    box-shadow: none !important;
+  }
+
+  /* Recibo térmico 58mm */
   .print-receipt {
     width: 58mm;
     margin: 0 auto;
@@ -61,14 +78,18 @@
     line-height: 1.35;
     color: #000;
   }
-  /* Para A4: el contenedor padre puede aplicar .print-a4 */
   .print-a4 .print-receipt {
     width: 100%;
     max-width: 80mm;
     font-size: 12px;
   }
+
   @page {
-    margin: 4mm;
+    margin: 8mm;
     size: auto;
+  }
+  /* Para recibo térmico, márgenes mínimos */
+  .print-receipt-page @page {
+    margin: 4mm;
   }
 }
