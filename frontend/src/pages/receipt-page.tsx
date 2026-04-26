@@ -2,6 +2,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import { Button, Icon, SkeletonCard, EmptyState } from '@/components/ui'
 import { useSale } from '@/hooks/use-sales'
 import { useCustomers } from '@/hooks/use-customers'
+import { useSettings } from '@/hooks/use-settings'
 import { formatCop } from '@/lib/utils'
 import { waLink, waTemplates } from '@/lib/whatsapp'
 
@@ -10,6 +11,10 @@ export default function ReceiptPage() {
   const navigate = useNavigate()
   const { data: sale, isLoading } = useSale(id ?? null)
   const { data: customers } = useCustomers()
+  const { data: settings } = useSettings()
+  const businessName = settings?.businessName || 'KoreVentas'
+  const logoUrl = settings?.logoUrl
+  const isCustomized = businessName !== 'KoreVentas'
 
   const customer = sale?.customerId
     ? customers?.find(c => c.id === sale.customerId)
@@ -86,7 +91,14 @@ export default function ReceiptPage() {
         <div className="mx-auto rounded-2xl bg-white p-6 shadow-soft print:rounded-none print:p-0 print:shadow-none print-receipt sm:max-w-sm">
           {/* Encabezado */}
           <div className="text-center">
-            <h1 className="text-base font-bold uppercase tracking-wider">KoreVentas</h1>
+            {logoUrl && (
+              <img
+                src={logoUrl}
+                alt={businessName}
+                className="mx-auto mb-2 h-14 w-14 rounded-lg object-cover"
+              />
+            )}
+            <h1 className="text-base font-bold uppercase tracking-wider">{businessName}</h1>
             <p className="text-xs text-slate-500 print:text-black">Comprobante de venta</p>
           </div>
 
@@ -148,6 +160,13 @@ export default function ReceiptPage() {
             ¡Gracias por tu compra!<br />
             Conserva este comprobante.
           </p>
+
+          {/* Marca de agua: solo cuando el negocio personalizó su nombre */}
+          {isCustomized && (
+            <p className="mt-3 text-center text-[8px] tracking-wider text-slate-400 print:text-slate-500">
+              Hecho con KoreVentas
+            </p>
+          )}
         </div>
       </div>
     </div>

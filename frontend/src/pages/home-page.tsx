@@ -15,6 +15,7 @@ import { useState } from 'react'
 import { useInsights } from '@/hooks/use-insights'
 import { useCurrentGoal } from '@/hooks/use-goal'
 import { useOnboarding, type OnboardingStatus } from '@/hooks/use-onboarding'
+import { useSettings } from '@/hooks/use-settings'
 import type { Insights } from '@/types/insights'
 import type { GoalProgress } from '@/types/goal'
 
@@ -111,6 +112,7 @@ export default function HomePage() {
   const { data: insights } = useInsights()
   const { data: goal } = useCurrentGoal()
   const { data: onboarding } = useOnboarding()
+  const { data: settings } = useSettings()
   const [onboardingDismissed, setOnboardingDismissed] = useState(
     () => localStorage.getItem('koreventas.onboarding.dismissed') === '1'
   )
@@ -126,7 +128,7 @@ export default function HomePage() {
       <div className="mb-7 flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-            Pulso del negocio
+            {settings?.businessName ? `Pulso de ${settings.businessName}` : 'Pulso del negocio'}
           </h1>
           <p className="mt-1 text-sm text-slate-500">
             Lo que necesitas saber hoy para tomar acción.

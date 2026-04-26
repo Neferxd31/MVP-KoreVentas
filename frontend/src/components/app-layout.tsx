@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { Icon } from './ui/icons'
+import { useSettings } from '@/hooks/use-settings'
 
 interface NavItem {
   path: string
@@ -26,7 +27,8 @@ const secondaryNav: NavItem[] = [
   { path: '/cash', label: 'Caja', icon: <Icon.DollarSign className="h-5 w-5" /> },
   { path: '/expenses', label: 'Gastos', icon: <Icon.TrendingDown className="h-5 w-5" /> },
   { path: '/reports', label: 'Reportes', icon: <Icon.BarChart className="h-5 w-5" /> },
-  { path: '/goals', label: 'Metas', icon: <Icon.Star className="h-5 w-5" /> }
+  { path: '/goals', label: 'Metas', icon: <Icon.Star className="h-5 w-5" /> },
+  { path: '/settings', label: 'Personalización', icon: <Icon.Sparkles className="h-5 w-5" /> }
 ]
 
 const allNav = [...primaryNav, ...secondaryNav]
@@ -39,6 +41,9 @@ interface Props {
 export function AppLayout({ children, onLogout }: Props) {
   const location = useLocation()
   const [sheetOpen, setSheetOpen] = useState(false)
+  const { data: settings } = useSettings()
+  const businessName = settings?.businessName || 'KoreVentas'
+  const logoUrl = settings?.logoUrl ?? null
 
   const closeSheet = () => setSheetOpen(false)
 
@@ -52,14 +57,19 @@ export function AppLayout({ children, onLogout }: Props) {
     <div className="min-h-screen bg-slate-50">
       {/* ── Sidebar desktop ─────────────────────────────────── */}
       <aside className="no-print hidden lg:flex fixed inset-y-0 left-0 z-30 w-64 flex-col border-r border-slate-200 bg-white">
-        <SidebarContent currentPath={location.pathname} onLogout={onLogout} />
+        <SidebarContent
+          currentPath={location.pathname}
+          onLogout={onLogout}
+          businessName={businessName}
+          logoUrl={logoUrl}
+        />
       </aside>
 
       {/* ── Topbar mobile (solo branding + logout, no menú) ──── */}
       <header className="no-print lg:hidden sticky top-0 z-20 flex h-14 items-center justify-between border-b border-slate-200 bg-white/90 px-4 backdrop-blur">
-        <Link to="/" className="flex items-center gap-2 font-bold text-brand-600">
-          <LogoMark />
-          <span>KoreVentas</span>
+        <Link to="/" className="flex items-center gap-2 font-bold text-brand-600 min-w-0">
+          <LogoMark logoUrl={logoUrl} />
+          <span className="truncate">{businessName}</span>
         </Link>
         <button
           onClick={onLogout}
@@ -163,7 +173,14 @@ export function AppLayout({ children, onLogout }: Props) {
   )
 }
 
-function LogoMark() {
+function LogoMark({ logoUrl }: { logoUrl?: string | null }) {
+  if (logoUrl) {
+    return (
+      <span className="inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg bg-white shadow-soft">
+        <img src={logoUrl} alt="Logo" className="h-full w-full object-cover" />
+      </span>
+    )
+  }
   return (
     <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-soft">
       <span className="text-sm font-bold">K</span>
@@ -173,19 +190,29 @@ function LogoMark() {
 
 function SidebarContent({
   currentPath,
-  onLogout
+  onLogout,
+  businessName,
+  logoUrl
 }: {
   currentPath: string
   onLogout: () => void
+  businessName: string
+  logoUrl: string | null
 }) {
+  // Subtítulo: si el negocio tiene nombre propio mostramos "Hecho con KoreVentas"
+  const isCustomized = businessName !== 'KoreVentas'
   return (
     <>
       {/* Brand */}
       <div className="flex h-16 items-center gap-2.5 px-5 border-b border-slate-100">
-        <LogoMark />
-        <div>
-          <p className="text-sm font-bold text-slate-800 leading-tight">KoreVentas</p>
-          <p className="text-[11px] text-slate-400 leading-tight">Gestión inteligente</p>
+        <LogoMark logoUrl={logoUrl} />
+        <div className="min-w-0">
+          <p className="text-sm font-bold text-slate-800 leading-tight truncate">
+            {businessName}
+          </p>
+          <p className="text-[11px] text-slate-400 leading-tight">
+            {isCustomized ? 'Hecho con KoreVentas' : 'Gestión inteligente'}
+          </p>
         </div>
       </div>
 
