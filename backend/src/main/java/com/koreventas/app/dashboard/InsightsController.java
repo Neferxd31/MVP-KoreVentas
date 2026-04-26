@@ -142,6 +142,54 @@ public class InsightsController {
     return m;
   }
 
+  /**
+   * Estado del onboarding: qué pasos ha completado el tenant.
+   * El frontend pinta una checklist con esto y se autoclava cuando todo está hecho.
+   */
+  @GetMapping("/onboarding")
+  @Transactional(readOnly = true)
+  public Map<String, Object> onboarding() {
+    applyTenant();
+
+    long products = ((Number) em.createNativeQuery(
+        "SELECT COUNT(*) FROM products WHERE active = true").getSingleResult()).longValue();
+    long services = ((Number) em.createNativeQuery(
+        "SELECT COUNT(*) FROM services WHERE active = true").getSingleResult()).longValue();
+    long customers = ((Number) em.createNativeQuery(
+        "SELECT COUNT(*) FROM customers").getSingleResult()).longValue();
+    long sales = ((Number) em.createNativeQuery(
+        "SELECT COUNT(*) FROM sales WHERE status = 'COMPLETADA'").getSingleResult()).longValue();
+    long cashSessions = ((Number) em.createNativeQuery(
+        "SELECT COUNT(*) FROM cash_sessions").getSingleResult()).longValue();
+    long goals = ((Number) em.createNativeQuery(
+        "SELECT COUNT(*) FROM monthly_goals").getSingleResult()).longValue();
+    long productsWithCost = ((Number) em.createNativeQuery(
+        "SELECT COUNT(*) FROM products WHERE active = true AND cost IS NOT NULL AND cost > 0")
+        .getSingleResult()).longValue();
+
+    Map<String, Object> result = new HashMap<>();
+    result.put("hasCatalog", products > 0 || services > 0);
+    result.put("hasCustomer", customers > 0);
+    result.put("hasFirstSale", sales > 0);
+    result.put("hasCashSession", cashSessions > 0);
+    result.put("hasGoal", goals > 0);
+    result.put("hasCostsDefined", productsWithCost >= 3);
+
+    int total = 6;
+    int done = 0;
+    if (products > 0 || services > 0) done++;
+    if (customers > 0) done++;
+    if (sales > 0) done++;
+    if (cashSessions > 0) done++;
+    if (goals > 0) done++;
+    if (productsWithCost >= 3) done++;
+
+    result.put("totalSteps", total);
+    result.put("completedSteps", done);
+    result.put("isComplete", done == total);
+    return result;
+  }
+
   private BigDecimal toBD(Object o) {
     if (o == null) return BigDecimal.ZERO;
     if (o instanceof BigDecimal bd) return bd;

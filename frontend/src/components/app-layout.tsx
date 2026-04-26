@@ -9,12 +9,17 @@ interface NavItem {
   icon: ReactNode
 }
 
-const navItems: NavItem[] = [
+// Items principales — siempre visibles en desktop sidebar y en mobile bottom-nav
+const primaryNav: NavItem[] = [
   { path: '/', label: 'Inicio', icon: <Icon.Home className="h-5 w-5" /> },
   { path: '/pos', label: 'Vender', icon: <Icon.Cart className="h-5 w-5" /> },
-  { path: '/sales', label: 'Ventas', icon: <Icon.Receipt className="h-5 w-5" /> },
   { path: '/agenda', label: 'Agenda', icon: <Icon.Calendar className="h-5 w-5" /> },
-  { path: '/products', label: 'Productos', icon: <Icon.Package className="h-5 w-5" /> },
+  { path: '/products', label: 'Productos', icon: <Icon.Package className="h-5 w-5" /> }
+]
+
+// Resto — solo en sidebar desktop y en sheet "Más" de mobile
+const secondaryNav: NavItem[] = [
+  { path: '/sales', label: 'Ventas', icon: <Icon.Receipt className="h-5 w-5" /> },
   { path: '/services', label: 'Servicios', icon: <Icon.Scissors className="h-5 w-5" /> },
   { path: '/customers', label: 'Clientes', icon: <Icon.Users className="h-5 w-5" /> },
   { path: '/employees', label: 'Equipo', icon: <Icon.UserCheck className="h-5 w-5" /> },
@@ -24,6 +29,8 @@ const navItems: NavItem[] = [
   { path: '/goals', label: 'Metas', icon: <Icon.Star className="h-5 w-5" /> }
 ]
 
+const allNav = [...primaryNav, ...secondaryNav]
+
 interface Props {
   children: ReactNode
   onLogout: () => void
@@ -31,53 +38,127 @@ interface Props {
 
 export function AppLayout({ children, onLogout }: Props) {
   const location = useLocation()
-  const [mobileOpen, setMobileOpen] = useState(false)
+  const [sheetOpen, setSheetOpen] = useState(false)
 
-  const closeMobile = () => setMobileOpen(false)
+  const closeSheet = () => setSheetOpen(false)
+
+  // Para imprimir recibos: ocultar todo el chrome
+  const isReceiptRoute = /^\/sales\/[^/]+\/receipt$/.test(location.pathname)
+  if (isReceiptRoute) {
+    return <>{children}</>
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">
       {/* ── Sidebar desktop ─────────────────────────────────── */}
-      <aside className="hidden lg:flex fixed inset-y-0 left-0 z-30 w-64 flex-col border-r border-slate-200 bg-white">
+      <aside className="no-print hidden lg:flex fixed inset-y-0 left-0 z-30 w-64 flex-col border-r border-slate-200 bg-white">
         <SidebarContent currentPath={location.pathname} onLogout={onLogout} />
       </aside>
 
-      {/* ── Topbar mobile ──────────────────────────────────── */}
-      <header className="lg:hidden sticky top-0 z-20 flex h-14 items-center justify-between border-b border-slate-200 bg-white/90 px-4 backdrop-blur">
+      {/* ── Topbar mobile (solo branding + logout, no menú) ──── */}
+      <header className="no-print lg:hidden sticky top-0 z-20 flex h-14 items-center justify-between border-b border-slate-200 bg-white/90 px-4 backdrop-blur">
         <Link to="/" className="flex items-center gap-2 font-bold text-brand-600">
           <LogoMark />
           <span>KoreVentas</span>
         </Link>
         <button
-          onClick={() => setMobileOpen(v => !v)}
-          className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 transition"
-          aria-label="Abrir menú"
+          onClick={onLogout}
+          className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 transition"
+          aria-label="Cerrar sesión"
         >
-          {mobileOpen ? <Icon.X className="h-5 w-5" /> : <Icon.Menu className="h-5 w-5" />}
+          <Icon.LogOut className="h-5 w-5" />
         </button>
       </header>
 
-      {/* ── Sidebar mobile (overlay) ───────────────────────── */}
-      {mobileOpen && (
-        <>
-          <div
-            className="lg:hidden fixed inset-0 z-30 bg-slate-900/40 backdrop-blur-sm animate-fade-in"
-            onClick={closeMobile}
-          />
-          <aside className="lg:hidden fixed inset-y-0 left-0 z-40 w-72 flex flex-col border-r border-slate-200 bg-white animate-slide-in-right">
-            <SidebarContent
-              currentPath={location.pathname}
-              onLogout={() => { closeMobile(); onLogout() }}
-              onNavigate={closeMobile}
-            />
-          </aside>
-        </>
-      )}
-
-      {/* ── Contenido principal ────────────────────────────── */}
-      <main className="lg:pl-64">
+      {/* ── Contenido principal ──────────────────────────────── */}
+      <main className="lg:pl-64 pb-20 lg:pb-0">
         {children}
       </main>
+
+      {/* ── Bottom-nav mobile ────────────────────────────────── */}
+      <nav className="no-print lg:hidden fixed bottom-0 inset-x-0 z-30 border-t border-slate-200 bg-white/95 backdrop-blur pb-[env(safe-area-inset-bottom)]">
+        <div className="grid grid-cols-5">
+          {primaryNav.map(item => {
+            const active = location.pathname === item.path
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={cn(
+                  'flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-semibold transition-colors',
+                  active ? 'text-brand-600' : 'text-slate-500 hover:text-slate-700'
+                )}
+              >
+                <span className={cn('transition-colors', active && 'scale-110')}>
+                  {item.icon}
+                </span>
+                <span>{item.label}</span>
+              </Link>
+            )
+          })}
+          <button
+            onClick={() => setSheetOpen(true)}
+            className={cn(
+              'flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-semibold transition-colors',
+              sheetOpen || secondaryNav.some(i => i.path === location.pathname)
+                ? 'text-brand-600'
+                : 'text-slate-500 hover:text-slate-700'
+            )}
+          >
+            <Icon.Menu className="h-5 w-5" />
+            <span>Más</span>
+          </button>
+        </div>
+      </nav>
+
+      {/* ── Sheet mobile "Más" ───────────────────────────────── */}
+      {sheetOpen && (
+        <>
+          <div
+            className="lg:hidden fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm animate-fade-in"
+            onClick={closeSheet}
+          />
+          <div className="lg:hidden fixed inset-x-0 bottom-0 z-50 rounded-t-2xl bg-white shadow-soft animate-slide-in-up max-h-[85vh] overflow-y-auto pb-[env(safe-area-inset-bottom)]">
+            <div className="sticky top-0 flex items-center justify-between border-b border-slate-100 bg-white px-5 py-3.5">
+              <h3 className="text-base font-semibold text-slate-800">Más opciones</h3>
+              <button
+                onClick={closeSheet}
+                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+              >
+                <Icon.X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="p-2">
+              <div className="grid grid-cols-2 gap-2">
+                {secondaryNav.map(item => {
+                  const active = location.pathname === item.path
+                  return (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      onClick={closeSheet}
+                      className={cn(
+                        'flex items-center gap-3 rounded-xl p-3 text-sm font-medium transition-all',
+                        active
+                          ? 'bg-brand-50 text-brand-700'
+                          : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
+                      )}
+                    >
+                      <span className={cn(
+                        'flex h-9 w-9 items-center justify-center rounded-lg',
+                        active ? 'bg-white text-brand-600' : 'bg-white text-slate-500'
+                      )}>
+                        {item.icon}
+                      </span>
+                      <span className="truncate">{item.label}</span>
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }
@@ -92,12 +173,10 @@ function LogoMark() {
 
 function SidebarContent({
   currentPath,
-  onLogout,
-  onNavigate
+  onLogout
 }: {
   currentPath: string
   onLogout: () => void
-  onNavigate?: () => void
 }) {
   return (
     <>
@@ -116,13 +195,12 @@ function SidebarContent({
           Menú
         </p>
         <ul className="space-y-1">
-          {navItems.map(item => {
+          {allNav.map(item => {
             const active = currentPath === item.path
             return (
               <li key={item.path}>
                 <Link
                   to={item.path}
-                  onClick={onNavigate}
                   className={cn(
                     'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all',
                     active

@@ -11,8 +11,10 @@ import {
 } from '@/components/ui'
 import { cn, formatCop } from '@/lib/utils'
 import { waLink, waTemplates } from '@/lib/whatsapp'
+import { useState } from 'react'
 import { useInsights } from '@/hooks/use-insights'
 import { useCurrentGoal } from '@/hooks/use-goal'
+import { useOnboarding, type OnboardingStatus } from '@/hooks/use-onboarding'
 import type { Insights } from '@/types/insights'
 import type { GoalProgress } from '@/types/goal'
 
@@ -108,6 +110,15 @@ export default function HomePage() {
   })
   const { data: insights } = useInsights()
   const { data: goal } = useCurrentGoal()
+  const { data: onboarding } = useOnboarding()
+  const [onboardingDismissed, setOnboardingDismissed] = useState(
+    () => localStorage.getItem('koreventas.onboarding.dismissed') === '1'
+  )
+  const dismissOnboarding = () => {
+    localStorage.setItem('koreventas.onboarding.dismissed', '1')
+    setOnboardingDismissed(true)
+  }
+  const showOnboarding = onboarding && !onboarding.isComplete && !onboardingDismissed
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
@@ -125,6 +136,13 @@ export default function HomePage() {
           <Button leftIcon={<Icon.Cart className="h-4 w-4" />}>Nueva venta</Button>
         </Link>
       </div>
+
+      {/* Onboarding checklist (se autoclava cuando todo está hecho o el usuario lo cierra) */}
+      {showOnboarding && onboarding && (
+        <div className="mb-7">
+          <OnboardingChecklist status={onboarding} onDismiss={dismissOnboarding} />
+        </div>
+      )}
 
       {/* Loading */}
       {isLoading && (
@@ -439,6 +457,96 @@ function ActionCard({
           </button>
         </Link>
       )}
+    </Card>
+  )
+}
+
+// ─── OnboardingChecklist: pasos para empezar ───────────────────
+function OnboardingChecklist({
+  status,
+  onDismiss
+}: {
+  status: OnboardingStatus
+  onDismiss: () => void
+}) {
+  const steps: { key: keyof OnboardingStatus; label: string; description: string; href: string }[] = [
+    { key: 'hasCatalog', label: 'Crea tu primer producto o servicio', description: 'Lo necesitas para vender', href: '/products' },
+    { key: 'hasCustomer', label: 'Registra tu primer cliente', description: 'O vincula uno por teléfono al vender', href: '/customers' },
+    { key: 'hasFirstSale', label: 'Haz tu primera venta', description: 'Aquí empieza la magia', href: '/pos' },
+    { key: 'hasCashSession', label: 'Abre tu caja por primera vez', description: 'Para arquear el efectivo del día', href: '/cash' },
+    { key: 'hasGoal', label: 'Fija tu meta del mes', description: 'Mide tu progreso día a día', href: '/goals' },
+    { key: 'hasCostsDefined', label: 'Define el costo de 3 productos', description: 'Para ver tu utilidad real', href: '/products' }
+  ]
+  const pct = (status.completedSteps / status.totalSteps) * 100
+
+  return (
+    <Card className="relative overflow-hidden border-brand-200 bg-gradient-to-br from-brand-50/60 to-white">
+      <button
+        onClick={onDismiss}
+        className="absolute right-3 top-3 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+        title="Ocultar"
+      >
+        <Icon.X className="h-4 w-4" />
+      </button>
+
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-100 text-brand-700 ring-4 ring-brand-50">
+          <Icon.Sparkles className="h-5 w-5" />
+        </div>
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-wider text-brand-700">
+            Para empezar
+          </p>
+          <p className="text-base font-bold text-slate-800">
+            {status.completedSteps} de {status.totalSteps} pasos completados
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
+        <div
+          className="h-full rounded-full bg-brand-500 transition-all"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+
+      <ul className="mt-5 space-y-2">
+        {steps.map(step => {
+          const done = !!status[step.key]
+          return (
+            <li key={step.key}>
+              <Link
+                to={step.href}
+                className={cn(
+                  'flex items-center gap-3 rounded-lg p-2.5 transition-colors',
+                  done ? 'opacity-60' : 'hover:bg-white'
+                )}
+              >
+                <span className={cn(
+                  'flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border-2',
+                  done
+                    ? 'border-success-500 bg-success-500 text-white'
+                    : 'border-slate-300 bg-white'
+                )}>
+                  {done && <Icon.Check className="h-3.5 w-3.5" />}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <p className={cn(
+                    'text-sm font-medium',
+                    done ? 'text-slate-500 line-through' : 'text-slate-800'
+                  )}>
+                    {step.label}
+                  </p>
+                  {!done && (
+                    <p className="text-xs text-slate-500">{step.description}</p>
+                  )}
+                </div>
+                {!done && <Icon.ChevronRight className="h-4 w-4 flex-shrink-0 text-slate-400" />}
+              </Link>
+            </li>
+          )
+        })}
+      </ul>
     </Card>
   )
 }

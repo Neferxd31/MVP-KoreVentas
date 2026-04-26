@@ -60,6 +60,10 @@ export default {
           '0%': { opacity: '0', transform: 'translateX(16px)' },
           '100%': { opacity: '1', transform: 'translateX(0)' }
         },
+        'slide-in-up': {
+          '0%': { opacity: '0', transform: 'translateY(100%)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' }
+        },
         'shimmer': {
           '0%': { backgroundPosition: '-400px 0' },
           '100%': { backgroundPosition: '400px 0' }
@@ -68,6 +72,7 @@ export default {
       animation: {
         'fade-in': 'fade-in 0.2s ease-out',
         'slide-in-right': 'slide-in-right 0.25s ease-out',
+        'slide-in-up': 'slide-in-up 0.28s ease-out',
         'shimmer': 'shimmer 1.4s linear infinite'
       }
     }

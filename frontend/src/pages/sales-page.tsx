@@ -8,6 +8,7 @@ import {
   Input,
   SkeletonRows
 } from '@/components/ui'
+import { Link } from 'react-router-dom'
 import { useSearchSales } from '@/hooks/use-sales'
 import { useCustomers } from '@/hooks/use-customers'
 import { useProducts } from '@/hooks/use-products'
@@ -191,8 +192,49 @@ export default function SalesPage() {
         />
       )}
 
+      {/* Mobile: cards apiladas */}
       {!isLoading && sales && sales.length > 0 && (
-        <Card padding="none" className="overflow-hidden">
+        <div className="space-y-2 md:hidden">
+          {sales.map(s => {
+            const cust = s.customerId ? customerById.get(s.customerId) : null
+            const date = new Date(s.createdAt)
+            return (
+              <Card
+                key={s.id}
+                padding="sm"
+                className="cursor-pointer active:scale-[0.99] transition-transform"
+                onClick={() => setSelected(s)}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-slate-800 truncate">
+                      {cust ? cust.fullName : <span className="text-slate-500 font-normal">Sin cliente</span>}
+                    </p>
+                    <p className="text-[11px] text-slate-400 tabular-nums">
+                      {date.toLocaleDateString('es-CO', { day: '2-digit', month: 'short' })}
+                      {' · '}
+                      {date.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                  </div>
+                  <Badge tone={paymentTone[s.paymentMethod] ?? 'neutral'} size="sm">
+                    {s.paymentMethod}
+                  </Badge>
+                </div>
+                <div className="mt-2 flex items-end justify-between border-t border-slate-100 pt-2">
+                  <p className="text-xs text-slate-400">{s.items.length} ítems</p>
+                  <p className="text-base font-bold text-slate-900 tabular-nums">
+                    {formatCop(s.total)}
+                  </p>
+                </div>
+              </Card>
+            )
+          })}
+        </div>
+      )}
+
+      {/* Desktop / tablet: tabla */}
+      {!isLoading && sales && sales.length > 0 && (
+        <Card padding="none" className="hidden md:block overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-slate-50/80 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
@@ -406,20 +448,33 @@ function SaleDetailModal({
         </div>
 
         {/* Acciones */}
-        {wa && (
-          <a
-            href={wa}
+        <div className="mt-5 flex flex-col gap-2">
+          <Link
+            to={`/sales/${sale.id}/receipt`}
             target="_blank"
-            rel="noopener noreferrer"
             className={cn(
-              'mt-5 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#25D366] px-4 py-2 text-sm font-semibold text-white shadow-soft',
-              'transition hover:bg-[#1ebe5a] active:scale-[0.98]'
+              'inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700',
+              'transition hover:bg-slate-50 active:scale-[0.98]'
             )}
           >
-            <Icon.WhatsApp className="h-4 w-4" />
-            Enviar resumen por WhatsApp
-          </a>
-        )}
+            <Icon.Receipt className="h-4 w-4" />
+            Ver / imprimir recibo
+          </Link>
+          {wa && (
+            <a
+              href={wa}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cn(
+                'inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#25D366] px-4 py-2 text-sm font-semibold text-white shadow-soft',
+                'transition hover:bg-[#1ebe5a] active:scale-[0.98]'
+              )}
+            >
+              <Icon.WhatsApp className="h-4 w-4" />
+              Enviar resumen por WhatsApp
+            </a>
+          )}
+        </div>
       </Card>
     </div>
   )

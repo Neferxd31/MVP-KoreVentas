@@ -45,3 +45,30 @@
     @apply animate-shimmer;
   }
 }
+
+/* ── Print styles para recibo de venta ─────────────────────────────
+   Soporta impresoras térmicas 58mm y fallback A4.
+   Los elementos con .no-print se ocultan al imprimir.
+*/
+@media print {
+  body { background: white !important; }
+  .no-print { display: none !important; }
+  .print-receipt {
+    width: 58mm;
+    margin: 0 auto;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    line-height: 1.35;
+    color: #000;
+  }
+  /* Para A4: el contenedor padre puede aplicar .print-a4 */
+  .print-a4 .print-receipt {
+    width: 100%;
+    max-width: 80mm;
+    font-size: 12px;
+  }
+  @page {
+    margin: 4mm;
+    size: auto;
+  }
+}

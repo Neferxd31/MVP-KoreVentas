@@ -449,15 +449,36 @@ export default function PosPage() {
           </Button>
 
           {lastSale && (
-            <div className="flex items-center gap-2.5 rounded-lg bg-success-50 border border-success-200 p-3 animate-fade-in">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-success-600 text-white">
-                <Icon.Check className="h-4 w-4" />
+            <div className="rounded-lg bg-success-50 border border-success-200 p-3 animate-fade-in">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-success-600 text-white">
+                  <Icon.Check className="h-4 w-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-success-800">Venta registrada</p>
+                  <p className="text-xs text-success-700">
+                    {formatCop(lastSale.total)} · <Badge tone="success" size="sm">{lastSale.paymentMethod}</Badge>
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-semibold text-success-800">Venta registrada</p>
-                <p className="text-xs text-success-700">
-                  {formatCop(lastSale.total)} · <Badge tone="success" size="sm">{lastSale.paymentMethod}</Badge>
-                </p>
+              <div className="mt-2.5 flex gap-2">
+                <a
+                  href={`/sales/${lastSale.id}/receipt`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-white border border-success-300 px-3 py-1.5 text-xs font-semibold text-success-700 hover:bg-success-100 transition"
+                >
+                  <Icon.Receipt className="h-3.5 w-3.5" />
+                  Ver recibo
+                </a>
+                {lastSale.customerId && (
+                  <button
+                    onClick={() => setLastSale(null)}
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-white border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition"
+                  >
+                    Nueva venta
+                  </button>
+                )}
               </div>
             </div>
           )}

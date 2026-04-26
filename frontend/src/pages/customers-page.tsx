@@ -185,8 +185,70 @@ export default function CustomersPage() {
         />
       )}
 
+      {/* Mobile: cards apiladas */}
       {!isLoading && !isError && filtered.length > 0 && (
-        <Card padding="none" className="overflow-hidden">
+        <div className="space-y-2 md:hidden">
+          {filtered.map(c => {
+            const cfg = tagConfig[c.autoTag as TagKey]
+            const waHref = c.phone
+              ? waLink(c.phone, c.autoTag === 'INACTIVO'
+                  ? waTemplates.reactivation(c.fullName)
+                  : waTemplates.generic(c.fullName))
+              : null
+            return (
+              <Card key={c.id} padding="sm" className="active:scale-[0.99] transition-transform">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-semibold text-slate-800">{c.fullName}</p>
+                    {c.phone && (
+                      <p className="text-xs text-slate-500 tabular-nums">{c.phone}</p>
+                    )}
+                  </div>
+                  <Badge tone={cfg.tone} size="sm">{cfg.label}</Badge>
+                </div>
+                <div className="mt-3 flex items-end justify-between gap-2 border-t border-slate-100 pt-2 text-xs">
+                  <div>
+                    <p className="text-slate-400">Total gastado</p>
+                    <p className="text-base font-bold text-slate-800 tabular-nums">{formatCop(c.totalSpent)}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-slate-400">{c.totalPurchases} compras</p>
+                    <p className="text-slate-500">
+                      {c.lastVisitAt ? `Hace ${c.daysSinceLastVisit}d` : 'Sin visitas'}
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-3 flex gap-1.5 border-t border-slate-100 pt-2">
+                  {waHref && (
+                    <a
+                      href={waHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-[#25D366]/10 px-2 py-1.5 text-xs font-semibold text-[#25D366]"
+                    >
+                      <Icon.WhatsApp className="h-3.5 w-3.5" />
+                      WhatsApp
+                    </a>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => { setEditing(c); setShowForm(true) }}
+                    leftIcon={<Icon.Edit className="h-3.5 w-3.5" />}
+                    fullWidth
+                  >
+                    Editar
+                  </Button>
+                </div>
+              </Card>
+            )
+          })}
+        </div>
+      )}
+
+      {/* Desktop / tablet: tabla */}
+      {!isLoading && !isError && filtered.length > 0 && (
+        <Card padding="none" className="hidden md:block overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-slate-50/80 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
