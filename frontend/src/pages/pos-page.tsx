@@ -4,9 +4,11 @@ import { useServices } from '@/hooks/use-services'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 import { Badge, Button, Icon, Input, EmptyState, useToast } from '@/components/ui'
+import CustomerPicker from '@/components/customer-picker'
 import { cn, formatCop } from '@/lib/utils'
 import type { Product } from '@/types/product'
 import type { Service } from '@/types/service'
+import type { Customer } from '@/types/customer'
 import type { CartItem, CreateSaleRequest, SaleResponse } from '@/types/sale'
 
 const paymentMethods = [
@@ -32,7 +34,7 @@ export default function PosPage() {
   const [tab, setTab] = useState<Tab>('PRODUCTS')
   const [cart, setCart] = useState<CartItem[]>([])
   const [payment, setPayment] = useState('EFECTIVO')
-  const [customerPhone, setCustomerPhone] = useState('')
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
   const [search, setSearch] = useState('')
   const [lastSale, setLastSale] = useState<SaleResponse | null>(null)
 
@@ -42,7 +44,7 @@ export default function PosPage() {
     onSuccess: (sale) => {
       setLastSale(sale)
       setCart([])
-      setCustomerPhone('')
+      setSelectedCustomer(null)
       toast.success('Venta registrada', `${formatCop(sale.total)} · ${sale.paymentMethod}`)
       qc.invalidateQueries({ queryKey: ['products'] })
       qc.invalidateQueries({ queryKey: ['customers'] })
@@ -126,7 +128,7 @@ export default function PosPage() {
     if (cart.length === 0) return
     createSale.mutate({
       paymentMethod: payment,
-      customerPhone: customerPhone || undefined,
+      customerId: selectedCustomer?.id,
       items: cart.map(i =>
         i.itemType === 'PRODUCT'
           ? { productId: i.productId!, quantity: i.quantity }
@@ -395,11 +397,10 @@ export default function PosPage() {
 
         {/* Totales + pago */}
         <div className="border-t border-slate-200 bg-white p-4 space-y-3">
-          <Input
-            leftIcon={<Icon.Phone className="h-4 w-4" />}
-            placeholder="Teléfono del cliente (opcional)"
-            value={customerPhone}
-            onChange={e => setCustomerPhone(e.target.value)}
+          <CustomerPicker
+            value={selectedCustomer}
+            onChange={setSelectedCustomer}
+            placeholder="Cliente (opcional) — busca o crea"
           />
 
           <div>

@@ -7,12 +7,15 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -84,6 +87,18 @@ public class SaleController {
   @GetMapping("/customer/{customerId}")
   public List<SaleResponse> byCustomer(@PathVariable UUID customerId) {
     return service.findByCustomer(customerId).stream().map(SaleResponse::from).toList();
+  }
+
+  /** Asigna o cambia el cliente de una venta existente. */
+  @PatchMapping("/{id}/customer")
+  public SaleResponse assignCustomer(@PathVariable UUID id,
+                                     @RequestBody Map<String, String> body) {
+    String raw = body.get("customerId");
+    if (raw == null || raw.isBlank()) {
+      throw new IllegalArgumentException("customerId requerido");
+    }
+    UUID customerId = UUID.fromString(raw);
+    return SaleResponse.from(service.assignCustomer(id, customerId));
   }
   
   @GetMapping("/resumen")

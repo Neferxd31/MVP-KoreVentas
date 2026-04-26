@@ -10,6 +10,9 @@ import {
 } from '@/components/ui'
 import { Link } from 'react-router-dom'
 import { useSearchSales } from '@/hooks/use-sales'
+import { useAssignSaleCustomer } from '@/hooks/use-customers'
+import CustomerPicker from '@/components/customer-picker'
+import { useToast } from '@/components/ui'
 import { useCustomers } from '@/hooks/use-customers'
 import { useProducts } from '@/hooks/use-products'
 import { useServices } from '@/hooks/use-services'
@@ -309,6 +312,7 @@ export default function SalesPage() {
           sale={selected}
           customer={selected.customerId ? customerById.get(selected.customerId) ?? null : null}
           onClose={() => setSelected(null)}
+          onAssigned={updated => setSelected(updated)}
         />
       )}
     </div>
@@ -334,12 +338,17 @@ function SummaryCard({ label, value, icon }: { label: string; value: string; ico
 function SaleDetailModal({
   sale,
   customer,
-  onClose
+  onClose,
+  onAssigned
 }: {
   sale: SaleResponse
   customer: { fullName: string; phone: string | null } | null
   onClose: () => void
+  onAssigned: (updated: SaleResponse) => void
 }) {
+  const toast = useToast()
+  const assign = useAssignSaleCustomer()
+  const [showAssign, setShowAssign] = useState(false)
   const date = new Date(sale.createdAt)
   // Plantilla WhatsApp: agradecimiento con resumen de la venta
   const waMessage = customer
@@ -382,10 +391,49 @@ function SaleDetailModal({
               <span className="text-slate-500">Cliente</span>
               <span className="font-medium text-slate-700">{customer.fullName}</span>
             </div>
-          ) : (
-            <div className="flex justify-between">
+          ) : !showAssign ? (
+            <div className="flex items-center justify-between gap-2">
               <span className="text-slate-500">Cliente</span>
-              <span className="text-slate-400">Sin cliente identificado</span>
+              <button
+                onClick={() => setShowAssign(true)}
+                className="inline-flex items-center gap-1 text-xs font-semibold text-brand-600 hover:underline"
+              >
+                <Icon.Plus className="h-3.5 w-3.5" />
+                Asignar cliente
+              </button>
+            </div>
+          ) : (
+            <div>
+              <div className="mb-1.5 flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  Asignar cliente
+                </span>
+                <button
+                  onClick={() => setShowAssign(false)}
+                  className="text-xs text-slate-400 hover:text-slate-600"
+                >
+                  Cancelar
+                </button>
+              </div>
+              <CustomerPicker
+                value={null}
+                onChange={c => {
+                  if (!c) return
+                  assign.mutate(
+                    { saleId: sale.id, customerId: c.id },
+                    {
+                      onSuccess: () => {
+                        toast.success('Cliente asignado', c.fullName)
+                        onAssigned({ ...sale, customerId: c.id })
+                        setShowAssign(false)
+                      },
+                      onError: () => toast.error('No se pudo asignar')
+                    }
+                  )
+                }}
+                allowClear={false}
+                placeholder="Buscar cliente o crear nuevo..."
+              />
             </div>
           )}
           <div className="flex justify-between">
