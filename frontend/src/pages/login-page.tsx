@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import axios from 'axios'
 import { Button, Input, Icon } from '@/components/ui'
 import { cn } from '@/lib/utils'
 import type { LoginRequest, RegisterRequest } from '@/types/auth'
@@ -25,6 +26,31 @@ export default function LoginPage({ onLogin, onRegister, loading, error }: Props
   const [fullName, setFullName] = useState('')
   const [businessName, setBusinessName] = useState('')
   const [businessType, setBusinessType] = useState('tienda')
+  const [demoLoading, setDemoLoading] = useState(false)
+  const [demoMsg, setDemoMsg] = useState<string | null>(null)
+
+  const handleLoadDemo = async () => {
+    setDemoMsg(null)
+    setDemoLoading(true)
+    try {
+      const res = await axios.post<{
+        ok: boolean
+        credentials: { email: string; password: string }
+        publicCatalogSlug: string
+      }>('/api/dev/seed-demo')
+      const creds = res.data.credentials
+      setEmail(creds.email)
+      setPassword(creds.password)
+      setMode('login')
+      setDemoMsg(`Datos cargados. Catálogo público en /c/${res.data.publicCatalogSlug}. Presiona Entrar.`)
+      // Auto-login para que el usuario solo presione enter
+      await onLogin({ email: creds.email, password: creds.password })
+    } catch (e: any) {
+      setDemoMsg('No se pudo cargar la demo. Verifica que el backend esté corriendo.')
+    } finally {
+      setDemoLoading(false)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -203,6 +229,36 @@ export default function LoginPage({ onLogin, onRegister, loading, error }: Props
               {mode === 'login' ? 'Entrar' : 'Crear mi negocio'}
             </Button>
           </form>
+
+          {/* Modo demo: 1 click crea un negocio completo y entra */}
+          <div className="mt-6 border-t border-slate-100 pt-5">
+            <p className="mb-2 text-center text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+              ¿Solo quieres ver el sistema?
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              fullWidth
+              loading={demoLoading}
+              onClick={handleLoadDemo}
+              leftIcon={<Icon.Sparkles className="h-4 w-4" />}
+            >
+              Cargar demo "Barbería El Capitán"
+            </Button>
+            <p className="mt-2 text-center text-[11px] text-slate-500">
+              Crea un negocio completo con productos, ventas, clientes y citas para que explores la app.
+            </p>
+            {demoMsg && (
+              <p className={cn(
+                'mt-3 rounded-lg border px-3 py-2 text-xs',
+                demoMsg.startsWith('No se pudo')
+                  ? 'border-danger-200 bg-danger-50 text-danger-700'
+                  : 'border-success-200 bg-success-50 text-success-700'
+              )}>
+                {demoMsg}
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </div>
