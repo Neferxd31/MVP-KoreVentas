@@ -7,7 +7,11 @@ public record SettingsResponse(
     String logoUrl,
     String primaryColor,
     String customColor,
-    String businessType
+    String businessType,
+    // Catálogo público
+    String whatsappPhone,
+    String publicSlug,
+    boolean catalogEnabled
 ) {
   public static SettingsResponse from(Tenant t) {
     return new SettingsResponse(
@@ -15,7 +19,10 @@ public record SettingsResponse(
         t.getLogoUrl(),
         t.getPrimaryColor(),
         t.getCustomColor(),
-        t.getBusinessType()
+        t.getBusinessType(),
+        t.getWhatsappPhone(),
+        t.getPublicSlug(),
+        t.isCatalogEnabled()
     );
   }
 }

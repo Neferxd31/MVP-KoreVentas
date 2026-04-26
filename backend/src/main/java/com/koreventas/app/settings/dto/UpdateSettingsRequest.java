@@ -10,5 +10,10 @@ public record UpdateSettingsRequest(
         message = "Paleta inválida")
     String primaryColor,
     @Pattern(regexp = "^#[0-9A-Fa-f]{6}$", message = "Color hex inválido")
-    String customColor
+    String customColor,
+    // Catálogo público
+    @Size(max = 30) String whatsappPhone,
+    @Pattern(regexp = "^[a-z0-9-]{3,80}$", message = "Slug solo permite minúsculas, números y guiones")
+    String publicSlug,
+    Boolean catalogEnabled
 ) {}

@@ -60,6 +60,7 @@ class SettingsService {
     // Si la paleta seleccionada no es 'custom', el customColor se descarta
     String customColor = "custom".equals(req.primaryColor()) ? req.customColor() : null;
     t.updateSettings(req.businessName(), req.logoUrl(), req.primaryColor(), customColor);
+    t.updateCatalogSettings(req.whatsappPhone(), req.publicSlug(), req.catalogEnabled());
     return tenants.save(t);
   }
 }

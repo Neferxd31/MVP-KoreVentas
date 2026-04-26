@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { Icon } from './ui/icons'
 import { useSettings } from '@/hooks/use-settings'
+import { useMe } from '@/hooks/use-account'
 
 interface NavItem {
   path: string
@@ -28,6 +29,7 @@ const secondaryNav: NavItem[] = [
   { path: '/expenses', label: 'Gastos', icon: <Icon.TrendingDown className="h-5 w-5" /> },
   { path: '/reports', label: 'Reportes', icon: <Icon.BarChart className="h-5 w-5" /> },
   { path: '/goals', label: 'Metas', icon: <Icon.Star className="h-5 w-5" /> },
+  { path: '/team', label: 'Equipo', icon: <Icon.Users className="h-5 w-5" /> },
   { path: '/settings', label: 'Personalización', icon: <Icon.Sparkles className="h-5 w-5" /> }
 ]
 
@@ -42,8 +44,10 @@ export function AppLayout({ children, onLogout }: Props) {
   const location = useLocation()
   const [sheetOpen, setSheetOpen] = useState(false)
   const { data: settings } = useSettings()
+  const { data: me } = useMe()
   const businessName = settings?.businessName || 'KoreVentas'
   const logoUrl = settings?.logoUrl ?? null
+  const isAdmin = me?.role === 'ADMIN'
 
   const closeSheet = () => setSheetOpen(false)
 
@@ -62,6 +66,8 @@ export function AppLayout({ children, onLogout }: Props) {
           onLogout={onLogout}
           businessName={businessName}
           logoUrl={logoUrl}
+          me={me}
+          isAdmin={isAdmin}
         />
       </aside>
 
@@ -192,12 +198,16 @@ function SidebarContent({
   currentPath,
   onLogout,
   businessName,
-  logoUrl
+  logoUrl,
+  me,
+  isAdmin
 }: {
   currentPath: string
   onLogout: () => void
   businessName: string
   logoUrl: string | null
+  me: { fullName: string; email: string; avatarUrl: string | null; role: string } | undefined
+  isAdmin: boolean
 }) {
   // Subtítulo: si el negocio tiene nombre propio mostramos "Hecho con KoreVentas"
   const isCustomized = businessName !== 'KoreVentas'
@@ -222,7 +232,7 @@ function SidebarContent({
           Menú
         </p>
         <ul className="space-y-1">
-          {allNav.map(item => {
+          {allNav.filter(i => i.path !== '/team' || isAdmin).map(item => {
             const active = currentPath === item.path
             return (
               <li key={item.path}>
@@ -254,16 +264,76 @@ function SidebarContent({
         </ul>
       </nav>
 
-      {/* Footer: logout */}
-      <div className="border-t border-slate-100 p-3">
-        <button
-          onClick={onLogout}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-500 hover:bg-danger-50 hover:text-danger-600 transition"
-        >
-          <Icon.LogOut className="h-5 w-5" />
-          <span>Cerrar sesión</span>
-        </button>
-      </div>
+      {/* Footer: usuario actual + acciones */}
+      <UserFooter me={me} onLogout={onLogout} />
     </>
+  )
+}
+
+function UserFooter({
+  me,
+  onLogout
+}: {
+  me: { fullName: string; email: string; avatarUrl: string | null; role: string } | undefined
+  onLogout: () => void
+}) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <div className="border-t border-slate-100 p-3 relative">
+      {/* Dropdown menu */}
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute bottom-[68px] left-3 right-3 z-20 rounded-xl border border-slate-200 bg-white shadow-soft-lg animate-fade-in p-1.5">
+            <Link
+              to="/account"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+            >
+              <Icon.UserCheck className="h-4 w-4 text-slate-400" />
+              Mi cuenta
+            </Link>
+            <button
+              onClick={() => { setOpen(false); onLogout() }}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-danger-600 hover:bg-danger-50"
+            >
+              <Icon.LogOut className="h-4 w-4" />
+              Cerrar sesión
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* Bloque clickable con avatar + nombre */}
+      <button
+        onClick={() => setOpen(v => !v)}
+        className="flex w-full items-center gap-3 rounded-lg p-2 text-left transition hover:bg-slate-50"
+      >
+        {me?.avatarUrl ? (
+          <img
+            src={me.avatarUrl}
+            alt={me.fullName}
+            className="h-9 w-9 flex-shrink-0 rounded-full object-cover"
+          />
+        ) : (
+          <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-brand-700">
+            {(me?.fullName ?? '?').charAt(0).toUpperCase()}
+          </div>
+        )}
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-semibold text-slate-800">
+            {me?.fullName ?? 'Cargando...'}
+          </p>
+          <p className="truncate text-[11px] text-slate-500">
+            {me?.role === 'ADMIN' ? 'Administrador' : 'Vendedor'}
+          </p>
+        </div>
+        <Icon.ChevronRight className={cn(
+          'h-4 w-4 flex-shrink-0 text-slate-400 transition-transform',
+          open && 'rotate-90'
+        )} />
+      </button>
+    </div>
   )
 }

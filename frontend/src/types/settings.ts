@@ -6,6 +6,10 @@ export interface Settings {
   primaryColor: PaletteKey
   customColor: string | null
   businessType: string
+  // Catálogo público
+  whatsappPhone: string | null
+  publicSlug: string | null
+  catalogEnabled: boolean
 }
 
 export interface UpdateSettingsRequest {
@@ -13,4 +17,7 @@ export interface UpdateSettingsRequest {
   logoUrl?: string | null
   primaryColor?: PaletteKey
   customColor?: string | null
+  whatsappPhone?: string | null
+  publicSlug?: string | null
+  catalogEnabled?: boolean
 }

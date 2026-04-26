@@ -42,6 +42,9 @@ public class User {
   @Column(name = "updated_at", nullable = false)
   private OffsetDateTime updatedAt;
 
+  @Column(name = "avatar_url", columnDefinition = "TEXT")
+  private String avatarUrl;
+
   protected User() {}
 
   public User(UUID id, UUID tenantId, String email, String passwordHash,
@@ -57,6 +60,28 @@ public class User {
     this.updatedAt = OffsetDateTime.now();
   }
 
+  public void updateProfile(String fullName, String email, String avatarUrl) {
+    if (fullName != null && !fullName.isBlank()) this.fullName = fullName;
+    if (email != null && !email.isBlank()) this.email = email;
+    this.avatarUrl = avatarUrl;
+    this.updatedAt = OffsetDateTime.now();
+  }
+
+  public void changePassword(String newHash) {
+    this.passwordHash = newHash;
+    this.updatedAt = OffsetDateTime.now();
+  }
+
+  public void setRole(UserRole role) {
+    this.role = role;
+    this.updatedAt = OffsetDateTime.now();
+  }
+
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+    this.updatedAt = OffsetDateTime.now();
+  }
+
   public UUID getId() { return id; }
   public UUID getTenantId() { return tenantId; }
   public String getEmail() { return email; }
@@ -64,4 +89,6 @@ public class User {
   public String getFullName() { return fullName; }
   public UserRole getRole() { return role; }
   public boolean isEnabled() { return enabled; }
+  public String getAvatarUrl() { return avatarUrl; }
+  public OffsetDateTime getCreatedAt() { return createdAt; }
 }

@@ -42,6 +42,16 @@ public class Tenant {
   @Column(name = "custom_color", length = 7)
   private String customColor;
 
+  // ── Catálogo público (Fase 9) ─────────────────────────────────────
+  @Column(name = "whatsapp_phone", length = 30)
+  private String whatsappPhone;
+
+  @Column(name = "public_slug", length = 80)
+  private String publicSlug;
+
+  @Column(name = "catalog_enabled", nullable = false)
+  private boolean catalogEnabled = false;
+
   protected Tenant() {}
 
   public Tenant(UUID id, String name, String businessType) {
@@ -62,6 +72,13 @@ public class Tenant {
     this.updatedAt = OffsetDateTime.now();
   }
 
+  public void updateCatalogSettings(String whatsappPhone, String publicSlug, Boolean catalogEnabled) {
+    this.whatsappPhone = whatsappPhone;
+    this.publicSlug = publicSlug;
+    if (catalogEnabled != null) this.catalogEnabled = catalogEnabled;
+    this.updatedAt = OffsetDateTime.now();
+  }
+
   public UUID getId() { return id; }
   public String getName() { return name; }
   public String getBusinessType() { return businessType; }
@@ -71,4 +88,7 @@ public class Tenant {
   public String getLogoUrl() { return logoUrl; }
   public String getPrimaryColor() { return primaryColor; }
   public String getCustomColor() { return customColor; }
+  public String getWhatsappPhone() { return whatsappPhone; }
+  public String getPublicSlug() { return publicSlug; }
+  public boolean isCatalogEnabled() { return catalogEnabled; }
 }
