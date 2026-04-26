@@ -173,10 +173,15 @@ export default function ProductsPage() {
                 {filtered.map(p => (
                   <tr key={p.id} className="transition-colors hover:bg-slate-50/60">
                     <td className="px-5 py-3">
-                      <div className="font-medium text-slate-800">{p.name}</div>
-                      {p.barcode && (
-                        <div className="text-xs text-slate-400">{p.barcode}</div>
-                      )}
+                      <div className="flex items-center gap-3">
+                        <ProductThumb url={p.imageUrl} name={p.name} />
+                        <div className="min-w-0">
+                          <div className="font-medium text-slate-800">{p.name}</div>
+                          {p.barcode && (
+                            <div className="text-xs text-slate-400">{p.barcode}</div>
+                          )}
+                        </div>
+                      </div>
                     </td>
                     <td className="px-5 py-3 font-medium text-slate-800 tabular-nums">
                       {formatCop(p.price)}
@@ -236,6 +241,23 @@ export default function ProductsPage() {
           </div>
         </Card>
       )}
+    </div>
+  )
+}
+
+// Miniatura cuadrada del producto. Si no hay imagen muestra placeholder con la inicial.
+function ProductThumb({ url, name }: { url: string | null; name: string }) {
+  if (url) {
+    return (
+      <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
+        <img src={url} alt={name} className="h-full w-full object-cover" />
+      </div>
+    )
+  }
+  const initial = name.trim().charAt(0).toUpperCase() || '?'
+  return (
+    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-slate-100 text-sm font-bold text-slate-400">
+      {initial}
     </div>
   )
 }

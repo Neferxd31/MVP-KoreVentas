@@ -215,28 +215,45 @@ export default function PosPage() {
                       onClick={() => addProductToCart(p)}
                       disabled={out}
                       className={cn(
-                        'group relative flex flex-col items-start justify-between rounded-xl border p-4 text-left transition-all min-h-[128px]',
+                        'group relative flex flex-col overflow-hidden rounded-xl border text-left transition-all min-h-[128px]',
                         out
                           ? 'border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed'
                           : 'border-slate-200 bg-white hover:border-brand-400 hover:shadow-soft-md hover:-translate-y-0.5 active:scale-[0.98]'
                       )}
                     >
                       {p.favorite && (
-                        <Icon.Star className="absolute top-2 right-2 h-3.5 w-3.5 fill-warning-500 text-warning-500" />
+                        <Icon.Star className="absolute top-2 right-2 z-10 h-3.5 w-3.5 fill-warning-500 text-warning-500" />
                       )}
-                      <span className="font-semibold text-slate-800 leading-tight line-clamp-2">
-                        {p.name}
-                      </span>
-                      <div className="w-full">
-                        <p className="mt-2 text-lg font-bold text-brand-700 tabular-nums">
-                          {formatCop(p.price)}
-                        </p>
-                        <p className={cn(
-                          'mt-0.5 text-xs font-medium',
-                          out ? 'text-slate-400' : p.lowStock ? 'text-danger-600' : 'text-slate-400'
+                      {p.imageUrl ? (
+                        <div className={cn(
+                          'aspect-square w-full overflow-hidden bg-slate-100',
+                          out && 'opacity-50'
                         )}>
-                          {out ? 'Sin stock' : `${p.stock} disponibles`}
-                        </p>
+                          <img src={p.imageUrl} alt={p.name} className="h-full w-full object-cover" />
+                        </div>
+                      ) : (
+                        <div className={cn(
+                          'aspect-square w-full flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100',
+                          out && 'opacity-50'
+                        )}>
+                          <Icon.Package className="h-8 w-8 text-slate-300" />
+                        </div>
+                      )}
+                      <div className="flex flex-1 flex-col justify-between p-3">
+                        <span className="font-semibold text-slate-800 leading-tight line-clamp-2 text-sm">
+                          {p.name}
+                        </span>
+                        <div className="mt-2">
+                          <p className="text-base font-bold text-brand-700 tabular-nums">
+                            {formatCop(p.price)}
+                          </p>
+                          <p className={cn(
+                            'mt-0.5 text-[11px] font-medium',
+                            out ? 'text-slate-400' : p.lowStock ? 'text-danger-600' : 'text-slate-400'
+                          )}>
+                            {out ? 'Sin stock' : `${p.stock} disponibles`}
+                          </p>
+                        </div>
                       </div>
                     </button>
                   )
