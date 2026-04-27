@@ -25,6 +25,14 @@ public record ProductResponse(
     OffsetDateTime updatedAt
 ) {
   public static ProductResponse from(Product p) {
+    return from(p, true);
+  }
+
+  /**
+   * Versión que oculta el costo si el caller no debería verlo (rol SELLER).
+   * El costo es información sensible que solo el ADMIN del negocio debe ver.
+   */
+  public static ProductResponse from(Product p, boolean includeCost) {
     return new ProductResponse(
         p.getId(),
         p.getCategoryId(),
@@ -32,7 +40,7 @@ public record ProductResponse(
         p.getDescription(),
         p.getBarcode(),
         p.getPrice(),
-        p.getCost(),
+        includeCost ? p.getCost() : null,
         p.getTaxRate(),
         p.getStock(),
         p.getStockAlert(),

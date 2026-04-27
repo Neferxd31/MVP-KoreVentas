@@ -3,6 +3,7 @@ package com.koreventas.app.product;
 import com.koreventas.app.product.dto.CreateProductRequest;
 import com.koreventas.app.product.dto.ProductResponse;
 import com.koreventas.app.product.dto.UpdateProductRequest;
+import com.koreventas.app.security.CurrentUser;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,55 +26,65 @@ import java.util.UUID;
 public class ProductController {
 
   private final ProductService service;
+  private final CurrentUser currentUser;
 
-  public ProductController(ProductService service) {
+  public ProductController(ProductService service, CurrentUser currentUser) {
     this.service = service;
+    this.currentUser = currentUser;
+  }
+
+  /** El SELLER ve productos pero sin el costo (información sensible). */
+  private ProductResponse mapResponse(Product p) {
+    return ProductResponse.from(p, currentUser.isAdmin());
   }
 
   @GetMapping
   public List<ProductResponse> list() {
-    return service.findAll().stream().map(ProductResponse::from).toList();
+    return service.findAll().stream().map(this::mapResponse).toList();
   }
 
   @GetMapping("/favorites")
   public List<ProductResponse> favorites() {
-    return service.findFavorites().stream().map(ProductResponse::from).toList();
+    return service.findFavorites().stream().map(this::mapResponse).toList();
   }
 
   @GetMapping("/low-stock")
   public List<ProductResponse> lowStock() {
-    return service.findLowStock().stream().map(ProductResponse::from).toList();
+    return service.findLowStock().stream().map(this::mapResponse).toList();
   }
 
   @GetMapping("/search")
   public List<ProductResponse> search(@RequestParam String q) {
-    return service.search(q).stream().map(ProductResponse::from).toList();
+    return service.search(q).stream().map(this::mapResponse).toList();
   }
 
   @GetMapping("/barcode/{barcode}")
   public ProductResponse byBarcode(@PathVariable String barcode) {
-    return ProductResponse.from(service.findByBarcode(barcode));
+    return mapResponse(service.findByBarcode(barcode));
   }
 
   @GetMapping("/{id}")
   public ProductResponse byId(@PathVariable UUID id) {
-    return ProductResponse.from(service.findById(id));
+    return mapResponse(service.findById(id));
   }
 
   @PostMapping
   public ResponseEntity<ProductResponse> create(@Valid @RequestBody CreateProductRequest req) {
+    currentUser.requireAdmin();
     Product product = service.create(req);
-    return ResponseEntity.status(HttpStatus.CREATED).body(ProductResponse.from(product));
+    return ResponseEntity.status(HttpStatus.CREATED).body(mapResponse(product));
   }
 
   @PatchMapping("/{id}")
   public ProductResponse update(@PathVariable UUID id,
                                 @Valid @RequestBody UpdateProductRequest req) {
-    return ProductResponse.from(service.update(id, req));
+    currentUser.requireAdmin();
+    return mapResponse(service.update(id, req));
   }
 
   @DeleteMapping("/{id}")
   public ResponseEntity<Map<String, String>> delete(@PathVariable UUID id) {
+    currentUser.requireAdmin();
     service.delete(id);
     return ResponseEntity.ok(Map.of("message", "Producto desactivado"));
   }
@@ -89,6 +100,7 @@ public class ProductController {
 
   @PostMapping("/categories")
   public ResponseEntity<Map<String, Object>> createCategory(@RequestBody Map<String, String> body) {
+    currentUser.requireAdmin();
     String name = body.get("name");
     if (name == null || name.isBlank()) {
       return ResponseEntity.badRequest().body(Map.of("error", "El nombre es obligatorio"));

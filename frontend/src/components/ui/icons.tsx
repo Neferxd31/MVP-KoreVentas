@@ -238,25 +238,53 @@ const ChevronRight = (p: IconProps) => (
   </svg>
 )
 
-// Añadido: Ícono de Luna (Modo oscuro)
-const Moon = (p: IconProps) => (
+const DollarSign = (p: IconProps) => (
   <svg {...baseProps} {...p}>
-    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+    <line x1="12" y1="2" x2="12" y2="22" />
+    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
   </svg>
 )
 
-// Añadido: Ícono de Sol (Modo claro)
-const Sun = (p: IconProps) => (
+const Lock = (p: IconProps) => (
   <svg {...baseProps} {...p}>
-    <circle cx="12" cy="12" r="4" />
-    <path d="M12 2v2" />
-    <path d="M12 20v2" />
-    <path d="m4.93 4.93 1.41 1.41" />
-    <path d="m17.66 17.66 1.41 1.41" />
-    <path d="M2 12h2" />
-    <path d="M20 12h2" />
-    <path d="m6.34 17.66-1.41 1.41" />
-    <path d="m19.07 4.93-1.41 1.41" />
+    <rect width="18" height="11" x="3" y="11" rx="2" />
+    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+  </svg>
+)
+
+const Unlock = (p: IconProps) => (
+  <svg {...baseProps} {...p}>
+    <rect width="18" height="11" x="3" y="11" rx="2" />
+    <path d="M7 11V7a5 5 0 0 1 9.9-1" />
+  </svg>
+)
+
+const PieChart = (p: IconProps) => (
+  <svg {...baseProps} {...p}>
+    <path d="M21.21 15.89A10 10 0 1 1 8 2.83" />
+    <path d="M22 12A10 10 0 0 0 12 2v10z" />
+  </svg>
+)
+
+const BarChart = (p: IconProps) => (
+  <svg {...baseProps} {...p}>
+    <line x1="12" y1="20" x2="12" y2="10" />
+    <line x1="18" y1="20" x2="18" y2="4" />
+    <line x1="6" y1="20" x2="6" y2="16" />
+  </svg>
+)
+
+// Logo simplificado de WhatsApp (fill, no stroke)
+const WhatsApp = (p: IconProps) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={24}
+    height={24}
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    {...p}
+  >
+    <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.97L2 22l5.25-1.38c1.45.79 3.08 1.21 4.79 1.21 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm0 18.15c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.22 8.22 0 0 1-1.27-4.38c0-4.54 3.7-8.23 8.26-8.23 4.54 0 8.23 3.7 8.23 8.23 0 4.54-3.7 8.24-8.23 8.24Zm4.52-6.17c-.25-.12-1.46-.72-1.68-.8-.23-.08-.39-.12-.55.12-.16.25-.63.8-.77.96-.14.17-.28.19-.52.06-.25-.12-1.04-.38-1.98-1.22-.73-.65-1.23-1.46-1.37-1.7-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.44.12-.14.16-.25.25-.41.08-.17.04-.31-.02-.44-.06-.12-.55-1.32-.75-1.81-.2-.48-.4-.41-.55-.42l-.47-.01c-.16 0-.42.06-.64.31-.22.25-.84.82-.84 2 0 1.18.86 2.32.98 2.48.12.16 1.7 2.59 4.11 3.63.57.25 1.02.4 1.37.51.58.18 1.1.16 1.51.1.46-.07 1.46-.6 1.67-1.18.21-.58.21-1.07.14-1.18-.06-.1-.22-.16-.47-.28Z" />
   </svg>
 )
 
@@ -264,5 +292,6 @@ export const Icon = {
   Home, Cart, Package, Users, LogOut, Search, Plus, Minus, X, Check,
   AlertTriangle, TrendingUp, TrendingDown, Cake, Star, Edit, Trash,
   Phone, Menu, Building, Receipt, Sparkles, Calendar, Clock, Scissors,
-  UserCheck, ChevronLeft, ChevronRight, Moon, Sun
+  UserCheck, ChevronLeft, ChevronRight, WhatsApp,
+  DollarSign, Lock, Unlock, PieChart, BarChart
 }

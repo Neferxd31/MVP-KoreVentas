@@ -2,6 +2,7 @@ package com.koreventas.app.employee;
 
 import com.koreventas.app.employee.dto.CreateEmployeeRequest;
 import com.koreventas.app.employee.dto.EmployeeResponse;
+import com.koreventas.app.security.CurrentUser;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +24,11 @@ import java.util.UUID;
 public class EmployeeController {
 
   private final EmployeeService service;
+  private final CurrentUser currentUser;
 
-  public EmployeeController(EmployeeService service) {
+  public EmployeeController(EmployeeService service, CurrentUser currentUser) {
     this.service = service;
+    this.currentUser = currentUser;
   }
 
   @GetMapping
@@ -40,6 +43,7 @@ public class EmployeeController {
 
   @PostMapping
   public ResponseEntity<EmployeeResponse> create(@Valid @RequestBody CreateEmployeeRequest req) {
+    currentUser.requireAdmin();
     Employee e = service.create(req);
     return ResponseEntity.status(HttpStatus.CREATED).body(EmployeeResponse.from(e));
   }
@@ -47,11 +51,13 @@ public class EmployeeController {
   @PatchMapping("/{id}")
   public EmployeeResponse update(@PathVariable UUID id,
                                  @Valid @RequestBody CreateEmployeeRequest req) {
+    currentUser.requireAdmin();
     return EmployeeResponse.from(service.update(id, req));
   }
 
   @DeleteMapping("/{id}")
   public ResponseEntity<Map<String, String>> delete(@PathVariable UUID id) {
+    currentUser.requireAdmin();
     service.delete(id);
     return ResponseEntity.ok(Map.of("message", "Empleado desactivado"));
   }

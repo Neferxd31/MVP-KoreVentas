@@ -2,6 +2,7 @@ package com.koreventas.app.catalog;
 
 import com.koreventas.app.catalog.dto.CreateServiceRequest;
 import com.koreventas.app.catalog.dto.ServiceResponse;
+import com.koreventas.app.security.CurrentUser;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +24,11 @@ import java.util.UUID;
 public class ServiceController {
 
   private final ServiceService service;
+  private final CurrentUser currentUser;
 
-  public ServiceController(ServiceService service) {
+  public ServiceController(ServiceService service, CurrentUser currentUser) {
     this.service = service;
+    this.currentUser = currentUser;
   }
 
   @GetMapping
@@ -40,6 +43,7 @@ public class ServiceController {
 
   @PostMapping
   public ResponseEntity<ServiceResponse> create(@Valid @RequestBody CreateServiceRequest req) {
+    currentUser.requireAdmin();
     Service s = service.create(req);
     return ResponseEntity.status(HttpStatus.CREATED).body(ServiceResponse.from(s));
   }
@@ -47,11 +51,13 @@ public class ServiceController {
   @PatchMapping("/{id}")
   public ServiceResponse update(@PathVariable UUID id,
                                 @Valid @RequestBody CreateServiceRequest req) {
+    currentUser.requireAdmin();
     return ServiceResponse.from(service.update(id, req));
   }
 
   @DeleteMapping("/{id}")
   public ResponseEntity<Map<String, String>> delete(@PathVariable UUID id) {
+    currentUser.requireAdmin();
     service.delete(id);
     return ResponseEntity.ok(Map.of("message", "Servicio desactivado"));
   }

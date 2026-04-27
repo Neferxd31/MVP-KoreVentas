@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Button, Input } from '@/components/ui'
+import { Button, ImageUploader, Input } from '@/components/ui'
 import { cn } from '@/lib/utils'
 import type { Product, CreateProductRequest } from '@/types/product'
 
@@ -24,6 +24,7 @@ export default function ProductForm({ initial, onSubmit, onCancel, loading }: Pr
   const [stock, setStock] = useState(initial?.stock?.toString() ?? '0')
   const [stockAlert, setStockAlert] = useState(initial?.stockAlert?.toString() ?? '5')
   const [favorite, setFavorite] = useState(initial?.favorite ?? false)
+  const [imageUrl, setImageUrl] = useState<string | null>(initial?.imageUrl ?? null)
 
   // CAMBIO 2: Funciones para formatear y manejar los cambios de los inputs de moneda
   const formatCurrency = (value: number | string) => {
@@ -61,6 +62,7 @@ export default function ProductForm({ initial, onSubmit, onCancel, loading }: Pr
       taxRate: parseFloat(taxRate),
       stock: parseInt(stock),
       stockAlert: parseInt(stockAlert),
+      imageUrl: imageUrl || undefined,
       favorite
     })
   }
@@ -143,6 +145,13 @@ export default function ProductForm({ initial, onSubmit, onCancel, loading }: Pr
         value={barcode}
         onChange={e => setBarcode(e.target.value)}
         placeholder="Opcional"
+      />
+
+      <ImageUploader
+        label="Foto del producto"
+        value={imageUrl}
+        onChange={setImageUrl}
+        hint="Opcional. Aparecerá en el POS y en la lista de productos."
       />
 
       <label className={cn(

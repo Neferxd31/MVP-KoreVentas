@@ -150,12 +150,52 @@ public class SaleService {
     return sales.findByCustomerIdAndTenantId(customerId, TenantContext.get());
   }
 
+  /**
+   * Asigna (o cambia) el cliente de una venta ya registrada.
+   * También actualiza las métricas del cliente con esta compra para que
+   * se refleje en sus totales y etiqueta automática.
+   */
+  @Transactional
+  public Sale assignCustomer(UUID saleId, UUID customerId) {
+    applyTenant();
+    Sale sale = sales.findById(saleId)
+        .orElseThrow(() -> new IllegalStateException("Venta no encontrada: " + saleId));
+
+    // Si la venta ya tenía otro cliente, no le quitamos las métricas (sería destructivo).
+    // Solo registramos la compra al nuevo cliente la primera vez.
+    boolean wasUnassigned = sale.getCustomerId() == null;
+
+    sale.setCustomerId(customerId);
+    Sale saved = sales.save(sale);
+
+    if (wasUnassigned) {
+      customers.findById(customerId).ifPresent(c -> {
+        c.recordPurchase(saved.getTotal());
+        customers.save(c);
+      });
+    }
+    return saved;
+  }
+
   @Transactional(readOnly = true)
   public List<Sale> findByDateRange(OffsetDateTime from, OffsetDateTime to) {
     applyTenant();
     return sales.findByDateRangeAndTenantId(TenantContext.get(), from, to);
   }
-@Transactional(readOnly = true)
+
+  /** Búsqueda con filtros opcionales para historial de ventas. */
+  @Transactional(readOnly = true)
+  public List<Sale> searchSales(OffsetDateTime from,
+                                OffsetDateTime to,
+                                UUID customerId,
+                                PaymentMethod paymentMethod,
+                                UUID productId,
+                                UUID serviceId) {
+    applyTenant();
+    return sales.searchSales(from, to, customerId, paymentMethod, productId, serviceId);
+  }
+
+  @Transactional(readOnly = true)
   public DashboardResumenDTO obtenerResumenDashboard() {
     applyTenant(); // Aplica seguridad RLS
     UUID tenantId = TenantContext.get();

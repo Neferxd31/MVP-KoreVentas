@@ -7,12 +7,19 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,6 +44,41 @@ public class SaleController {
     return service.findToday().stream().map(SaleResponse::from).toList();
   }
 
+  /**
+   * Historial de ventas con filtros opcionales.
+   * - from / to: rango de fechas (yyyy-MM-dd). Default: últimos 30 días.
+   * - customerId, productId, serviceId, paymentMethod: filtros opcionales.
+   */
+  @GetMapping
+  public List<SaleResponse> search(
+      @RequestParam(required = false) String from,
+      @RequestParam(required = false) String to,
+      @RequestParam(required = false) UUID customerId,
+      @RequestParam(required = false) UUID productId,
+      @RequestParam(required = false) UUID serviceId,
+      @RequestParam(required = false) String paymentMethod
+  ) {
+    OffsetDateTime fromDt = parseStart(from);
+    OffsetDateTime toDt = parseEnd(to);
+    PaymentMethod method = paymentMethod != null && !paymentMethod.isBlank()
+        ? PaymentMethod.valueOf(paymentMethod)
+        : null;
+    return service.searchSales(fromDt, toDt, customerId, method, productId, serviceId)
+        .stream().map(SaleResponse::from).toList();
+  }
+
+  private OffsetDateTime parseStart(String d) {
+    LocalDate ld = (d == null || d.isBlank())
+        ? LocalDate.now().minusDays(30)
+        : LocalDate.parse(d);
+    return ld.atStartOfDay().atOffset(ZoneOffset.UTC);
+  }
+
+  private OffsetDateTime parseEnd(String d) {
+    LocalDate ld = (d == null || d.isBlank()) ? LocalDate.now() : LocalDate.parse(d);
+    return ld.atTime(23, 59, 59).atOffset(ZoneOffset.UTC);
+  }
+
   @GetMapping("/{id}")
   public SaleResponse byId(@PathVariable UUID id) {
     return SaleResponse.from(service.findById(id));
@@ -45,6 +87,18 @@ public class SaleController {
   @GetMapping("/customer/{customerId}")
   public List<SaleResponse> byCustomer(@PathVariable UUID customerId) {
     return service.findByCustomer(customerId).stream().map(SaleResponse::from).toList();
+  }
+
+  /** Asigna o cambia el cliente de una venta existente. */
+  @PatchMapping("/{id}/customer")
+  public SaleResponse assignCustomer(@PathVariable UUID id,
+                                     @RequestBody Map<String, String> body) {
+    String raw = body.get("customerId");
+    if (raw == null || raw.isBlank()) {
+      throw new IllegalArgumentException("customerId requerido");
+    }
+    UUID customerId = UUID.fromString(raw);
+    return SaleResponse.from(service.assignCustomer(id, customerId));
   }
   
   @GetMapping("/resumen")

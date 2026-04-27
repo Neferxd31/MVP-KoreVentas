@@ -16,6 +16,7 @@ import {
 import { useServices } from '@/hooks/use-services'
 import AppointmentForm from '@/components/appointment-form'
 import { cn, formatCop } from '@/lib/utils'
+import { waLink, waTemplates } from '@/lib/whatsapp'
 import type { Appointment, AppointmentStatus, CreateAppointmentRequest } from '@/types/appointment'
 
 // ── Helpers de fecha ────────────────────────────────────────
@@ -265,6 +266,32 @@ export default function AgendaPage() {
                 </div>
               )}
             </div>
+
+            {selectedAppt.customerPhone && (() => {
+              const when = new Date(selectedAppt.startAt).toLocaleString('es-CO', {
+                weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit'
+              })
+              const link = waLink(
+                selectedAppt.customerPhone,
+                waTemplates.appointmentReminder(
+                  selectedAppt.customerName ?? 'cliente',
+                  selectedAppt.serviceName,
+                  when
+                )
+              )
+              if (!link) return null
+              return (
+                <a
+                  href={link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#25D366] px-4 py-2 text-sm font-semibold text-white shadow-soft transition hover:bg-[#1ebe5a] active:scale-[0.98]"
+                >
+                  <Icon.WhatsApp className="h-4 w-4" />
+                  Recordar por WhatsApp
+                </a>
+              )
+            })()}
 
             {selectedAppt.status === 'AGENDADA' && (
               <div className="mt-4 flex flex-col gap-2">

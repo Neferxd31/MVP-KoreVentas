@@ -4,9 +4,11 @@ import { useServices } from '@/hooks/use-services'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 import { Badge, Button, Icon, Input, EmptyState, useToast } from '@/components/ui'
+import CustomerPicker from '@/components/customer-picker'
 import { cn, formatCop } from '@/lib/utils'
 import type { Product } from '@/types/product'
 import type { Service } from '@/types/service'
+import type { Customer } from '@/types/customer'
 import type { CartItem, CreateSaleRequest, SaleResponse } from '@/types/sale'
 
 const paymentMethods = [
@@ -32,7 +34,7 @@ export default function PosPage() {
   const [tab, setTab] = useState<Tab>('PRODUCTS')
   const [cart, setCart] = useState<CartItem[]>([])
   const [payment, setPayment] = useState('EFECTIVO')
-  const [customerPhone, setCustomerPhone] = useState('')
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
   const [search, setSearch] = useState('')
   const [lastSale, setLastSale] = useState<SaleResponse | null>(null)
 
@@ -42,7 +44,7 @@ export default function PosPage() {
     onSuccess: (sale) => {
       setLastSale(sale)
       setCart([])
-      setCustomerPhone('')
+      setSelectedCustomer(null)
       toast.success('Venta registrada', `${formatCop(sale.total)} · ${sale.paymentMethod}`)
       qc.invalidateQueries({ queryKey: ['products'] })
       qc.invalidateQueries({ queryKey: ['customers'] })
@@ -126,7 +128,7 @@ export default function PosPage() {
     if (cart.length === 0) return
     createSale.mutate({
       paymentMethod: payment,
-      customerPhone: customerPhone || undefined,
+      customerId: selectedCustomer?.id,
       items: cart.map(i =>
         i.itemType === 'PRODUCT'
           ? { productId: i.productId!, quantity: i.quantity }
@@ -213,28 +215,45 @@ export default function PosPage() {
                       onClick={() => addProductToCart(p)}
                       disabled={out}
                       className={cn(
-                        'group relative flex flex-col items-start justify-between rounded-xl border p-4 text-left transition-all min-h-[128px]',
+                        'group relative flex flex-col overflow-hidden rounded-xl border text-left transition-all min-h-[128px]',
                         out
                           ? 'border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed'
                           : 'border-slate-200 bg-white hover:border-brand-400 hover:shadow-soft-md hover:-translate-y-0.5 active:scale-[0.98]'
                       )}
                     >
                       {p.favorite && (
-                        <Icon.Star className="absolute top-2 right-2 h-3.5 w-3.5 fill-warning-500 text-warning-500" />
+                        <Icon.Star className="absolute top-2 right-2 z-10 h-3.5 w-3.5 fill-warning-500 text-warning-500" />
                       )}
-                      <span className="font-semibold text-slate-800 leading-tight line-clamp-2">
-                        {p.name}
-                      </span>
-                      <div className="w-full">
-                        <p className="mt-2 text-lg font-bold text-brand-700 tabular-nums">
-                          {formatCop(p.price)}
-                        </p>
-                        <p className={cn(
-                          'mt-0.5 text-xs font-medium',
-                          out ? 'text-slate-400' : p.lowStock ? 'text-danger-600' : 'text-slate-400'
+                      {p.imageUrl ? (
+                        <div className={cn(
+                          'aspect-square w-full overflow-hidden bg-slate-100',
+                          out && 'opacity-50'
                         )}>
-                          {out ? 'Sin stock' : `${p.stock} disponibles`}
-                        </p>
+                          <img src={p.imageUrl} alt={p.name} className="h-full w-full object-cover" />
+                        </div>
+                      ) : (
+                        <div className={cn(
+                          'aspect-square w-full flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100',
+                          out && 'opacity-50'
+                        )}>
+                          <Icon.Package className="h-8 w-8 text-slate-300" />
+                        </div>
+                      )}
+                      <div className="flex flex-1 flex-col justify-between p-3">
+                        <span className="font-semibold text-slate-800 leading-tight line-clamp-2 text-sm">
+                          {p.name}
+                        </span>
+                        <div className="mt-2">
+                          <p className="text-base font-bold text-brand-700 tabular-nums">
+                            {formatCop(p.price)}
+                          </p>
+                          <p className={cn(
+                            'mt-0.5 text-[11px] font-medium',
+                            out ? 'text-slate-400' : p.lowStock ? 'text-danger-600' : 'text-slate-400'
+                          )}>
+                            {out ? 'Sin stock' : `${p.stock} disponibles`}
+                          </p>
+                        </div>
                       </div>
                     </button>
                   )
@@ -395,11 +414,10 @@ export default function PosPage() {
 
         {/* Totales + pago */}
         <div className="border-t border-slate-200 bg-white p-4 space-y-3">
-          <Input
-            leftIcon={<Icon.Phone className="h-4 w-4" />}
-            placeholder="Teléfono del cliente (opcional)"
-            value={customerPhone}
-            onChange={e => setCustomerPhone(e.target.value)}
+          <CustomerPicker
+            value={selectedCustomer}
+            onChange={setSelectedCustomer}
+            placeholder="Cliente (opcional) — busca o crea"
           />
 
           <div>
@@ -449,15 +467,36 @@ export default function PosPage() {
           </Button>
 
           {lastSale && (
-            <div className="flex items-center gap-2.5 rounded-lg bg-success-50 border border-success-200 p-3 animate-fade-in">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-success-600 text-white">
-                <Icon.Check className="h-4 w-4" />
+            <div className="rounded-lg bg-success-50 border border-success-200 p-3 animate-fade-in">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-success-600 text-white">
+                  <Icon.Check className="h-4 w-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-success-800">Venta registrada</p>
+                  <p className="text-xs text-success-700">
+                    {formatCop(lastSale.total)} · <Badge tone="success" size="sm">{lastSale.paymentMethod}</Badge>
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-semibold text-success-800">Venta registrada</p>
-                <p className="text-xs text-success-700">
-                  {formatCop(lastSale.total)} · <Badge tone="success" size="sm">{lastSale.paymentMethod}</Badge>
-                </p>
+              <div className="mt-2.5 flex gap-2">
+                <a
+                  href={`/sales/${lastSale.id}/receipt`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-white border border-success-300 px-3 py-1.5 text-xs font-semibold text-success-700 hover:bg-success-100 transition"
+                >
+                  <Icon.Receipt className="h-3.5 w-3.5" />
+                  Ver recibo
+                </a>
+                {lastSale.customerId && (
+                  <button
+                    onClick={() => setLastSale(null)}
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-white border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition"
+                  >
+                    Nueva venta
+                  </button>
+                )}
               </div>
             </div>
           )}

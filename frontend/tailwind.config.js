@@ -8,18 +8,20 @@ export default {
         sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif']
       },
       colors: {
-        // Marca: indigo profundo — transmite confianza financiera
+        // Marca: paleta dinámica vía CSS variables.
+        // Los valores los inyecta lib/theme.ts en :root al cargar settings.
+        // El default (indigo) se setea en index.css como fallback antes del JS.
         brand: {
-          50: '#eef2ff',
-          100: '#e0e7ff',
-          200: '#c7d2fe',
-          300: '#a5b4fc',
-          400: '#818cf8',
-          500: '#6366f1',
-          600: '#4f46e5',
-          700: '#4338ca',
-          800: '#3730a3',
-          900: '#312e81'
+          50: 'var(--brand-50)',
+          100: 'var(--brand-100)',
+          200: 'var(--brand-200)',
+          300: 'var(--brand-300)',
+          400: 'var(--brand-400)',
+          500: 'var(--brand-500)',
+          600: 'var(--brand-600)',
+          700: 'var(--brand-700)',
+          800: 'var(--brand-800)',
+          900: 'var(--brand-900)'
         },
         // Éxito / ventas / dinero positivo
         success: {
@@ -61,6 +63,10 @@ export default {
           '0%': { opacity: '0', transform: 'translateX(16px)' },
           '100%': { opacity: '1', transform: 'translateX(0)' }
         },
+        'slide-in-up': {
+          '0%': { opacity: '0', transform: 'translateY(100%)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' }
+        },
         'shimmer': {
           '0%': { backgroundPosition: '-400px 0' },
           '100%': { backgroundPosition: '400px 0' }
@@ -69,6 +75,7 @@ export default {
       animation: {
         'fade-in': 'fade-in 0.2s ease-out',
         'slide-in-right': 'slide-in-right 0.25s ease-out',
+        'slide-in-up': 'slide-in-up 0.28s ease-out',
         'shimmer': 'shimmer 1.4s linear infinite'
       }
     }

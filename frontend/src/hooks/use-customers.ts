@@ -41,3 +41,39 @@ export function useDeleteCustomer() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['customers'] })
   })
 }
+
+/**
+ * Busca un cliente por teléfono. Devuelve null si no existe (404).
+ * Útil para detección proactiva al escribir el teléfono en POS.
+ */
+export function useCustomerByPhone(phone: string | null) {
+  const cleaned = phone?.replace(/\s/g, '') ?? ''
+  return useQuery<Customer | null>({
+    enabled: cleaned.length >= 7,
+    queryKey: ['customers', 'by-phone', cleaned],
+    queryFn: async () => {
+      try {
+        const res = await api.get<Customer>(`/customers/phone/${encodeURIComponent(cleaned)}`)
+        return res.data
+      } catch (e: any) {
+        if (e?.response?.status === 404) return null
+        throw e
+      }
+    },
+    // Sin reintentos en 404s
+    retry: false
+  })
+}
+
+/** Asigna un cliente a una venta existente. */
+export function useAssignSaleCustomer() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ saleId, customerId }: { saleId: string; customerId: string }) =>
+      (await api.patch(`/sales/${saleId}/customer`, { customerId })).data,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['sales'] })
+      qc.invalidateQueries({ queryKey: ['customers'] })
+    }
+  })
+}

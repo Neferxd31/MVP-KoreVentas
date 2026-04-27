@@ -13,12 +13,14 @@ import {
   useUpdateService,
   useDeleteService
 } from '@/hooks/use-services'
+import { useIsAdmin } from '@/hooks/use-account'
 import ServiceForm from '@/components/service-form'
 import { formatCop } from '@/lib/utils'
 import type { Service, CreateServiceRequest } from '@/types/service'
 
 export default function ServicesPage() {
   const toast = useToast()
+  const isAdmin = useIsAdmin()
   const { data: services, isLoading, isError } = useServices()
   const createService = useCreateService()
   const updateService = useUpdateService()
@@ -61,7 +63,7 @@ export default function ServicesPage() {
             {services?.length ?? 0} servicios en catálogo
           </p>
         </div>
-        {!showForm && (
+        {!showForm && isAdmin && (
           <Button
             onClick={() => { setEditing(null); setShowForm(true) }}
             leftIcon={<Icon.Plus className="h-4 w-4" />}
@@ -138,26 +140,28 @@ export default function ServicesPage() {
                 </div>
               </div>
 
-              <div className="flex gap-1 border-t border-slate-100 pt-2">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => { setEditing(s); setShowForm(true) }}
-                  leftIcon={<Icon.Edit className="h-3.5 w-3.5" />}
-                  fullWidth
-                >
-                  Editar
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => handleDelete(s)}
-                  leftIcon={<Icon.Trash className="h-3.5 w-3.5" />}
-                  className="hover:bg-danger-50 hover:text-danger-600"
-                >
-                  Quitar
-                </Button>
-              </div>
+              {isAdmin && (
+                <div className="flex gap-1 border-t border-slate-100 pt-2">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => { setEditing(s); setShowForm(true) }}
+                    leftIcon={<Icon.Edit className="h-3.5 w-3.5" />}
+                    fullWidth
+                  >
+                    Editar
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleDelete(s)}
+                    leftIcon={<Icon.Trash className="h-3.5 w-3.5" />}
+                    className="hover:bg-danger-50 hover:text-danger-600"
+                  >
+                    Quitar
+                  </Button>
+                </div>
+              )}
             </Card>
           ))}
         </div>
