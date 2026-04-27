@@ -9,9 +9,12 @@ interface NavItem {
   path: string
   label: string
   icon: ReactNode
+  /** Si true, solo se muestra a usuarios con rol ADMIN. */
+  adminOnly?: boolean
 }
 
-// Items principales — siempre visibles en desktop sidebar y en mobile bottom-nav
+// Items principales — siempre visibles en desktop sidebar y en mobile bottom-nav.
+// Todos accesibles para SELLER (vender, ver agenda y consultar productos es su día a día).
 const primaryNav: NavItem[] = [
   { path: '/', label: 'Inicio', icon: <Icon.Home className="h-5 w-5" /> },
   { path: '/pos', label: 'Vender', icon: <Icon.Cart className="h-5 w-5" /> },
@@ -19,18 +22,18 @@ const primaryNav: NavItem[] = [
   { path: '/products', label: 'Productos', icon: <Icon.Package className="h-5 w-5" /> }
 ]
 
-// Resto — solo en sidebar desktop y en sheet "Más" de mobile
+// Resto. adminOnly: true → no visible para SELLER (datos sensibles del negocio).
 const secondaryNav: NavItem[] = [
   { path: '/sales', label: 'Ventas', icon: <Icon.Receipt className="h-5 w-5" /> },
   { path: '/services', label: 'Servicios', icon: <Icon.Scissors className="h-5 w-5" /> },
   { path: '/customers', label: 'Clientes', icon: <Icon.Users className="h-5 w-5" /> },
-  { path: '/employees', label: 'Equipo', icon: <Icon.UserCheck className="h-5 w-5" /> },
-  { path: '/cash', label: 'Caja', icon: <Icon.DollarSign className="h-5 w-5" /> },
-  { path: '/expenses', label: 'Gastos', icon: <Icon.TrendingDown className="h-5 w-5" /> },
-  { path: '/reports', label: 'Reportes', icon: <Icon.BarChart className="h-5 w-5" /> },
-  { path: '/goals', label: 'Metas', icon: <Icon.Star className="h-5 w-5" /> },
-  { path: '/team', label: 'Equipo', icon: <Icon.Users className="h-5 w-5" /> },
-  { path: '/settings', label: 'Personalización', icon: <Icon.Sparkles className="h-5 w-5" /> }
+  { path: '/employees', label: 'Empleados', icon: <Icon.UserCheck className="h-5 w-5" />, adminOnly: true },
+  { path: '/cash', label: 'Caja', icon: <Icon.DollarSign className="h-5 w-5" />, adminOnly: true },
+  { path: '/expenses', label: 'Gastos', icon: <Icon.TrendingDown className="h-5 w-5" />, adminOnly: true },
+  { path: '/reports', label: 'Reportes', icon: <Icon.BarChart className="h-5 w-5" />, adminOnly: true },
+  { path: '/goals', label: 'Metas', icon: <Icon.Star className="h-5 w-5" />, adminOnly: true },
+  { path: '/team', label: 'Usuarios del sistema', icon: <Icon.UserCheck className="h-5 w-5" />, adminOnly: true },
+  { path: '/settings', label: 'Personalización', icon: <Icon.Sparkles className="h-5 w-5" />, adminOnly: true }
 ]
 
 const allNav = [...primaryNav, ...secondaryNav]
@@ -146,7 +149,7 @@ export function AppLayout({ children, onLogout }: Props) {
             </div>
             <div className="p-2">
               <div className="grid grid-cols-2 gap-2">
-                {secondaryNav.map(item => {
+                {secondaryNav.filter(i => !i.adminOnly || isAdmin).map(item => {
                   const active = location.pathname === item.path
                   return (
                     <Link
@@ -232,7 +235,7 @@ function SidebarContent({
           Menú
         </p>
         <ul className="space-y-1">
-          {allNav.filter(i => i.path !== '/team' || isAdmin).map(item => {
+          {allNav.filter(i => !i.adminOnly || isAdmin).map(item => {
             const active = currentPath === item.path
             return (
               <li key={item.path}>

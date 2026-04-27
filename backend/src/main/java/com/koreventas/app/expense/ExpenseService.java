@@ -1,6 +1,7 @@
 package com.koreventas.app.expense;
 
 import com.koreventas.app.expense.dto.CreateExpenseRequest;
+import com.koreventas.app.security.CurrentUser;
 import com.koreventas.app.tenant.TenantContext;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -17,16 +18,21 @@ public class ExpenseService {
 
   private final ExpenseRepository expenses;
   private final ExpenseCategoryRepository categories;
+  private final CurrentUser currentUser;
 
   @PersistenceContext
   private EntityManager em;
 
-  public ExpenseService(ExpenseRepository expenses, ExpenseCategoryRepository categories) {
+  public ExpenseService(ExpenseRepository expenses, ExpenseCategoryRepository categories,
+                        CurrentUser currentUser) {
     this.expenses = expenses;
     this.categories = categories;
+    this.currentUser = currentUser;
   }
 
   private void applyTenant() {
+    // Gastos: solo ADMIN. Es información financiera sensible.
+    currentUser.requireAdmin();
     UUID tenantId = TenantContext.get();
     if (tenantId == null) throw new IllegalStateException("No hay tenant en contexto");
     em.createNativeQuery("SET LOCAL app.tenant_id = '" + tenantId + "'").executeUpdate();

@@ -1,5 +1,6 @@
 package com.koreventas.app.settings;
 
+import com.koreventas.app.security.CurrentUser;
 import com.koreventas.app.settings.dto.SettingsResponse;
 import com.koreventas.app.settings.dto.UpdateSettingsRequest;
 import com.koreventas.app.tenant.Tenant;
@@ -41,11 +42,14 @@ public class SettingsController {
 class SettingsService {
 
   private final TenantRepository tenants;
+  private final CurrentUser currentUser;
 
-  SettingsService(TenantRepository tenants) {
+  SettingsService(TenantRepository tenants, CurrentUser currentUser) {
     this.tenants = tenants;
+    this.currentUser = currentUser;
   }
 
+  /** GET es lectura: cualquier usuario logueado puede ver el nombre/logo/color del negocio. */
   @Transactional(readOnly = true)
   public Tenant getCurrent() {
     UUID tenantId = TenantContext.get();
@@ -54,8 +58,10 @@ class SettingsService {
         .orElseThrow(() -> new IllegalStateException("Tenant no encontrado"));
   }
 
+  /** Solo ADMIN puede modificar la personalización del negocio. */
   @Transactional
   public Tenant update(UpdateSettingsRequest req) {
+    currentUser.requireAdmin();
     Tenant t = getCurrent();
     // Si la paleta seleccionada no es 'custom', el customColor se descarta
     String customColor = "custom".equals(req.primaryColor()) ? req.customColor() : null;

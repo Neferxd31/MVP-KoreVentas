@@ -16,6 +16,7 @@ import {
   useDeleteCustomer
 } from '@/hooks/use-customers'
 import CustomerForm from '@/components/customer-form'
+import { useIsAdmin } from '@/hooks/use-account'
 import { cn, formatCop } from '@/lib/utils'
 import { waLink, waTemplates } from '@/lib/whatsapp'
 import type { Customer, CreateCustomerRequest } from '@/types/customer'
@@ -31,6 +32,7 @@ const tagConfig: Record<TagKey, { label: string; tone: 'info' | 'success' | 'pur
 
 export default function CustomersPage() {
   const toast = useToast()
+  const isAdmin = useIsAdmin()
   const { data: customers, isLoading, isError } = useCustomers()
   const createCustomer = useCreateCustomer()
   const updateCustomer = useUpdateCustomer()
@@ -328,15 +330,17 @@ export default function CustomersPage() {
                           >
                             Editar
                           </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleDelete(c)}
-                            leftIcon={<Icon.Trash className="h-3.5 w-3.5" />}
-                            className="hover:bg-danger-50 hover:text-danger-600"
-                          >
-                            Quitar
-                          </Button>
+                          {isAdmin && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleDelete(c)}
+                              leftIcon={<Icon.Trash className="h-3.5 w-3.5" />}
+                              className="hover:bg-danger-50 hover:text-danger-600"
+                            >
+                              Quitar
+                            </Button>
+                          )}
                         </div>
                       </td>
                     </tr>

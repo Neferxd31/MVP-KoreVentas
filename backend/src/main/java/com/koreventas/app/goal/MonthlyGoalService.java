@@ -3,6 +3,7 @@ package com.koreventas.app.goal;
 import com.koreventas.app.goal.dto.GoalProgressResponse;
 import com.koreventas.app.goal.dto.UpsertGoalRequest;
 import com.koreventas.app.sale.SaleRepository;
+import com.koreventas.app.security.CurrentUser;
 import com.koreventas.app.tenant.TenantContext;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -22,16 +23,21 @@ public class MonthlyGoalService {
 
   private final MonthlyGoalRepository goals;
   private final SaleRepository sales;
+  private final CurrentUser currentUser;
 
   @PersistenceContext
   private EntityManager em;
 
-  public MonthlyGoalService(MonthlyGoalRepository goals, SaleRepository sales) {
+  public MonthlyGoalService(MonthlyGoalRepository goals, SaleRepository sales,
+                            CurrentUser currentUser) {
     this.goals = goals;
     this.sales = sales;
+    this.currentUser = currentUser;
   }
 
   private void applyTenant() {
+    // Metas: solo ADMIN
+    currentUser.requireAdmin();
     UUID tenantId = TenantContext.get();
     if (tenantId == null) throw new IllegalStateException("No hay tenant en contexto");
     em.createNativeQuery("SET LOCAL app.tenant_id = '" + tenantId + "'").executeUpdate();

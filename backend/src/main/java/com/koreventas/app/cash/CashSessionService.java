@@ -3,6 +3,7 @@ package com.koreventas.app.cash;
 import com.koreventas.app.cash.dto.CloseCashSessionRequest;
 import com.koreventas.app.cash.dto.OpenCashSessionRequest;
 import com.koreventas.app.sale.SaleRepository;
+import com.koreventas.app.security.CurrentUser;
 import com.koreventas.app.tenant.TenantContext;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -20,16 +21,21 @@ public class CashSessionService {
 
   private final CashSessionRepository sessions;
   private final SaleRepository sales;
+  private final CurrentUser currentUser;
 
   @PersistenceContext
   private EntityManager em;
 
-  public CashSessionService(CashSessionRepository sessions, SaleRepository sales) {
+  public CashSessionService(CashSessionRepository sessions, SaleRepository sales,
+                            CurrentUser currentUser) {
     this.sessions = sessions;
     this.sales = sales;
+    this.currentUser = currentUser;
   }
 
   private void applyTenant() {
+    // Caja: solo ADMIN gestiona arqueo (responsabilidad del dueño/encargado)
+    currentUser.requireAdmin();
     UUID tenantId = TenantContext.get();
     if (tenantId == null) throw new IllegalStateException("No hay tenant en contexto");
     em.createNativeQuery("SET LOCAL app.tenant_id = '" + tenantId + "'").executeUpdate();

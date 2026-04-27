@@ -10,12 +10,14 @@ import {
   useToast
 } from '@/components/ui'
 import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from '@/hooks/use-products'
+import { useIsAdmin } from '@/hooks/use-account'
 import ProductForm from '@/components/product-form'
 import { formatCop } from '@/lib/utils'
 import type { Product, CreateProductRequest } from '@/types/product'
 
 export default function ProductsPage() {
   const toast = useToast()
+  const isAdmin = useIsAdmin()
   const { data: products, isLoading, isError } = useProducts()
   const createProduct = useCreateProduct()
   const updateProduct = useUpdateProduct()
@@ -82,7 +84,7 @@ export default function ProductsPage() {
             )}
           </p>
         </div>
-        {!showForm && (
+        {!showForm && isAdmin && (
           <Button
             onClick={() => { setEditing(null); setShowForm(true) }}
             leftIcon={<Icon.Plus className="h-4 w-4" />}
@@ -162,11 +164,11 @@ export default function ProductsPage() {
                 <tr>
                   <th className="px-5 py-3.5">Producto</th>
                   <th className="px-5 py-3.5">Precio</th>
-                  <th className="px-5 py-3.5">Margen</th>
+                  {isAdmin && <th className="px-5 py-3.5">Margen</th>}
                   <th className="px-5 py-3.5">IVA</th>
                   <th className="px-5 py-3.5 text-center">Stock</th>
                   <th className="px-5 py-3.5 text-center">Favorito</th>
-                  <th className="px-5 py-3.5 text-right">Acciones</th>
+                  {isAdmin && <th className="px-5 py-3.5 text-right">Acciones</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -186,20 +188,22 @@ export default function ProductsPage() {
                     <td className="px-5 py-3 font-medium text-slate-800 tabular-nums">
                       {formatCop(p.price)}
                     </td>
-                    <td className="px-5 py-3">
-                      {p.cost && Number(p.cost) > 0 ? (() => {
-                        const margin = ((Number(p.price) - Number(p.cost)) / Number(p.price)) * 100
-                        const tone: 'success' | 'warning' | 'danger' =
-                          margin >= 30 ? 'success' : margin >= 15 ? 'warning' : 'danger'
-                        return (
-                          <Badge tone={tone} size="sm">
-                            {margin.toFixed(0)}%
-                          </Badge>
-                        )
-                      })() : (
-                        <span className="text-xs text-slate-400">Sin costo</span>
-                      )}
-                    </td>
+                    {isAdmin && (
+                      <td className="px-5 py-3">
+                        {p.cost && Number(p.cost) > 0 ? (() => {
+                          const margin = ((Number(p.price) - Number(p.cost)) / Number(p.price)) * 100
+                          const tone: 'success' | 'warning' | 'danger' =
+                            margin >= 30 ? 'success' : margin >= 15 ? 'warning' : 'danger'
+                          return (
+                            <Badge tone={tone} size="sm">
+                              {margin.toFixed(0)}%
+                            </Badge>
+                          )
+                        })() : (
+                          <span className="text-xs text-slate-400">Sin costo</span>
+                        )}
+                      </td>
+                    )}
                     <td className="px-5 py-3 text-slate-500">{p.taxRate}%</td>
                     <td className="px-5 py-3 text-center">
                       <Badge tone={p.lowStock ? 'danger' : 'success'} size="sm">
@@ -213,27 +217,29 @@ export default function ProductsPage() {
                         <span className="text-slate-300">—</span>
                       )}
                     </td>
-                    <td className="px-5 py-3">
-                      <div className="flex justify-end gap-1">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => { setEditing(p); setShowForm(true) }}
-                          leftIcon={<Icon.Edit className="h-3.5 w-3.5" />}
-                        >
-                          Editar
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleDelete(p)}
-                          leftIcon={<Icon.Trash className="h-3.5 w-3.5" />}
-                          className="hover:bg-danger-50 hover:text-danger-600"
-                        >
-                          Quitar
-                        </Button>
-                      </div>
-                    </td>
+                    {isAdmin && (
+                      <td className="px-5 py-3">
+                        <div className="flex justify-end gap-1">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => { setEditing(p); setShowForm(true) }}
+                            leftIcon={<Icon.Edit className="h-3.5 w-3.5" />}
+                          >
+                            Editar
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleDelete(p)}
+                            leftIcon={<Icon.Trash className="h-3.5 w-3.5" />}
+                            className="hover:bg-danger-50 hover:text-danger-600"
+                          >
+                            Quitar
+                          </Button>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>

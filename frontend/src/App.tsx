@@ -2,6 +2,7 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import { useAuth } from './hooks/use-auth'
 import { AppLayout } from './components/app-layout'
 import { ThemeSync } from './components/theme-sync'
+import { RequireAdmin } from './components/require-admin'
 import LoginPage from './pages/login-page'
 import ProductsPage from './pages/products-page'
 import CustomersPage from './pages/customers-page'
@@ -58,15 +59,15 @@ export default function App() {
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/customers" element={<CustomersPage />} />
-          <Route path="/employees" element={<EmployeesPage />} />
-          <Route path="/cash" element={<CashPage />} />
-          <Route path="/expenses" element={<ExpensesPage />} />
-          <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/employees" element={<RequireAdmin><EmployeesPage /></RequireAdmin>} />
+          <Route path="/cash" element={<RequireAdmin><CashPage /></RequireAdmin>} />
+          <Route path="/expenses" element={<RequireAdmin><ExpensesPage /></RequireAdmin>} />
+          <Route path="/reports" element={<RequireAdmin><ReportsPage /></RequireAdmin>} />
           <Route path="/sales" element={<SalesPage />} />
-          <Route path="/goals" element={<GoalsPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/goals" element={<RequireAdmin><GoalsPage /></RequireAdmin>} />
+          <Route path="/settings" element={<RequireAdmin><SettingsPage /></RequireAdmin>} />
           <Route path="/account" element={<AccountPage />} />
-          <Route path="/team" element={<TeamPage />} />
+          <Route path="/team" element={<RequireAdmin><TeamPage /></RequireAdmin>} />
           <Route path="/sales/:id/receipt" element={<ReceiptPage />} />
         </Routes>
       </AppLayout>

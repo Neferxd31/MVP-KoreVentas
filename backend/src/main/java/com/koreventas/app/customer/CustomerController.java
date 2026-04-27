@@ -3,6 +3,7 @@ package com.koreventas.app.customer;
 import com.koreventas.app.customer.dto.CreateCustomerRequest;
 import com.koreventas.app.customer.dto.CustomerResponse;
 import com.koreventas.app.customer.dto.UpdateCustomerRequest;
+import com.koreventas.app.security.CurrentUser;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,9 +26,11 @@ import java.util.UUID;
 public class CustomerController {
 
   private final CustomerService service;
+  private final CurrentUser currentUser;
 
-  public CustomerController(CustomerService service) {
+  public CustomerController(CustomerService service, CurrentUser currentUser) {
     this.service = service;
+    this.currentUser = currentUser;
   }
 
   @GetMapping
@@ -77,6 +80,8 @@ public class CustomerController {
 
   @DeleteMapping("/{id}")
   public ResponseEntity<Map<String, String>> delete(@PathVariable UUID id) {
+    // Eliminar clientes solo lo puede hacer el dueño (es destructivo)
+    currentUser.requireAdmin();
     service.delete(id);
     return ResponseEntity.ok(Map.of("message", "Cliente eliminado"));
   }

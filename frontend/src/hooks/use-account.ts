@@ -29,3 +29,13 @@ export function useChangePassword() {
       (await api.post('/me/password', data)).data
   })
 }
+
+/**
+ * Atajo: ¿el usuario actual es ADMIN del negocio?
+ * Devuelve false mientras carga (fail-closed) para que las pantallas
+ * no parpadeen mostrando información sensible.
+ */
+export function useIsAdmin(): boolean {
+  const { data } = useMe()
+  return data?.role === 'ADMIN'
+}

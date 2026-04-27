@@ -1,5 +1,6 @@
 package com.koreventas.app.reports;
 
+import com.koreventas.app.security.CurrentUser;
 import com.koreventas.app.tenant.TenantContext;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -32,7 +33,15 @@ public class ReportsController {
   @PersistenceContext
   private EntityManager em;
 
+  private final CurrentUser currentUser;
+
+  public ReportsController(CurrentUser currentUser) {
+    this.currentUser = currentUser;
+  }
+
   private void applyTenant() {
+    // Solo ADMIN ve reportes — son datos sensibles del negocio
+    currentUser.requireAdmin();
     UUID tenantId = TenantContext.get();
     if (tenantId == null) throw new IllegalStateException("No hay tenant en contexto");
     em.createNativeQuery("SET LOCAL app.tenant_id = '" + tenantId + "'").executeUpdate();
