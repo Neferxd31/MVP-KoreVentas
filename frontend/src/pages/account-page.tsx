@@ -80,10 +80,10 @@ export default function AccountPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl transition-colors">
           Mi cuenta
         </h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 transition-colors">
           Tus datos personales y seguridad. Solo tú puedes verlos y editarlos.
         </p>
       </div>
@@ -93,15 +93,15 @@ export default function AccountPage() {
       {me && (
         <>
           {/* Perfil */}
-          <Card className="mb-6">
+          <Card className="mb-6 dark:bg-slate-900 dark:border-slate-800 transition-colors">
             <CardHeader
               icon={
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-4 ring-brand-100">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-4 ring-brand-100 dark:bg-brand-900/30 dark:text-brand-400 dark:ring-brand-900/50 transition-colors">
                   <Icon.UserCheck className="h-5 w-5" />
                 </div>
               }
-              title="Perfil"
-              subtitle="Cómo te ven en la aplicación."
+              title={<span className="text-slate-800 dark:text-white">Perfil</span>}
+              subtitle={<span className="text-slate-500 dark:text-slate-400">Cómo te ven en la aplicación.</span>}
               action={<Badge tone={me.role === 'ADMIN' ? 'purple' : 'info'}>{ROLE_LABEL[me.role]}</Badge>}
             />
             <div className="mt-5 space-y-4">
@@ -124,7 +124,7 @@ export default function AccountPage() {
                 onChange={e => setEmail(e.target.value)}
                 hint="Se usa para iniciar sesión."
               />
-              <div className="text-xs text-slate-500">
+              <div className="text-xs text-slate-500 dark:text-slate-400 transition-colors">
                 Cuenta creada el{' '}
                 {new Date(me.createdAt).toLocaleDateString('es-CO', {
                   day: '2-digit', month: 'long', year: 'numeric'
@@ -139,15 +139,15 @@ export default function AccountPage() {
           </Card>
 
           {/* Seguridad */}
-          <Card className="mb-6">
+          <Card className="mb-6 dark:bg-slate-900 dark:border-slate-800 transition-colors">
             <CardHeader
               icon={
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-warning-50 text-warning-700 ring-4 ring-warning-100">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-warning-50 text-warning-700 ring-4 ring-warning-100 dark:bg-warning-900/30 dark:text-warning-400 dark:ring-warning-900/50 transition-colors">
                   <Icon.Lock className="h-5 w-5" />
                 </div>
               }
-              title="Cambiar contraseña"
-              subtitle="Mínimo 6 caracteres. Te pedimos la actual para confirmar."
+              title={<span className="text-slate-800 dark:text-white">Cambiar contraseña</span>}
+              subtitle={<span className="text-slate-500 dark:text-slate-400">Mínimo 6 caracteres. Te pedimos la actual para confirmar.</span>}
             />
             <div className="mt-5 space-y-3">
               <Input
@@ -184,15 +184,15 @@ export default function AccountPage() {
           </Card>
 
           {/* Sesión */}
-          <Card>
+          <Card className="dark:bg-slate-900 dark:border-slate-800 transition-colors">
             <CardHeader
               icon={
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-danger-50 text-danger-600 ring-4 ring-danger-100">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-danger-50 text-danger-600 ring-4 ring-danger-100 dark:bg-danger-900/30 dark:text-danger-400 dark:ring-danger-900/50 transition-colors">
                   <Icon.LogOut className="h-5 w-5" />
                 </div>
               }
-              title="Cerrar sesión"
-              subtitle="Saldrás del sistema en este dispositivo."
+              title={<span className="text-slate-800 dark:text-white">Cerrar sesión</span>}
+              subtitle={<span className="text-slate-500 dark:text-slate-400">Saldrás del sistema en este dispositivo.</span>}
             />
             <div className="mt-5 flex justify-end">
               <Button variant="danger" onClick={logout} leftIcon={<Icon.LogOut className="h-4 w-4" />}>

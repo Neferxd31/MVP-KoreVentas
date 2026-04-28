@@ -138,23 +138,23 @@ export default function PosPage() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-3.5rem)] lg:h-screen flex-col lg:flex-row">
+    <div className="flex h-[calc(100vh-3.5rem)] lg:h-screen flex-col lg:flex-row dark:bg-slate-950 transition-colors">
       {/* ── Panel izquierdo: Productos / Servicios ─────────── */}
-      <div className="flex-1 overflow-y-auto bg-white lg:border-r border-slate-200 p-4 sm:p-6">
+      <div className="flex-1 overflow-y-auto bg-white dark:bg-slate-900 lg:border-r border-slate-200 dark:border-slate-800 p-4 sm:p-6 transition-colors">
         <div className="mb-4">
-          <h1 className="text-xl font-bold text-slate-900">Vender</h1>
-          <p className="text-xs text-slate-500">Toca un ítem para agregarlo al carrito.</p>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-white">Vender</h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400">Toca un ítem para agregarlo al carrito.</p>
         </div>
 
         {/* Tabs */}
-        <div className="mb-4 inline-flex rounded-lg bg-slate-100 p-1">
+        <div className="mb-4 inline-flex rounded-lg bg-slate-100 dark:bg-slate-800/50 p-1 transition-colors">
           <button
             onClick={() => setTab('PRODUCTS')}
             className={cn(
               'flex items-center gap-1.5 rounded-md px-4 py-1.5 text-sm font-medium transition-all',
               tab === 'PRODUCTS'
-                ? 'bg-white text-brand-700 shadow-soft'
-                : 'text-slate-500 hover:text-slate-700'
+                ? 'bg-white text-brand-700 shadow-soft dark:bg-slate-700 dark:text-brand-400'
+                : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'
             )}
           >
             <Icon.Package className="h-4 w-4" />
@@ -165,8 +165,8 @@ export default function PosPage() {
             className={cn(
               'flex items-center gap-1.5 rounded-md px-4 py-1.5 text-sm font-medium transition-all',
               tab === 'SERVICES'
-                ? 'bg-white text-brand-700 shadow-soft'
-                : 'text-slate-500 hover:text-slate-700'
+                ? 'bg-white text-brand-700 shadow-soft dark:bg-slate-700 dark:text-brand-400'
+                : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'
             )}
           >
             <Icon.Scissors className="h-4 w-4" />
@@ -188,7 +188,7 @@ export default function PosPage() {
             {loadingProducts && (
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                 {Array.from({ length: 8 }).map((_, i) => (
-                  <div key={i} className="skeleton h-[120px] rounded-xl" />
+                  <div key={i} className="skeleton h-[120px] rounded-xl dark:bg-slate-800" />
                 ))}
               </div>
             )}
@@ -217,8 +217,8 @@ export default function PosPage() {
                       className={cn(
                         'group relative flex flex-col overflow-hidden rounded-xl border text-left transition-all min-h-[128px]',
                         out
-                          ? 'border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed'
-                          : 'border-slate-200 bg-white hover:border-brand-400 hover:shadow-soft-md hover:-translate-y-0.5 active:scale-[0.98]'
+                          ? 'border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-600'
+                          : 'border-slate-200 bg-white hover:border-brand-400 hover:shadow-soft-md hover:-translate-y-0.5 active:scale-[0.98] dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700'
                       )}
                     >
                       {p.favorite && (
@@ -226,30 +226,30 @@ export default function PosPage() {
                       )}
                       {p.imageUrl ? (
                         <div className={cn(
-                          'aspect-square w-full overflow-hidden bg-slate-100',
+                          'aspect-square w-full overflow-hidden bg-slate-100 dark:bg-slate-800',
                           out && 'opacity-50'
                         )}>
                           <img src={p.imageUrl} alt={p.name} className="h-full w-full object-cover" />
                         </div>
                       ) : (
                         <div className={cn(
-                          'aspect-square w-full flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100',
+                          'aspect-square w-full flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-800/50',
                           out && 'opacity-50'
                         )}>
-                          <Icon.Package className="h-8 w-8 text-slate-300" />
+                          <Icon.Package className="h-8 w-8 text-slate-300 dark:text-slate-600" />
                         </div>
                       )}
                       <div className="flex flex-1 flex-col justify-between p-3">
-                        <span className="font-semibold text-slate-800 leading-tight line-clamp-2 text-sm">
+                        <span className="font-semibold text-slate-800 dark:text-slate-200 leading-tight line-clamp-2 text-sm">
                           {p.name}
                         </span>
                         <div className="mt-2">
-                          <p className="text-base font-bold text-brand-700 tabular-nums">
+                          <p className="text-base font-bold text-brand-700 dark:text-brand-400 tabular-nums">
                             {formatCop(p.price)}
                           </p>
                           <p className={cn(
                             'mt-0.5 text-[11px] font-medium',
-                            out ? 'text-slate-400' : p.lowStock ? 'text-danger-600' : 'text-slate-400'
+                            out ? 'text-slate-400 dark:text-slate-500' : p.lowStock ? 'text-danger-600 dark:text-danger-400' : 'text-slate-400 dark:text-slate-500'
                           )}>
                             {out ? 'Sin stock' : `${p.stock} disponibles`}
                           </p>
@@ -268,7 +268,7 @@ export default function PosPage() {
             {loadingServices && (
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="skeleton h-[120px] rounded-xl" />
+                  <div key={i} className="skeleton h-[120px] rounded-xl dark:bg-slate-800" />
                 ))}
               </div>
             )}
@@ -291,20 +291,20 @@ export default function PosPage() {
                   <button
                     key={s.id}
                     onClick={() => addServiceToCart(s)}
-                    className="group relative flex flex-col items-start justify-between rounded-xl border border-slate-200 bg-white p-4 text-left min-h-[128px] transition-all hover:border-brand-400 hover:shadow-soft-md hover:-translate-y-0.5 active:scale-[0.98]"
+                    className="group relative flex flex-col items-start justify-between rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-left min-h-[128px] transition-all hover:border-brand-400 dark:hover:border-slate-700 hover:shadow-soft-md hover:-translate-y-0.5 active:scale-[0.98]"
                   >
                     <div
-                      className="absolute top-2 right-2 h-3 w-3 rounded-full"
+                      className="absolute top-2 right-2 h-3 w-3 rounded-full opacity-80"
                       style={{ backgroundColor: s.color }}
                     />
-                    <span className="font-semibold text-slate-800 leading-tight line-clamp-2">
+                    <span className="font-semibold text-slate-800 dark:text-slate-200 leading-tight line-clamp-2">
                       {s.name}
                     </span>
                     <div className="w-full">
-                      <p className="mt-2 text-lg font-bold text-brand-700 tabular-nums">
+                      <p className="mt-2 text-lg font-bold text-brand-700 dark:text-brand-400 tabular-nums">
                         {formatCop(s.price)}
                       </p>
-                      <p className="mt-0.5 flex items-center gap-1 text-xs font-medium text-slate-400">
+                      <p className="mt-0.5 flex items-center gap-1 text-xs font-medium text-slate-400 dark:text-slate-500">
                         <Icon.Clock className="h-3 w-3" />
                         {s.durationMinutes} min
                       </p>
@@ -318,22 +318,22 @@ export default function PosPage() {
       </div>
 
       {/* ── Panel derecho: Carrito ────────────────────────── */}
-      <aside className="lg:w-[380px] flex flex-col bg-slate-50 border-t lg:border-t-0 border-slate-200">
-        <div className="border-b border-slate-200 bg-white px-5 py-4">
+      <aside className="lg:w-[380px] flex flex-col bg-slate-50 dark:bg-slate-950 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-800 transition-colors">
+        <div className="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-5 py-4 transition-colors">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
                 <Icon.Cart className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-slate-800">Carrito</p>
-                <p className="text-xs text-slate-500">{cartCount} ítem(s)</p>
+                <p className="text-sm font-semibold text-slate-800 dark:text-white">Carrito</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{cartCount} ítem(s)</p>
               </div>
             </div>
             {cart.length > 0 && (
               <button
                 onClick={() => setCart([])}
-                className="text-xs font-medium text-slate-500 hover:text-danger-600 transition"
+                className="text-xs font-medium text-slate-500 hover:text-danger-600 dark:text-slate-400 dark:hover:text-danger-400 transition"
               >
                 Vaciar
               </button>
@@ -345,11 +345,11 @@ export default function PosPage() {
           {cart.length === 0 ? (
             <div className="flex h-full items-center justify-center">
               <div className="text-center">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400 dark:bg-slate-800/50 dark:text-slate-500">
                   <Icon.Cart className="h-5 w-5" />
                 </div>
-                <p className="mt-3 text-sm font-medium text-slate-600">Carrito vacío</p>
-                <p className="text-xs text-slate-400">Toca un ítem para agregarlo</p>
+                <p className="mt-3 text-sm font-medium text-slate-600 dark:text-slate-400">Carrito vacío</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500">Toca un ítem para agregarlo</p>
               </div>
             </div>
           ) : (
@@ -360,20 +360,20 @@ export default function PosPage() {
                 return (
                   <li
                     key={key}
-                    className="rounded-xl border border-slate-200 bg-white p-3 animate-fade-in"
+                    className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-3 animate-fade-in transition-colors"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5">
-                          {isService && <Icon.Scissors className="h-3 w-3 text-brand-500" />}
-                          <span className="text-sm font-medium text-slate-800 line-clamp-2">
+                          {isService && <Icon.Scissors className="h-3 w-3 text-brand-500 dark:text-brand-400" />}
+                          <span className="text-sm font-medium text-slate-800 dark:text-slate-200 line-clamp-2">
                             {item.name}
                           </span>
                         </div>
                       </div>
                       <button
                         onClick={() => removeFromCart(key)}
-                        className="text-slate-300 hover:text-danger-500 transition"
+                        className="text-slate-300 hover:text-danger-500 dark:text-slate-600 dark:hover:text-danger-400 transition"
                         aria-label="Quitar"
                       >
                         <Icon.X className="h-4 w-4" />
@@ -381,27 +381,27 @@ export default function PosPage() {
                     </div>
                     <div className="mt-2 flex items-center justify-between">
                       {isService ? (
-                        <span className="text-xs text-slate-400">Servicio</span>
+                        <span className="text-xs text-slate-400 dark:text-slate-500">Servicio</span>
                       ) : (
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() => updateQuantity(key, item.quantity - 1)}
-                            className="flex h-7 w-7 items-center justify-center rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 transition"
+                            className="flex h-7 w-7 items-center justify-center rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 transition"
                           >
                             <Icon.Minus className="h-3.5 w-3.5" />
                           </button>
-                          <span className="w-8 text-center text-sm font-semibold tabular-nums">
+                          <span className="w-8 text-center text-sm font-semibold tabular-nums dark:text-slate-200">
                             {item.quantity}
                           </span>
                           <button
                             onClick={() => updateQuantity(key, item.quantity + 1)}
-                            className="flex h-7 w-7 items-center justify-center rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 transition"
+                            className="flex h-7 w-7 items-center justify-center rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 transition"
                           >
                             <Icon.Plus className="h-3.5 w-3.5" />
                           </button>
                         </div>
                       )}
-                      <span className="text-sm font-semibold text-slate-700 tabular-nums">
+                      <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 tabular-nums">
                         {formatCop(item.price * item.quantity)}
                       </span>
                     </div>
@@ -413,7 +413,7 @@ export default function PosPage() {
         </div>
 
         {/* Totales + pago */}
-        <div className="border-t border-slate-200 bg-white p-4 space-y-3">
+        <div className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 space-y-3 transition-colors">
           <CustomerPicker
             value={selectedCustomer}
             onChange={setSelectedCustomer}
@@ -421,7 +421,7 @@ export default function PosPage() {
           />
 
           <div>
-            <p className="mb-1.5 text-xs font-medium text-slate-500">Método de pago</p>
+            <p className="mb-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">Método de pago</p>
             <div className="grid grid-cols-3 gap-1.5">
               {paymentMethods.map(pm => (
                 <button
@@ -430,8 +430,8 @@ export default function PosPage() {
                   className={cn(
                     'rounded-lg px-2 py-2 text-xs font-medium transition-all',
                     payment === pm.value
-                      ? 'bg-brand-600 text-white shadow-soft'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      ? 'bg-brand-600 text-white shadow-soft dark:bg-brand-500'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700'
                   )}
                 >
                   {pm.label}
@@ -440,16 +440,16 @@ export default function PosPage() {
             </div>
           </div>
 
-          <div className="space-y-1 rounded-lg bg-slate-50 p-3 text-sm">
-            <div className="flex justify-between text-slate-500">
+          <div className="space-y-1 rounded-lg bg-slate-50 dark:bg-slate-950/50 p-3 text-sm transition-colors">
+            <div className="flex justify-between text-slate-500 dark:text-slate-400">
               <span>Subtotal</span>
               <span className="tabular-nums">{formatCop(cartSubtotal)}</span>
             </div>
-            <div className="flex justify-between text-slate-500">
+            <div className="flex justify-between text-slate-500 dark:text-slate-400">
               <span>IVA</span>
               <span className="tabular-nums">{formatCop(cartTax)}</span>
             </div>
-            <div className="flex justify-between pt-2 border-t border-slate-200 text-lg font-bold text-slate-900">
+            <div className="flex justify-between pt-2 border-t border-slate-200 dark:border-slate-800 text-lg font-bold text-slate-900 dark:text-white">
               <span>Total</span>
               <span className="tabular-nums">{formatCop(cartTotal)}</span>
             </div>
@@ -467,14 +467,14 @@ export default function PosPage() {
           </Button>
 
           {lastSale && (
-            <div className="rounded-lg bg-success-50 border border-success-200 p-3 animate-fade-in">
+            <div className="rounded-lg bg-success-50 border border-success-200 dark:bg-success-900/20 dark:border-success-900/50 p-3 animate-fade-in transition-colors">
               <div className="flex items-center gap-2.5">
-                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-success-600 text-white">
+                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-success-600 text-white dark:bg-success-500">
                   <Icon.Check className="h-4 w-4" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-success-800">Venta registrada</p>
-                  <p className="text-xs text-success-700">
+                  <p className="text-sm font-semibold text-success-800 dark:text-success-400">Venta registrada</p>
+                  <p className="text-xs text-success-700 dark:text-success-500">
                     {formatCop(lastSale.total)} · <Badge tone="success" size="sm">{lastSale.paymentMethod}</Badge>
                   </p>
                 </div>
@@ -484,7 +484,7 @@ export default function PosPage() {
                   href={`/sales/${lastSale.id}/receipt`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-white border border-success-300 px-3 py-1.5 text-xs font-semibold text-success-700 hover:bg-success-100 transition"
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-white dark:bg-slate-800 border border-success-300 dark:border-slate-700 px-3 py-1.5 text-xs font-semibold text-success-700 dark:text-slate-300 hover:bg-success-100 dark:hover:bg-slate-700 transition"
                 >
                   <Icon.Receipt className="h-3.5 w-3.5" />
                   Ver recibo
@@ -492,7 +492,7 @@ export default function PosPage() {
                 {lastSale.customerId && (
                   <button
                     onClick={() => setLastSale(null)}
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-white border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition"
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
                   >
                     Nueva venta
                   </button>

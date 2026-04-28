@@ -51,10 +51,10 @@ export default function GoalsPage() {
     <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl transition-colors">
           Metas del mes
         </h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 transition-colors">
           Define cuánto quieres facturar este mes y mide el avance día a día.
         </p>
       </div>
@@ -64,31 +64,31 @@ export default function GoalsPage() {
       {goal && (
         <>
           {/* Progreso visual */}
-          <Card className="mb-6">
+          <Card className="mb-6 dark:bg-slate-900 dark:border-slate-800 transition-colors">
             <CardHeader
               icon={
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-4 ring-brand-100">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-4 ring-brand-100 dark:bg-brand-900/30 dark:text-brand-400 dark:ring-brand-900/50 transition-colors">
                   <Icon.TrendingUp className="h-5 w-5" />
                 </div>
               }
-              title={`${MONTH_NAMES[goal.month - 1].toUpperCase()} ${goal.year}`}
-              subtitle={`Día ${goal.dayOfMonth} de ${goal.daysInMonth}`}
+              title={<span className="text-slate-800 dark:text-white">{`${MONTH_NAMES[goal.month - 1].toUpperCase()} ${goal.year}`}</span>}
+              subtitle={<span className="text-slate-500 dark:text-slate-400">{`Día ${goal.dayOfMonth} de ${goal.daysInMonth}`}</span>}
             />
 
             {goal.goalSet ? (
               <ProgressBlock goal={goal} />
             ) : (
-              <p className="mt-5 rounded-lg bg-warning-50 px-4 py-3 text-sm text-warning-700">
+              <p className="mt-5 rounded-lg bg-warning-50 dark:bg-warning-900/20 px-4 py-3 text-sm text-warning-700 dark:text-warning-400 transition-colors">
                 Aún no has fijado meta para este mes. Define una abajo y empezamos a medir.
               </p>
             )}
           </Card>
 
           {/* Formulario */}
-          <Card>
+          <Card className="dark:bg-slate-900 dark:border-slate-800 transition-colors">
             <CardHeader
-              title={goal.goalSet ? 'Ajustar meta' : 'Definir meta'}
-              subtitle="Puedes editarla en cualquier momento."
+              title={<span className="text-slate-800 dark:text-white">{goal.goalSet ? 'Ajustar meta' : 'Definir meta'}</span>}
+              subtitle={<span className="text-slate-500 dark:text-slate-400">Puedes editarla en cualquier momento.</span>}
             />
             <div className="mt-5 grid gap-4 md:grid-cols-2">
               <Input
@@ -152,50 +152,50 @@ function ProgressBlock({ goal }: { goal: import('@/types/goal').GoalProgress }) 
       {/* Barra de ingresos */}
       <div>
         <div className="mb-2 flex items-baseline justify-between">
-          <span className="text-sm font-semibold text-slate-700">Ingresos</span>
+          <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 transition-colors">Ingresos</span>
           <span className={cn(
-            'text-sm font-semibold tabular-nums',
-            isAhead ? 'text-success-700' : 'text-warning-700'
+            'text-sm font-semibold tabular-nums transition-colors',
+            isAhead ? 'text-success-700 dark:text-success-400' : 'text-warning-700 dark:text-warning-400'
           )}>
             {revenuePct.toFixed(0)}%
           </span>
         </div>
-        <div className="relative h-4 overflow-hidden rounded-full bg-slate-100">
+        <div className="relative h-4 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800 transition-colors">
           {/* Marca del día esperado */}
           <div
-            className="absolute top-0 h-full w-px bg-slate-400/60"
+            className="absolute top-0 h-full w-px bg-slate-400/60 dark:bg-slate-500/60 z-10"
             style={{ left: `${expectedPct}%` }}
             title={`Hoy deberías ir en ${expectedPct.toFixed(0)}%`}
           />
           <div
             className={cn(
               'h-full rounded-full transition-all',
-              isAhead ? 'bg-success-500' : 'bg-warning-500'
+              isAhead ? 'bg-success-500 dark:bg-success-500/90' : 'bg-warning-500 dark:bg-warning-500/90'
             )}
             style={{ width: `${revenuePct}%` }}
           />
         </div>
-        <div className="mt-1.5 flex items-center justify-between text-xs text-slate-500">
+        <div className="mt-1.5 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 transition-colors">
           <span className="tabular-nums">{formatCop(goal.revenueSoFar)}</span>
           <span className="tabular-nums">Meta: {formatCop(goal.revenueTarget)}</span>
         </div>
       </div>
 
       {/* Proyección */}
-      <div className="rounded-xl bg-slate-50 p-4 text-sm">
-        <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-500">
+      <div className="rounded-xl bg-slate-50 dark:bg-slate-800/50 p-4 text-sm transition-colors">
+        <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 transition-colors">
           A este ritmo terminarás en
         </p>
-        <p className="text-2xl font-bold text-slate-900 tabular-nums">
+        <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums transition-colors">
           {formatCop(goal.projectedRevenue)}
         </p>
-        <p className="mt-1 text-xs text-slate-500">
+        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 transition-colors">
           {projectionPct >= 100 ? (
-            <span className="text-success-700">
+            <span className="text-success-700 dark:text-success-400">
               🚀 Vas a superar la meta en {(projectionPct - 100).toFixed(0)}%. Sigue así.
             </span>
           ) : (
-            <span className="text-warning-700">
+            <span className="text-warning-700 dark:text-warning-400">
               ⚠️ Te faltarían {formatCop(goal.revenueTarget - goal.projectedRevenue)} para la meta.
               Necesitas {formatCop(dailyNeeded)} / día los próximos {daysLeft} días.
             </span>
@@ -216,9 +216,9 @@ function ProgressBlock({ goal }: { goal: import('@/types/goal').GoalProgress }) 
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg bg-slate-50 p-3">
-      <p className="text-xs text-slate-500">{label}</p>
-      <p className="text-xl font-bold text-slate-900 tabular-nums">{value}</p>
+    <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 p-3 transition-colors">
+      <p className="text-xs text-slate-500 dark:text-slate-400 transition-colors">{label}</p>
+      <p className="text-xl font-bold text-slate-900 dark:text-white tabular-nums transition-colors">{value}</p>
     </div>
   )
 }

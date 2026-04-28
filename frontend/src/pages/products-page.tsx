@@ -12,7 +12,7 @@ import {
 import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from '@/hooks/use-products'
 import { useIsAdmin } from '@/hooks/use-account'
 import ProductForm from '@/components/product-form'
-import { formatCop } from '@/lib/utils'
+import { cn, formatCop } from '@/lib/utils'
 import type { Product, CreateProductRequest } from '@/types/product'
 
 export default function ProductsPage() {
@@ -69,15 +69,15 @@ export default function ProductsPage() {
       {/* Header */}
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl transition-colors">
             Productos
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 transition-colors">
             {products?.length ?? 0} productos activos
             {lowStockCount > 0 && (
               <>
                 {' · '}
-                <span className="text-danger-600 font-medium">
+                <span className="font-medium text-danger-600 dark:text-danger-400">
                   {lowStockCount} con stock bajo
                 </span>
               </>
@@ -96,8 +96,8 @@ export default function ProductsPage() {
 
       {/* Formulario */}
       {showForm && (
-        <Card className="mb-6 animate-fade-in">
-          <h2 className="mb-4 text-lg font-semibold text-slate-800">
+        <Card className="mb-6 animate-fade-in dark:bg-slate-900 dark:border-slate-800 transition-colors">
+          <h2 className="mb-4 text-lg font-semibold text-slate-800 dark:text-white transition-colors">
             {editing ? 'Editar producto' : 'Nuevo producto'}
           </h2>
           <ProductForm
@@ -121,7 +121,7 @@ export default function ProductsPage() {
 
       {/* Lista */}
       {isLoading && (
-        <Card padding="sm">
+        <Card padding="sm" className="dark:bg-slate-900 dark:border-slate-800 transition-colors">
           <SkeletonRows rows={5} cols={5} />
         </Card>
       )}
@@ -144,7 +144,7 @@ export default function ProductsPage() {
               : 'Intenta con otra búsqueda.'
           }
           action={
-            products?.length === 0 && (
+            products?.length === 0 && isAdmin && (
               <Button
                 onClick={() => setShowForm(true)}
                 leftIcon={<Icon.Plus className="h-4 w-4" />}
@@ -157,10 +157,10 @@ export default function ProductsPage() {
       )}
 
       {!isLoading && !isError && filtered.length > 0 && (
-        <Card padding="none" className="overflow-hidden">
+        <Card padding="none" className="overflow-hidden dark:bg-slate-900 dark:border-slate-800 transition-colors">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50/80 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+              <thead className="bg-slate-50/80 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:bg-slate-800/50 dark:text-slate-400 transition-colors">
                 <tr>
                   <th className="px-5 py-3.5">Producto</th>
                   <th className="px-5 py-3.5">Precio</th>
@@ -171,21 +171,21 @@ export default function ProductsPage() {
                   {isAdmin && <th className="px-5 py-3.5 text-right">Acciones</th>}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 transition-colors">
                 {filtered.map(p => (
-                  <tr key={p.id} className="transition-colors hover:bg-slate-50/60">
+                  <tr key={p.id} className="transition-colors hover:bg-slate-50/60 dark:hover:bg-slate-800/50">
                     <td className="px-5 py-3">
                       <div className="flex items-center gap-3">
                         <ProductThumb url={p.imageUrl} name={p.name} />
                         <div className="min-w-0">
-                          <div className="font-medium text-slate-800">{p.name}</div>
+                          <div className="font-medium text-slate-800 dark:text-slate-200 transition-colors">{p.name}</div>
                           {p.barcode && (
-                            <div className="text-xs text-slate-400">{p.barcode}</div>
+                            <div className="text-xs text-slate-400 dark:text-slate-500 transition-colors">{p.barcode}</div>
                           )}
                         </div>
                       </div>
                     </td>
-                    <td className="px-5 py-3 font-medium text-slate-800 tabular-nums">
+                    <td className="px-5 py-3 font-medium text-slate-800 dark:text-white tabular-nums transition-colors">
                       {formatCop(p.price)}
                     </td>
                     {isAdmin && (
@@ -200,11 +200,11 @@ export default function ProductsPage() {
                             </Badge>
                           )
                         })() : (
-                          <span className="text-xs text-slate-400">Sin costo</span>
+                          <span className="text-xs text-slate-400 dark:text-slate-500 transition-colors">Sin costo</span>
                         )}
                       </td>
                     )}
-                    <td className="px-5 py-3 text-slate-500">{p.taxRate}%</td>
+                    <td className="px-5 py-3 text-slate-500 dark:text-slate-400 transition-colors">{p.taxRate}%</td>
                     <td className="px-5 py-3 text-center">
                       <Badge tone={p.lowStock ? 'danger' : 'success'} size="sm">
                         {p.stock}
@@ -214,7 +214,7 @@ export default function ProductsPage() {
                       {p.favorite ? (
                         <Icon.Star className="mx-auto h-4 w-4 fill-warning-500 text-warning-500" />
                       ) : (
-                        <span className="text-slate-300">—</span>
+                        <span className="text-slate-300 dark:text-slate-600 transition-colors">—</span>
                       )}
                     </td>
                     {isAdmin && (
@@ -233,7 +233,7 @@ export default function ProductsPage() {
                             variant="ghost"
                             onClick={() => handleDelete(p)}
                             leftIcon={<Icon.Trash className="h-3.5 w-3.5" />}
-                            className="hover:bg-danger-50 hover:text-danger-600"
+                            className="hover:bg-danger-50 hover:text-danger-600 dark:hover:bg-danger-900/30 dark:hover:text-danger-400"
                           >
                             Quitar
                           </Button>
@@ -255,14 +255,14 @@ export default function ProductsPage() {
 function ProductThumb({ url, name }: { url: string | null; name: string }) {
   if (url) {
     return (
-      <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
+      <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800 transition-colors">
         <img src={url} alt={name} className="h-full w-full object-cover" />
       </div>
     )
   }
   const initial = name.trim().charAt(0).toUpperCase() || '?'
   return (
-    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-slate-100 text-sm font-bold text-slate-400">
+    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-slate-100 text-sm font-bold text-slate-400 dark:bg-slate-800 dark:text-slate-500 transition-colors">
       {initial}
     </div>
   )

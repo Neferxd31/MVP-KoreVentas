@@ -53,10 +53,10 @@ export default function EmployeesPage() {
     <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl transition-colors">
             Equipo
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 transition-colors">
             {employees?.length ?? 0} miembros activos
           </p>
         </div>
@@ -71,8 +71,8 @@ export default function EmployeesPage() {
       </div>
 
       {showForm && (
-        <Card className="mb-6 animate-fade-in">
-          <h2 className="mb-4 text-lg font-semibold text-slate-800">
+        <Card className="mb-6 animate-fade-in dark:bg-slate-900 dark:border-slate-800 transition-colors">
+          <h2 className="mb-4 text-lg font-semibold text-slate-800 dark:text-white transition-colors">
             {editing ? 'Editar miembro' : 'Nuevo miembro'}
           </h2>
           <EmployeeForm
@@ -85,7 +85,7 @@ export default function EmployeesPage() {
       )}
 
       {isLoading && (
-        <Card padding="sm">
+        <Card padding="sm" className="dark:bg-slate-900 dark:border-slate-800 transition-colors">
           <SkeletonRows rows={4} cols={3} />
         </Card>
       )}
@@ -113,17 +113,20 @@ export default function EmployeesPage() {
       {!isLoading && !isError && (employees?.length ?? 0) > 0 && (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {employees!.map(e => (
-            <Card key={e.id} className="flex items-center gap-4">
+            <Card 
+              key={e.id} 
+              className="flex items-center gap-4 transition-all hover:shadow-soft-md dark:bg-slate-900 dark:border-slate-800 dark:hover:border-slate-700"
+            >
               <div
-                className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full text-lg font-semibold text-white"
+                className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full text-lg font-semibold text-white opacity-90"
                 style={{ backgroundColor: e.color }}
               >
                 {e.fullName.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
-                <h3 className="truncate font-semibold text-slate-800">{e.fullName}</h3>
-                {e.role && <p className="truncate text-xs text-slate-500">{e.role}</p>}
-                {e.phone && <p className="truncate text-xs text-slate-400">{e.phone}</p>}
+                <h3 className="truncate font-semibold text-slate-800 dark:text-slate-200 transition-colors">{e.fullName}</h3>
+                {e.role && <p className="truncate text-xs text-slate-500 dark:text-slate-400 transition-colors">{e.role}</p>}
+                {e.phone && <p className="truncate text-xs text-slate-400 dark:text-slate-500 transition-colors">{e.phone}</p>}
               </div>
               <div className="flex flex-col gap-1">
                 <Button
@@ -139,7 +142,7 @@ export default function EmployeesPage() {
                   variant="ghost"
                   onClick={() => handleDelete(e)}
                   leftIcon={<Icon.Trash className="h-3.5 w-3.5" />}
-                  className="hover:bg-danger-50 hover:text-danger-600"
+                  className="hover:bg-danger-50 hover:text-danger-600 dark:hover:bg-danger-900/30 dark:hover:text-danger-400"
                 >
                   Quitar
                 </Button>

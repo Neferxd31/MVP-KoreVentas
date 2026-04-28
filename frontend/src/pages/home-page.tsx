@@ -58,14 +58,16 @@ type Pulso = {
 function Variacion({ pct }: { pct: number }) {
   const n = Number(pct)
   if (n === 0) {
-    return <span className="text-xs font-medium text-slate-500">= 0%</span>
+    return <span className="text-xs font-medium text-slate-500 dark:text-slate-400">= 0%</span>
   }
   const up = n > 0
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-xs font-semibold',
-        up ? 'bg-success-50 text-success-700' : 'bg-danger-50 text-danger-700'
+        'inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-xs font-semibold transition-colors',
+        up 
+          ? 'bg-success-50 text-success-700 dark:bg-success-900/30 dark:text-success-400' 
+          : 'bg-danger-50 text-danger-700 dark:bg-danger-900/30 dark:text-danger-400'
       )}
     >
       {up ? <Icon.TrendingUp className="h-3 w-3" /> : <Icon.TrendingDown className="h-3 w-3" />}
@@ -88,15 +90,15 @@ function MetricCard({
   subtitle?: React.ReactNode
 }) {
   return (
-    <Card className="relative overflow-hidden">
+    <Card className="relative overflow-hidden dark:bg-slate-900 dark:border-slate-800 transition-colors">
       <div className="flex items-start justify-between">
-        <p className="text-sm font-medium text-slate-500">{label}</p>
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{label}</p>
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400 transition-colors">
           {icon}
         </div>
       </div>
-      <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">{value}</p>
-      <div className="mt-1.5 flex items-center gap-2 text-sm text-slate-500">
+      <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900 dark:text-white transition-colors">{value}</p>
+      <div className="mt-1.5 flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 transition-colors">
         {subtitle}
         {trend}
       </div>
@@ -127,10 +129,10 @@ export default function HomePage() {
       {/* Header */}
       <div className="mb-7 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl transition-colors">
             {settings?.businessName ? `Pulso de ${settings.businessName}` : 'Pulso del negocio'}
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 transition-colors">
             Lo que necesitas saber hoy para tomar acción.
           </p>
         </div>
@@ -139,7 +141,7 @@ export default function HomePage() {
         </Link>
       </div>
 
-      {/* Onboarding checklist (se autoclava cuando todo está hecho o el usuario lo cierra) */}
+      {/* Onboarding checklist */}
       {showOnboarding && onboarding && (
         <div className="mb-7">
           <OnboardingChecklist status={onboarding} onDismiss={dismissOnboarding} />
@@ -186,7 +188,7 @@ export default function HomePage() {
               label="Órdenes hoy"
               value={String(pulso.ordenesHoy)}
               icon={<Icon.Cart className="h-5 w-5" />}
-              subtitle={<span className="text-slate-500">ventas completadas</span>}
+              subtitle={<span className="text-slate-500 dark:text-slate-400">ventas completadas</span>}
             />
           </div>
 
@@ -200,7 +202,7 @@ export default function HomePage() {
           {/* Qué vender hoy — insights accionables */}
           {insights && (insights.champion || insights.slowMover || insights.bundle) && (
             <div className="mt-8">
-              <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-500">
+              <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Qué vender hoy
               </h2>
               <InsightsRow insights={insights} />
@@ -209,7 +211,7 @@ export default function HomePage() {
 
           {/* Atajos rápidos a gestión financiera */}
           <div className="mt-8">
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-500">
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
               Gestión del día
             </h2>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -246,7 +248,7 @@ export default function HomePage() {
 
           {/* Tarjetas accionables */}
           <div className="mt-8">
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-500">
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
               Acciones sugeridas
             </h2>
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
@@ -326,20 +328,20 @@ function ShortcutCard({
   tone: 'brand' | 'warning' | 'success'
 }) {
   const toneMap = {
-    brand: 'bg-brand-50 text-brand-600 group-hover:bg-brand-100',
-    warning: 'bg-warning-50 text-warning-700 group-hover:bg-warning-100',
-    success: 'bg-success-50 text-success-700 group-hover:bg-success-100'
+    brand: 'bg-brand-50 text-brand-600 group-hover:bg-brand-100 dark:bg-brand-900/30 dark:text-brand-400 dark:group-hover:bg-brand-900/50',
+    warning: 'bg-warning-50 text-warning-700 group-hover:bg-warning-100 dark:bg-warning-900/30 dark:text-warning-400 dark:group-hover:bg-warning-900/50',
+    success: 'bg-success-50 text-success-700 group-hover:bg-success-100 dark:bg-success-900/30 dark:text-success-400 dark:group-hover:bg-success-900/50'
   }
   return (
     <Link to={to} className="group">
-      <Card className="h-full transition-shadow hover:shadow-soft-md">
+      <Card className="h-full transition-all hover:shadow-soft-md dark:bg-slate-900 dark:border-slate-800 dark:hover:border-slate-700">
         <div className="flex items-center gap-3">
           <div className={cn('flex h-10 w-10 items-center justify-center rounded-xl transition-colors', toneMap[tone])}>
             {icon}
           </div>
           <div className="min-w-0">
-            <p className="font-semibold text-slate-800">{title}</p>
-            <p className="text-xs text-slate-500">{subtitle}</p>
+            <p className="font-semibold text-slate-800 dark:text-white transition-colors">{title}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 transition-colors">{subtitle}</p>
           </div>
         </div>
       </Card>
@@ -367,24 +369,24 @@ const toneStyles: Record<
   { icon: string; ring: string; button: string }
 > = {
   warning: {
-    icon: 'bg-warning-50 text-warning-700',
-    ring: 'ring-warning-100',
-    button: 'bg-warning-600 hover:bg-warning-700'
+    icon: 'bg-warning-50 text-warning-700 dark:bg-warning-900/30 dark:text-warning-400',
+    ring: 'ring-warning-100 dark:ring-warning-900/50',
+    button: 'bg-warning-600 hover:bg-warning-700 dark:bg-warning-600/90 dark:hover:bg-warning-500'
   },
   danger: {
-    icon: 'bg-danger-50 text-danger-700',
-    ring: 'ring-danger-100',
-    button: 'bg-danger-600 hover:bg-danger-700'
+    icon: 'bg-danger-50 text-danger-700 dark:bg-danger-900/30 dark:text-danger-400',
+    ring: 'ring-danger-100 dark:ring-danger-900/50',
+    button: 'bg-danger-600 hover:bg-danger-700 dark:bg-danger-600/90 dark:hover:bg-danger-500'
   },
   pink: {
-    icon: 'bg-pink-50 text-pink-700',
-    ring: 'ring-pink-100',
-    button: 'bg-pink-600 hover:bg-pink-700'
+    icon: 'bg-pink-50 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400',
+    ring: 'ring-pink-100 dark:ring-pink-900/50',
+    button: 'bg-pink-600 hover:bg-pink-700 dark:bg-pink-600/90 dark:hover:bg-pink-500'
   },
   brand: {
-    icon: 'bg-brand-50 text-brand-700',
-    ring: 'ring-brand-100',
-    button: 'bg-brand-600 hover:bg-brand-700'
+    icon: 'bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-400',
+    ring: 'ring-brand-100 dark:ring-brand-900/50',
+    button: 'bg-brand-600 hover:bg-brand-700 dark:bg-brand-600/90 dark:hover:bg-brand-500'
   }
 }
 
@@ -393,12 +395,12 @@ function ActionCard({
 }: ActionCardProps) {
   const s = toneStyles[tone]
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col dark:bg-slate-900 dark:border-slate-800 transition-colors">
       <CardHeader
         icon={
           <div
             className={cn(
-              'flex h-10 w-10 items-center justify-center rounded-xl ring-4',
+              'flex h-10 w-10 items-center justify-center rounded-xl ring-4 transition-colors',
               s.icon,
               s.ring
             )}
@@ -408,22 +410,22 @@ function ActionCard({
         }
         title={
           <div className="flex items-baseline gap-2">
-            <span>{title}</span>
-            <span className="text-2xl font-bold text-slate-900">{count}</span>
+            <span className="dark:text-slate-200">{title}</span>
+            <span className="text-2xl font-bold text-slate-900 dark:text-white">{count}</span>
           </div>
         }
-        subtitle={subtitle}
+        subtitle={<span className="dark:text-slate-400">{subtitle}</span>}
       />
 
       {items.length > 0 ? (
-        <ul className="mt-4 divide-y divide-slate-100">
+        <ul className="mt-4 divide-y divide-slate-100 dark:divide-slate-800 transition-colors">
           {items.map(it => (
             <li key={it.key} className="flex items-center justify-between gap-2 py-2 text-sm">
-              <span className="truncate flex-1 text-slate-700">{it.left}</span>
+              <span className="truncate flex-1 text-slate-700 dark:text-slate-300">{it.left}</span>
               <span
                 className={cn(
                   'font-semibold tabular-nums',
-                  it.rightDanger ? 'text-danger-600' : 'text-slate-500'
+                  it.rightDanger ? 'text-danger-600 dark:text-danger-400' : 'text-slate-500 dark:text-slate-400'
                 )}
               >
                 {it.right}
@@ -433,7 +435,7 @@ function ActionCard({
                   href={it.waHref}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg text-[#25D366] hover:bg-[#25D366]/10 transition"
+                  className="inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg text-[#25D366] hover:bg-[#25D366]/10 transition dark:hover:bg-[#25D366]/20"
                   title="Enviar WhatsApp"
                   onClick={e => e.stopPropagation()}
                 >
@@ -444,11 +446,11 @@ function ActionCard({
           ))}
         </ul>
       ) : (
-        <p className="mt-4 text-sm text-slate-500">{emptyLabel}</p>
+        <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">{emptyLabel}</p>
       )}
 
       {actionLabel && actionHref && (
-        <Link to={actionHref} className="mt-5">
+        <Link to={actionHref} className="mt-auto pt-5">
           <button
             className={cn(
               'inline-flex w-full items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-soft transition active:scale-[0.98]',
@@ -482,30 +484,30 @@ function OnboardingChecklist({
   const pct = (status.completedSteps / status.totalSteps) * 100
 
   return (
-    <Card className="relative overflow-hidden border-brand-200 bg-gradient-to-br from-brand-50/60 to-white">
+    <Card className="relative overflow-hidden border-brand-200 bg-gradient-to-br from-brand-50/60 to-white dark:border-brand-900/50 dark:from-brand-900/20 dark:to-slate-900 transition-colors">
       <button
         onClick={onDismiss}
-        className="absolute right-3 top-3 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+        className="absolute right-3 top-3 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300 transition-colors"
         title="Ocultar"
       >
         <Icon.X className="h-4 w-4" />
       </button>
 
       <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-100 text-brand-700 ring-4 ring-brand-50">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-100 text-brand-700 ring-4 ring-brand-50 dark:bg-brand-900/40 dark:text-brand-400 dark:ring-brand-900/20 transition-colors">
           <Icon.Sparkles className="h-5 w-5" />
         </div>
         <div>
-          <p className="text-sm font-semibold uppercase tracking-wider text-brand-700">
+          <p className="text-sm font-semibold uppercase tracking-wider text-brand-700 dark:text-brand-400">
             Para empezar
           </p>
-          <p className="text-base font-bold text-slate-800">
+          <p className="text-base font-bold text-slate-800 dark:text-white">
             {status.completedSteps} de {status.totalSteps} pasos completados
           </p>
         </div>
       </div>
 
-      <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
+      <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
         <div
           className="h-full rounded-full bg-brand-500 transition-all"
           style={{ width: `${pct}%` }}
@@ -521,29 +523,29 @@ function OnboardingChecklist({
                 to={step.href}
                 className={cn(
                   'flex items-center gap-3 rounded-lg p-2.5 transition-colors',
-                  done ? 'opacity-60' : 'hover:bg-white'
+                  done ? 'opacity-60' : 'hover:bg-white dark:hover:bg-slate-800/50'
                 )}
               >
                 <span className={cn(
-                  'flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border-2',
+                  'flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border-2 transition-colors',
                   done
-                    ? 'border-success-500 bg-success-500 text-white'
-                    : 'border-slate-300 bg-white'
+                    ? 'border-success-500 bg-success-500 text-white dark:border-success-600 dark:bg-success-600'
+                    : 'border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-900'
                 )}>
                   {done && <Icon.Check className="h-3.5 w-3.5" />}
                 </span>
                 <div className="flex-1 min-w-0">
                   <p className={cn(
                     'text-sm font-medium',
-                    done ? 'text-slate-500 line-through' : 'text-slate-800'
+                    done ? 'text-slate-500 line-through dark:text-slate-400' : 'text-slate-800 dark:text-slate-200'
                   )}>
                     {step.label}
                   </p>
                   {!done && (
-                    <p className="text-xs text-slate-500">{step.description}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{step.description}</p>
                   )}
                 </div>
-                {!done && <Icon.ChevronRight className="h-4 w-4 flex-shrink-0 text-slate-400" />}
+                {!done && <Icon.ChevronRight className="h-4 w-4 flex-shrink-0 text-slate-400 dark:text-slate-500" />}
               </Link>
             </li>
           )
@@ -557,14 +559,14 @@ function OnboardingChecklist({
 function GoalCard({ goal }: { goal: GoalProgress }) {
   if (!goal.goalSet) {
     return (
-      <Card className="flex items-center justify-between gap-4 border-2 border-dashed border-brand-200 bg-brand-50/40">
+      <Card className="flex items-center justify-between gap-4 border-2 border-dashed border-brand-200 bg-brand-50/40 dark:border-brand-900/50 dark:bg-brand-900/10 transition-colors">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-100 text-brand-700">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-400 transition-colors">
             <Icon.Star className="h-5 w-5" />
           </div>
           <div>
-            <p className="font-semibold text-slate-800">Define tu meta del mes</p>
-            <p className="text-sm text-slate-500">
+            <p className="font-semibold text-slate-800 dark:text-white">Define tu meta del mes</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               Mide tu avance día a día y proyecta el cierre del mes.
             </p>
           </div>
@@ -586,33 +588,33 @@ function GoalCard({ goal }: { goal: GoalProgress }) {
     : 0
 
   return (
-    <Card>
+    <Card className="dark:bg-slate-900 dark:border-slate-800 transition-colors">
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-4 ring-brand-100">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-4 ring-brand-100 dark:bg-brand-900/30 dark:text-brand-400 dark:ring-brand-900/50 transition-colors">
             <Icon.Star className="h-5 w-5" />
           </div>
           <div>
-            <p className="text-sm font-semibold uppercase tracking-wider text-slate-500">
+            <p className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
               Meta del mes
             </p>
-            <p className="text-2xl font-bold text-slate-900 tabular-nums">
+            <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">
               {formatCop(goal.revenueSoFar)}
-              <span className="ml-2 text-sm font-medium text-slate-400">
+              <span className="ml-2 text-sm font-medium text-slate-400 dark:text-slate-500">
                 de {formatCop(goal.revenueTarget)}
               </span>
             </p>
           </div>
         </div>
-        <Link to="/goals" className="text-xs font-semibold text-brand-600 hover:underline">
+        <Link to="/goals" className="text-xs font-semibold text-brand-600 hover:underline dark:text-brand-400">
           Ajustar
         </Link>
       </div>
 
       <div className="mt-4">
-        <div className="relative h-3 overflow-hidden rounded-full bg-slate-100">
+        <div className="relative h-3 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
           <div
-            className="absolute top-0 h-full w-px bg-slate-400/60"
+            className="absolute top-0 h-full w-px bg-slate-400/60 dark:bg-slate-500/60"
             style={{ left: `${expectedPct}%` }}
             title={`Día ${goal.dayOfMonth}/${goal.daysInMonth}`}
           />
@@ -627,12 +629,12 @@ function GoalCard({ goal }: { goal: GoalProgress }) {
         <div className="mt-2 flex items-center justify-between text-xs">
           <span className={cn(
             'font-semibold',
-            isAhead ? 'text-success-700' : 'text-warning-700'
+            isAhead ? 'text-success-700 dark:text-success-400' : 'text-warning-700 dark:text-warning-400'
           )}>
             {revenuePct.toFixed(0)}% completado
           </span>
-          <span className="text-slate-500">
-            Proyectado: <span className="font-semibold text-slate-700 tabular-nums">
+          <span className="text-slate-500 dark:text-slate-400">
+            Proyectado: <span className="font-semibold text-slate-700 dark:text-slate-200 tabular-nums">
               {formatCop(goal.projectedRevenue)}
             </span>{' '}
             ({projectionPct.toFixed(0)}%)
@@ -663,7 +665,7 @@ function InsightsRow({ insights }: { insights: Insights }) {
       title: insights.champion.name,
       body: (
         <>
-          <span className="font-semibold text-slate-800 tabular-nums">
+          <span className="font-semibold text-slate-800 dark:text-white tabular-nums">
             {insights.champion.quantity}
           </span>{' '}
           unidades · {formatCop(insights.champion.revenue)} de ingresos. Empújalo otra vez.
@@ -681,7 +683,7 @@ function InsightsRow({ insights }: { insights: Insights }) {
       title: insights.slowMover.name,
       body: (
         <>
-          <span className="font-semibold text-slate-800 tabular-nums">
+          <span className="font-semibold text-slate-800 dark:text-white tabular-nums">
             {insights.slowMover.stock} unidades
           </span>{' '}
           en bodega y 0 ventas en 14 días. Considera ofrecerlo con descuento.
@@ -700,7 +702,7 @@ function InsightsRow({ insights }: { insights: Insights }) {
       body: (
         <>
           Se han comprado juntos{' '}
-          <span className="font-semibold text-slate-800 tabular-nums">
+          <span className="font-semibold text-slate-800 dark:text-white tabular-nums">
             {insights.bundle.timesTogether} veces
           </span>
           . Cuando vendas uno, ofrece el otro.
@@ -711,8 +713,8 @@ function InsightsRow({ insights }: { insights: Insights }) {
 
   if (cards.length === 0) {
     return (
-      <Card padding="sm">
-        <p className="text-sm text-slate-500">
+      <Card padding="sm" className="dark:bg-slate-900 dark:border-slate-800">
+        <p className="text-sm text-slate-500 dark:text-slate-400">
           Vuelve cuando tengas algunas ventas registradas — necesito datos para sugerirte qué empujar.
         </p>
       </Card>
@@ -720,30 +722,30 @@ function InsightsRow({ insights }: { insights: Insights }) {
   }
 
   const toneMap: Record<string, string> = {
-    success: 'bg-success-50 text-success-700 ring-success-100',
-    warning: 'bg-warning-50 text-warning-700 ring-warning-100',
-    brand: 'bg-brand-50 text-brand-600 ring-brand-100'
+    success: 'bg-success-50 text-success-700 ring-success-100 dark:bg-success-900/30 dark:text-success-400 dark:ring-success-900/50',
+    warning: 'bg-warning-50 text-warning-700 ring-warning-100 dark:bg-warning-900/30 dark:text-warning-400 dark:ring-warning-900/50',
+    brand: 'bg-brand-50 text-brand-600 ring-brand-100 dark:bg-brand-900/30 dark:text-brand-400 dark:ring-brand-900/50'
   }
 
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
       {cards.map(c => (
-        <Card key={c.key} className="flex flex-col gap-3">
+        <Card key={c.key} className="flex flex-col gap-3 dark:bg-slate-900 dark:border-slate-800 transition-colors">
           <div className="flex items-start gap-3">
             <div className={cn(
-              'flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl ring-4',
+              'flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl ring-4 transition-colors',
               toneMap[c.tone]
             )}>
               {c.icon}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                 {c.label}
               </p>
-              <p className="font-semibold text-slate-800">{c.title}</p>
+              <p className="font-semibold text-slate-800 dark:text-white">{c.title}</p>
             </div>
           </div>
-          <p className="text-sm text-slate-600">{c.body}</p>
+          <p className="text-sm text-slate-600 dark:text-slate-300">{c.body}</p>
         </Card>
       ))}
     </div>

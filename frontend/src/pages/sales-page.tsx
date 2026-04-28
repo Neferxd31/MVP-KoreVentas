@@ -83,16 +83,16 @@ export default function SalesPage() {
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl transition-colors">
           Historial de ventas
         </h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 transition-colors">
           Consulta todas las ventas con filtros por fecha, cliente, producto o método de pago.
         </p>
       </div>
 
       {/* Filtros */}
-      <Card className="mb-6" padding="sm">
+      <Card className="mb-6 dark:bg-slate-900 dark:border-slate-800 transition-colors" padding="sm">
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
           <Input
             type="date"
@@ -107,9 +107,9 @@ export default function SalesPage() {
             onChange={e => setTo(e.target.value)}
           />
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-slate-700">Cliente</label>
+            <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Cliente</label>
             <select
-              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-brand-500/50 transition-colors"
               value={customerId}
               onChange={e => setCustomerId(e.target.value)}
             >
@@ -120,9 +120,9 @@ export default function SalesPage() {
             </select>
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-slate-700">Producto</label>
+            <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Producto</label>
             <select
-              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-brand-500/50 transition-colors"
               value={productId}
               onChange={e => { setProductId(e.target.value); if (e.target.value) setServiceId('') }}
             >
@@ -133,9 +133,9 @@ export default function SalesPage() {
             </select>
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-slate-700">Servicio</label>
+            <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Servicio</label>
             <select
-              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-brand-500/50 transition-colors"
               value={serviceId}
               onChange={e => { setServiceId(e.target.value); if (e.target.value) setProductId('') }}
             >
@@ -146,9 +146,9 @@ export default function SalesPage() {
             </select>
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-slate-700">Método pago</label>
+            <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Método pago</label>
             <select
-              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-brand-500/50 transition-colors"
               value={paymentMethod}
               onChange={e => setPaymentMethod(e.target.value)}
             >
@@ -182,7 +182,7 @@ export default function SalesPage() {
 
       {/* Tabla */}
       {isLoading && (
-        <Card padding="sm">
+        <Card padding="sm" className="dark:bg-slate-900 dark:border-slate-800">
           <SkeletonRows rows={6} cols={6} />
         </Card>
       )}
@@ -205,15 +205,15 @@ export default function SalesPage() {
               <Card
                 key={s.id}
                 padding="sm"
-                className="cursor-pointer active:scale-[0.99] transition-transform"
+                className="cursor-pointer active:scale-[0.99] transition-all hover:border-slate-300 dark:bg-slate-900 dark:border-slate-800 dark:hover:border-slate-700"
                 onClick={() => setSelected(s)}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-slate-800 truncate">
-                      {cust ? cust.fullName : <span className="text-slate-500 font-normal">Sin cliente</span>}
+                    <p className="text-sm font-semibold text-slate-800 dark:text-white truncate">
+                      {cust ? cust.fullName : <span className="font-normal text-slate-500 dark:text-slate-400">Sin cliente</span>}
                     </p>
-                    <p className="text-[11px] text-slate-400 tabular-nums">
+                    <p className="text-[11px] text-slate-400 dark:text-slate-500 tabular-nums">
                       {date.toLocaleDateString('es-CO', { day: '2-digit', month: 'short' })}
                       {' · '}
                       {date.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}
@@ -223,9 +223,9 @@ export default function SalesPage() {
                     {s.paymentMethod}
                   </Badge>
                 </div>
-                <div className="mt-2 flex items-end justify-between border-t border-slate-100 pt-2">
-                  <p className="text-xs text-slate-400">{s.items.length} ítems</p>
-                  <p className="text-base font-bold text-slate-900 tabular-nums">
+                <div className="mt-2 flex items-end justify-between border-t border-slate-100 pt-2 dark:border-slate-800 transition-colors">
+                  <p className="text-xs text-slate-400 dark:text-slate-500">{s.items.length} ítems</p>
+                  <p className="text-base font-bold text-slate-900 dark:text-white tabular-nums">
                     {formatCop(s.total)}
                   </p>
                 </div>
@@ -237,10 +237,10 @@ export default function SalesPage() {
 
       {/* Desktop / tablet: tabla */}
       {!isLoading && sales && sales.length > 0 && (
-        <Card padding="none" className="hidden md:block overflow-hidden">
+        <Card padding="none" className="hidden md:block overflow-hidden dark:bg-slate-900 dark:border-slate-800 transition-colors">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50/80 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+              <thead className="bg-slate-50/80 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:bg-slate-800/50 dark:text-slate-400 transition-colors">
                 <tr>
                   <th className="px-5 py-3.5">Fecha</th>
                   <th className="px-5 py-3.5">Cliente</th>
@@ -250,33 +250,33 @@ export default function SalesPage() {
                   <th className="px-5 py-3.5"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 transition-colors">
                 {sales.map(s => {
                   const cust = s.customerId ? customerById.get(s.customerId) : null
                   const date = new Date(s.createdAt)
                   return (
                     <tr
                       key={s.id}
-                      className="cursor-pointer transition-colors hover:bg-slate-50/60"
+                      className="cursor-pointer transition-colors hover:bg-slate-50/60 dark:hover:bg-slate-800/50"
                       onClick={() => setSelected(s)}
                     >
-                      <td className="px-5 py-3 text-xs text-slate-500 tabular-nums">
+                      <td className="px-5 py-3 text-xs text-slate-500 dark:text-slate-400 tabular-nums">
                         {date.toLocaleDateString('es-CO', { day: '2-digit', month: 'short' })}
-                        <div className="text-[11px] text-slate-400">
+                        <div className="text-[11px] text-slate-400 dark:text-slate-500">
                           {date.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}
                         </div>
                       </td>
                       <td className="px-5 py-3">
                         {cust ? (
                           <div>
-                            <div className="font-medium text-slate-800">{cust.fullName}</div>
-                            {cust.phone && <div className="text-xs text-slate-400">{cust.phone}</div>}
+                            <div className="font-medium text-slate-800 dark:text-slate-200">{cust.fullName}</div>
+                            {cust.phone && <div className="text-xs text-slate-400 dark:text-slate-500">{cust.phone}</div>}
                           </div>
                         ) : (
-                          <span className="text-xs text-slate-400">Sin cliente</span>
+                          <span className="text-xs text-slate-400 dark:text-slate-500">Sin cliente</span>
                         )}
                       </td>
-                      <td className="px-5 py-3 text-center tabular-nums text-slate-700">
+                      <td className="px-5 py-3 text-center tabular-nums text-slate-700 dark:text-slate-300">
                         {s.items.length}
                       </td>
                       <td className="px-5 py-3">
@@ -284,7 +284,7 @@ export default function SalesPage() {
                           {s.paymentMethod}
                         </Badge>
                       </td>
-                      <td className="px-5 py-3 text-right font-semibold text-slate-800 tabular-nums">
+                      <td className="px-5 py-3 text-right font-semibold text-slate-800 dark:text-white tabular-nums">
                         {formatCop(s.total)}
                       </td>
                       <td className="px-5 py-3 text-right">
@@ -321,14 +321,14 @@ export default function SalesPage() {
 
 function SummaryCard({ label, value, icon }: { label: string; value: string; icon: React.ReactNode }) {
   return (
-    <Card padding="sm">
+    <Card padding="sm" className="dark:bg-slate-900 dark:border-slate-800 transition-colors">
       <div className="flex items-center gap-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400 transition-colors">
           {icon}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-xs text-slate-500">{label}</p>
-          <p className="text-lg font-bold text-slate-900 tabular-nums">{value}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
+          <p className="text-lg font-bold text-slate-900 dark:text-white tabular-nums">{value}</p>
         </div>
       </div>
     </Card>
@@ -350,7 +350,7 @@ function SaleDetailModal({
   const assign = useAssignSaleCustomer()
   const [showAssign, setShowAssign] = useState(false)
   const date = new Date(sale.createdAt)
-  // Plantilla WhatsApp: agradecimiento con resumen de la venta
+  
   const waMessage = customer
     ? `${waTemplates.thankYou(customer.fullName)}\n\nResumen de tu compra:\n${sale.items
         .map(i => `• ${i.quantity} × ${i.productName} — ${formatCop(i.total)}`)
@@ -364,13 +364,13 @@ function SaleDetailModal({
       onClick={onClose}
     >
       <Card
-        className="w-full max-w-lg max-h-[90vh] overflow-y-auto"
+        className="w-full max-w-lg max-h-[90vh] overflow-y-auto dark:bg-slate-900 dark:border-slate-800 transition-colors"
         onClick={e => e.stopPropagation()}
       >
         <div className="mb-4 flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <h2 className="text-lg font-semibold text-slate-800">Detalle de venta</h2>
-            <p className="text-sm text-slate-500">
+            <h2 className="text-lg font-semibold text-slate-800 dark:text-white">Detalle de venta</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               {date.toLocaleString('es-CO', {
                 weekday: 'long', day: 'numeric', month: 'long',
                 hour: '2-digit', minute: '2-digit'
@@ -379,24 +379,24 @@ function SaleDetailModal({
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300 transition-colors"
           >
             <Icon.X className="h-5 w-5" />
           </button>
         </div>
 
-        <div className="space-y-3 border-y border-slate-100 py-4 text-sm">
+        <div className="space-y-3 border-y border-slate-100 py-4 text-sm dark:border-slate-800 transition-colors">
           {customer ? (
             <div className="flex justify-between">
-              <span className="text-slate-500">Cliente</span>
-              <span className="font-medium text-slate-700">{customer.fullName}</span>
+              <span className="text-slate-500 dark:text-slate-400">Cliente</span>
+              <span className="font-medium text-slate-700 dark:text-slate-200">{customer.fullName}</span>
             </div>
           ) : !showAssign ? (
             <div className="flex items-center justify-between gap-2">
-              <span className="text-slate-500">Cliente</span>
+              <span className="text-slate-500 dark:text-slate-400">Cliente</span>
               <button
                 onClick={() => setShowAssign(true)}
-                className="inline-flex items-center gap-1 text-xs font-semibold text-brand-600 hover:underline"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-brand-600 hover:underline dark:text-brand-400"
               >
                 <Icon.Plus className="h-3.5 w-3.5" />
                 Asignar cliente
@@ -405,12 +405,12 @@ function SaleDetailModal({
           ) : (
             <div>
               <div className="mb-1.5 flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Asignar cliente
                 </span>
                 <button
                   onClick={() => setShowAssign(false)}
-                  className="text-xs text-slate-400 hover:text-slate-600"
+                  className="text-xs text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
                 >
                   Cancelar
                 </button>
@@ -437,40 +437,40 @@ function SaleDetailModal({
             </div>
           )}
           <div className="flex justify-between">
-            <span className="text-slate-500">Método de pago</span>
+            <span className="text-slate-500 dark:text-slate-400">Método de pago</span>
             <Badge tone={paymentTone[sale.paymentMethod] ?? 'neutral'} size="sm">
               {sale.paymentMethod}
             </Badge>
           </div>
           {sale.notes && (
             <div>
-              <p className="text-slate-500">Notas</p>
-              <p className="mt-1 text-slate-700">{sale.notes}</p>
+              <p className="text-slate-500 dark:text-slate-400">Notas</p>
+              <p className="mt-1 text-slate-700 dark:text-slate-300">{sale.notes}</p>
             </div>
           )}
         </div>
 
         {/* Ítems */}
         <div className="mt-4">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
             Ítems ({sale.items.length})
           </p>
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-slate-100 dark:divide-slate-800 transition-colors">
             {sale.items.map(it => (
               <li key={it.id} className="py-2.5">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-slate-800">{it.productName}</p>
-                    <p className="text-xs text-slate-500">
+                    <p className="font-medium text-slate-800 dark:text-slate-200">{it.productName}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
                       {it.quantity} × {formatCop(it.unitPrice)}
                       {Number(it.taxRate) > 0 && (
-                        <span className="ml-2 text-slate-400">
+                        <span className="ml-2 text-slate-400 dark:text-slate-500">
                           IVA {(Number(it.taxRate) * 100).toFixed(0)}%
                         </span>
                       )}
                     </p>
                   </div>
-                  <span className="font-semibold text-slate-800 tabular-nums">
+                  <span className="font-semibold text-slate-800 dark:text-white tabular-nums">
                     {formatCop(it.total)}
                   </span>
                 </div>
@@ -480,16 +480,16 @@ function SaleDetailModal({
         </div>
 
         {/* Totales */}
-        <div className="mt-4 space-y-1 border-t border-slate-100 pt-3 text-sm">
-          <div className="flex justify-between text-slate-500">
+        <div className="mt-4 space-y-1 border-t border-slate-100 pt-3 text-sm dark:border-slate-800 transition-colors">
+          <div className="flex justify-between text-slate-500 dark:text-slate-400">
             <span>Subtotal</span>
             <span className="tabular-nums">{formatCop(sale.subtotal)}</span>
           </div>
-          <div className="flex justify-between text-slate-500">
+          <div className="flex justify-between text-slate-500 dark:text-slate-400">
             <span>IVA</span>
             <span className="tabular-nums">{formatCop(sale.taxTotal)}</span>
           </div>
-          <div className="mt-1 flex justify-between border-t border-slate-100 pt-2 text-base font-bold text-slate-900">
+          <div className="mt-1 flex justify-between border-t border-slate-100 pt-2 text-base font-bold text-slate-900 dark:border-slate-800 dark:text-white transition-colors">
             <span>Total</span>
             <span className="tabular-nums">{formatCop(sale.total)}</span>
           </div>
@@ -502,7 +502,8 @@ function SaleDetailModal({
             target="_blank"
             className={cn(
               'inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700',
-              'transition hover:bg-slate-50 active:scale-[0.98]'
+              'transition hover:bg-slate-50 active:scale-[0.98]',
+              'dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
             )}
           >
             <Icon.Receipt className="h-4 w-4" />

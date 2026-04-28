@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Icon } from '@/components/ui/icons'
+import { Badge, Button, EmptyState, Icon } from '@/components/ui'
 import { applyPalette, paletteFromHex, PALETTES } from '@/lib/theme'
 import { cn, formatCop } from '@/lib/utils'
 import { waLink } from '@/lib/whatsapp'
 import { usePublicCatalog } from '@/hooks/use-public-catalog'
+import { useTheme } from '@/context/ThemeContext'
 import type { PublicCatalogItem } from '@/types/public-catalog'
 
 interface CartLine {
@@ -15,9 +16,12 @@ interface CartLine {
 export default function PublicCatalogPage() {
   const { slug } = useParams<{ slug: string }>()
   const { data: catalog, isLoading, isError } = usePublicCatalog(slug ?? null)
+  const { theme, toggleTheme } = useTheme()
 
   const [cart, setCart] = useState<Map<string, CartLine>>(new Map())
   const [search, setSearch] = useState('')
+
+  const isDarkMode = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
 
   // Aplicar la paleta del negocio al cargar
   useEffect(() => {
@@ -101,8 +105,8 @@ export default function PublicCatalogPage() {
   // Estados de carga / error
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="flex flex-col items-center gap-3 text-slate-500">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 transition-colors">
+        <div className="flex flex-col items-center gap-3 text-slate-500 dark:text-slate-400">
           <span className="inline-block h-8 w-8 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
           <p className="text-sm">Cargando catálogo...</p>
         </div>
@@ -112,13 +116,13 @@ export default function PublicCatalogPage() {
 
   if (isError || !catalog) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 transition-colors">
         <div className="max-w-md text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 transition-colors">
             <Icon.AlertTriangle className="h-6 w-6" />
           </div>
-          <h1 className="text-lg font-semibold text-slate-800">Catálogo no disponible</h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <h1 className="text-lg font-semibold text-slate-800 dark:text-white transition-colors">Catálogo no disponible</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 transition-colors">
             El enlace que abriste no existe o el negocio desactivó su catálogo.
           </p>
         </div>
@@ -127,9 +131,20 @@ export default function PublicCatalogPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
       {/* Header del negocio */}
-      <header className="bg-gradient-to-br from-brand-600 to-brand-800 text-white">
+      <header className="relative bg-gradient-to-br from-brand-600 to-brand-800 text-white shadow-md">
+        {/* Botón Theme Toggle */}
+        <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+          <button
+            onClick={toggleTheme}
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur transition-all hover:bg-white/20 active:scale-95"
+            aria-label="Alternar tema"
+          >
+            {isDarkMode ? <Icon.Sun className="h-5 w-5" /> : <Icon.Moon className="h-5 w-5" />}
+          </button>
+        </div>
+
         <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
           <div className="flex items-center gap-4">
             {catalog.logoUrl ? (
@@ -143,7 +158,7 @@ export default function PublicCatalogPage() {
                 {catalog.businessName.charAt(0).toUpperCase()}
               </div>
             )}
-            <div className="min-w-0 flex-1">
+            <div className="min-w-0 flex-1 pr-12"> {/* pr-12 para que el texto no pise el botón del tema */}
               <p className="text-xs uppercase tracking-wider text-white/70">Catálogo</p>
               <h1 className="text-2xl font-bold truncate sm:text-3xl">{catalog.businessName}</h1>
               <p className="mt-0.5 text-sm text-white/80">
@@ -157,7 +172,7 @@ export default function PublicCatalogPage() {
       {/* Buscador */}
       <div className="mx-auto max-w-5xl px-4 pt-6 sm:px-6">
         <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 transition-colors">
             <Icon.Search className="h-4 w-4" />
           </span>
           <input
@@ -165,7 +180,7 @@ export default function PublicCatalogPage() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar producto..."
-            className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-3 text-sm shadow-soft focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+            className="w-full rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-500 py-2.5 pl-10 pr-3 text-sm shadow-soft focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 transition-colors"
           />
         </div>
       </div>
@@ -174,8 +189,8 @@ export default function PublicCatalogPage() {
       <main className="mx-auto max-w-5xl px-4 py-6 pb-32 sm:px-6">
         {filtered.length === 0 ? (
           <div className="py-12 text-center">
-            <Icon.Package className="mx-auto h-10 w-10 text-slate-300" />
-            <p className="mt-3 text-sm text-slate-500">
+            <Icon.Package className="mx-auto h-10 w-10 text-slate-300 dark:text-slate-700 transition-colors" />
+            <p className="mt-3 text-sm text-slate-500 dark:text-slate-400 transition-colors">
               {search ? 'No encontramos productos con esa búsqueda.' : 'Este catálogo está vacío.'}
             </p>
           </div>
@@ -188,42 +203,42 @@ export default function PublicCatalogPage() {
               return (
                 <div
                   key={p.id}
-                  className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all hover:shadow-soft-md"
+                  className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 transition-all hover:shadow-soft-md dark:hover:border-slate-700"
                 >
                   {p.imageUrl ? (
-                    <div className="aspect-square w-full overflow-hidden bg-slate-100">
+                    <div className="aspect-square w-full overflow-hidden bg-slate-100 dark:bg-slate-800 transition-colors">
                       <img src={p.imageUrl} alt={p.name} className="h-full w-full object-cover" />
                     </div>
                   ) : (
-                    <div className="flex aspect-square w-full items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
-                      <Icon.Package className="h-10 w-10 text-slate-300" />
+                    <div className="flex aspect-square w-full items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 transition-colors">
+                      <Icon.Package className="h-10 w-10 text-slate-300 dark:text-slate-700 transition-colors" />
                     </div>
                   )}
                   <div className="flex flex-1 flex-col gap-2 p-3">
                     <div>
-                      <p className="font-semibold text-slate-800 line-clamp-2 text-sm">{p.name}</p>
+                      <p className="font-semibold text-slate-800 dark:text-slate-200 line-clamp-2 text-sm transition-colors">{p.name}</p>
                       {p.description && (
-                        <p className="mt-0.5 text-xs text-slate-500 line-clamp-2">{p.description}</p>
+                        <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400 line-clamp-2 transition-colors">{p.description}</p>
                       )}
                     </div>
-                    <p className="mt-auto text-base font-bold text-brand-700 tabular-nums">
+                    <p className="mt-auto text-base font-bold text-brand-700 dark:text-brand-400 tabular-nums transition-colors">
                       {formatCop(p.price)}
                     </p>
                     {/* Selector cantidad */}
                     {qty > 0 ? (
-                      <div className="flex items-center justify-between rounded-lg bg-brand-50 p-1.5">
+                      <div className="flex items-center justify-between rounded-lg bg-brand-50 dark:bg-brand-500/10 p-1.5 transition-colors">
                         <button
                           onClick={() => decQty(p.id)}
-                          className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-brand-700 shadow-soft hover:bg-brand-50 active:scale-95"
+                          className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-brand-700 shadow-soft hover:bg-brand-50 active:scale-95 dark:bg-slate-800 dark:text-brand-400 dark:hover:bg-slate-700 transition-colors"
                           aria-label="Disminuir"
                         >
                           <Icon.Minus className="h-3.5 w-3.5" />
                         </button>
-                        <span className="text-sm font-bold tabular-nums text-brand-700">{qty}</span>
+                        <span className="text-sm font-bold tabular-nums text-brand-700 dark:text-brand-400 transition-colors">{qty}</span>
                         <button
                           onClick={() => incQty(p)}
                           disabled={atMax}
-                          className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-brand-700 shadow-soft hover:bg-brand-50 active:scale-95 disabled:opacity-40"
+                          className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-brand-700 shadow-soft hover:bg-brand-50 active:scale-95 disabled:opacity-40 dark:bg-slate-800 dark:text-brand-400 dark:hover:bg-slate-700 transition-colors"
                           aria-label="Aumentar"
                         >
                           <Icon.Plus className="h-3.5 w-3.5" />
@@ -232,7 +247,7 @@ export default function PublicCatalogPage() {
                     ) : (
                       <button
                         onClick={() => incQty(p)}
-                        className="rounded-lg bg-brand-600 py-1.5 text-xs font-semibold text-white shadow-soft transition hover:bg-brand-700 active:scale-[0.98]"
+                        className="rounded-lg bg-brand-600 py-1.5 text-xs font-semibold text-white shadow-soft transition hover:bg-brand-700 active:scale-[0.98] dark:bg-brand-500 dark:hover:bg-brand-600"
                       >
                         Agregar
                       </button>
@@ -247,13 +262,13 @@ export default function PublicCatalogPage() {
 
       {/* Barra inferior fija con resumen + botón pedir */}
       {cart.size > 0 && (
-        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 shadow-soft-lg backdrop-blur pb-[env(safe-area-inset-bottom)] animate-slide-in-up">
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 dark:border-slate-800 dark:bg-slate-900/95 shadow-soft-lg backdrop-blur pb-[env(safe-area-inset-bottom)] animate-slide-in-up transition-colors">
           <div className="mx-auto flex max-w-5xl items-center gap-3 px-4 py-3 sm:px-6">
             <div className="flex-1 min-w-0">
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400 transition-colors">
                 {itemsInCart} {itemsInCart === 1 ? 'producto' : 'productos'} en tu pedido
               </p>
-              <p className="text-lg font-bold tabular-nums text-slate-900">{formatCop(total)}</p>
+              <p className="text-lg font-bold tabular-nums text-slate-900 dark:text-white transition-colors">{formatCop(total)}</p>
             </div>
             <button
               onClick={handleSendOrder}
@@ -272,8 +287,8 @@ export default function PublicCatalogPage() {
 
       {/* Marca de agua */}
       <div className="mx-auto max-w-5xl px-4 pb-24 text-center sm:px-6">
-        <p className="text-[11px] tracking-wider text-slate-400">
-          Hecho con <span className="font-semibold text-slate-500">KoreVentas</span>
+        <p className="text-[11px] tracking-wider text-slate-400 dark:text-slate-600 transition-colors">
+          Hecho con <span className="font-semibold text-slate-500 dark:text-slate-500">KoreVentas</span>
         </p>
       </div>
     </div>

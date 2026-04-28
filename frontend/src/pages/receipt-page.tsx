@@ -5,6 +5,7 @@ import { useCustomers } from '@/hooks/use-customers'
 import { useSettings } from '@/hooks/use-settings'
 import { formatCop } from '@/lib/utils'
 import { waLink, waTemplates } from '@/lib/whatsapp'
+import { useTheme } from '@/context/ThemeContext'
 
 export default function ReceiptPage() {
   const { id } = useParams<{ id: string }>()
@@ -12,6 +13,10 @@ export default function ReceiptPage() {
   const { data: sale, isLoading } = useSale(id ?? null)
   const { data: customers } = useCustomers()
   const { data: settings } = useSettings()
+  const { theme, toggleTheme } = useTheme()
+
+  const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+
   const businessName = settings?.businessName || 'KoreVentas'
   const logoUrl = settings?.logoUrl
   const isCustomized = businessName !== 'KoreVentas'
@@ -23,7 +28,7 @@ export default function ReceiptPage() {
   if (isLoading) {
     return (
       <div className="mx-auto max-w-md px-4 py-8">
-        <SkeletonCard />
+        <SkeletonCard  />
       </div>
     )
   }
@@ -46,24 +51,33 @@ export default function ReceiptPage() {
 
   // Mensaje WhatsApp con resumen completo
   const waMessage = customer
-    ? `${waTemplates.thankYou(customer.fullName)}\n\nResumen de tu compra (${fecha} ${hora}):\n${sale.items
+    ? `${waTemplates.thankYou(customer.fullName)}\n\nResumen de tu compra (${fecha}  ${hora}):\n${sale.items
         .map(i => `• ${i.quantity} × ${i.productName} — ${formatCop(i.total)}`)
         .join('\n')}\n\n*Total: ${formatCop(sale.total)}*\nPago: ${sale.paymentMethod}`
     : ''
   const wa = customer?.phone ? waLink(customer.phone, waMessage) : null
 
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="min-h-screen bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
       {/* Toolbar — solo en pantalla, oculto al imprimir */}
-      <div className="no-print sticky top-0 z-10 border-b border-slate-200 bg-white">
+      <div className="no-print sticky top-0 z-10 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors">
         <div className="mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-3">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-slate-600 hover:bg-slate-100"
-          >
-            <Icon.ChevronLeft className="h-4 w-4" />
-            Volver
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            >
+              <Icon.ChevronLeft className="h-4 w-4" />
+              Volver
+            </button>
+            <button
+              onClick={toggleTheme}
+              className="flex h-8 w-8 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors"
+              title="Cambiar tema"
+            >
+              {isDark ? <Icon.Sun className="h-4 w-4" /> : <Icon.Moon className="h-4 w-4" />}
+            </button>
+          </div>
           <div className="flex items-center gap-2">
             {wa && (
               <a
@@ -87,8 +101,8 @@ export default function ReceiptPage() {
       </div>
 
       {/* Recibo — esto se imprime */}
-      <div className="mx-auto max-w-4xl px-4 py-6 print-a4">
-        <div className="mx-auto rounded-2xl bg-white p-6 shadow-soft print:rounded-none print:p-0 print:shadow-none print-receipt sm:max-w-sm">
+      <div className="mx-auto max-w-4xl px-4 py-6 print-a4 text-slate-900 dark:text-white print:text-black">
+        <div className="mx-auto rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-soft dark:shadow-none dark:border dark:border-slate-800 print:border-none print:rounded-none print:p-0 print:shadow-none print:bg-white print-receipt sm:max-w-sm transition-colors">
           {/* Encabezado */}
           <div className="text-center">
             {logoUrl && (
@@ -99,7 +113,7 @@ export default function ReceiptPage() {
               />
             )}
             <h1 className="text-base font-bold uppercase tracking-wider">{businessName}</h1>
-            <p className="text-xs text-slate-500 print:text-black">Comprobante de venta</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 print:text-black transition-colors">Comprobante de venta</p>
           </div>
 
           <Divider />
@@ -119,14 +133,14 @@ export default function ReceiptPage() {
           <div className="text-xs">
             {sale.items.map(it => (
               <div key={it.id} className="mb-2">
-                <div className="font-semibold leading-tight">
+                <div className="font-semibold leading-tight text-slate-800 dark:text-slate-200 print:text-black transition-colors">
                   {it.productName}
                 </div>
-                <div className="flex justify-between leading-tight text-slate-600 print:text-black">
+                <div className="flex justify-between leading-tight text-slate-600 dark:text-slate-400 print:text-black transition-colors">
                   <span>
                     {it.quantity} × {formatCop(it.unitPrice)}
                   </span>
-                  <span className="tabular-nums">{formatCop(it.total)}</span>
+                  <span className="tabular-nums text-slate-800 dark:text-slate-200 print:text-black transition-colors">{formatCop(it.total)}</span>
                 </div>
               </div>
             ))}
@@ -138,7 +152,7 @@ export default function ReceiptPage() {
           <div className="text-xs">
             <Row label="Subtotal" value={formatCop(sale.subtotal)} />
             <Row label="IVA" value={formatCop(sale.taxTotal)} />
-            <div className="mt-1 flex justify-between border-t border-dashed border-slate-300 pt-1.5 text-sm font-bold">
+            <div className="mt-1 flex justify-between border-t border-dashed border-slate-300 dark:border-slate-700 print:border-black pt-1.5 text-sm font-bold text-slate-900 dark:text-white print:text-black transition-colors">
               <span>TOTAL</span>
               <span className="tabular-nums">{formatCop(sale.total)}</span>
             </div>
@@ -147,7 +161,7 @@ export default function ReceiptPage() {
           {sale.notes && (
             <>
               <Divider />
-              <p className="text-xs italic text-slate-600 print:text-black">
+              <p className="text-xs italic text-slate-600 dark:text-slate-400 print:text-black transition-colors">
                 {sale.notes}
               </p>
             </>
@@ -156,14 +170,14 @@ export default function ReceiptPage() {
           <Divider />
 
           {/* Pie */}
-          <p className="text-center text-[10px] text-slate-500 print:text-black">
+          <p className="text-center text-[10px] text-slate-500 dark:text-slate-400 print:text-black transition-colors">
             ¡Gracias por tu compra!<br />
             Conserva este comprobante.
           </p>
 
           {/* Marca de agua: solo cuando el negocio personalizó su nombre */}
           {isCustomized && (
-            <p className="mt-3 text-center text-[8px] tracking-wider text-slate-400 print:text-slate-500">
+            <p className="mt-3 text-center text-[8px] tracking-wider text-slate-400 dark:text-slate-600 print:text-slate-500 transition-colors">
               Hecho con KoreVentas
             </p>
           )}
@@ -174,14 +188,14 @@ export default function ReceiptPage() {
 }
 
 function Divider() {
-  return <div className="my-3 border-t border-dashed border-slate-300 print:border-black" />
+  return <div className="my-3 border-t border-dashed border-slate-300 dark:border-slate-700 print:border-black transition-colors" />
 }
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between">
-      <span className="text-slate-500 print:text-black">{label}:</span>
-      <span className="font-medium tabular-nums">{value}</span>
+      <span className="text-slate-500 dark:text-slate-400 print:text-black transition-colors">{label}:</span>
+      <span className="font-medium tabular-nums text-slate-900 dark:text-slate-200 print:text-black transition-colors">{value}</span>
     </div>
   )
 }

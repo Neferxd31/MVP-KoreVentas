@@ -83,10 +83,10 @@ export default function CustomersPage() {
       {/* Header */}
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl transition-colors">
             Clientes
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 transition-colors">
             {customers?.length ?? 0} clientes registrados
           </p>
         </div>
@@ -112,14 +112,14 @@ export default function CustomersPage() {
               className={cn(
                 'group rounded-2xl border p-4 text-left transition-all',
                 active
-                  ? 'border-brand-400 bg-brand-50/50 shadow-soft-md'
-                  : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-soft-md'
+                  ? 'border-brand-400 bg-brand-50/50 shadow-soft-md dark:border-brand-500/50 dark:bg-brand-500/10'
+                  : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-soft-md dark:border-slate-700/80 dark:bg-slate-800/50 dark:hover:border-slate-600 dark:hover:bg-slate-800'
               )}
             >
               <Badge tone={cfg.tone} size="sm">{cfg.label}</Badge>
-              <p className="mt-2 text-2xl font-bold text-slate-900">{tagCounts[tag] || 0}</p>
+              <p className="mt-2 text-2xl font-bold text-slate-900 dark:text-white transition-colors">{tagCounts[tag] || 0}</p>
               {active && (
-                <p className="mt-0.5 text-[11px] font-medium text-brand-600">✓ Filtrando</p>
+                <p className="mt-0.5 text-[11px] font-medium text-brand-600 dark:text-brand-400 transition-colors">✓ Filtrando</p>
               )}
             </button>
           )
@@ -128,8 +128,8 @@ export default function CustomersPage() {
 
       {/* Formulario */}
       {showForm && (
-        <Card className="mb-6 animate-fade-in">
-          <h2 className="mb-4 text-lg font-semibold text-slate-800">
+        <Card className="mb-6 animate-fade-in dark:bg-slate-900 dark:border-slate-800 transition-colors">
+          <h2 className="mb-4 text-lg font-semibold text-slate-800 dark:text-white transition-colors">
             {editing ? 'Editar cliente' : 'Nuevo cliente'}
           </h2>
           <CustomerForm
@@ -153,7 +153,7 @@ export default function CustomersPage() {
 
       {/* Lista */}
       {isLoading && (
-        <Card padding="sm">
+        <Card padding="sm" className="dark:bg-slate-900 dark:border-slate-800 transition-colors">
           <SkeletonRows rows={5} cols={6} />
         </Card>
       )}
@@ -198,35 +198,35 @@ export default function CustomersPage() {
                   : waTemplates.generic(c.fullName))
               : null
             return (
-              <Card key={c.id} padding="sm" className="active:scale-[0.99] transition-transform">
+              <Card key={c.id} padding="sm" className="active:scale-[0.99] transition-all dark:bg-slate-900 dark:border-slate-800">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-semibold text-slate-800">{c.fullName}</p>
+                    <p className="truncate font-semibold text-slate-800 dark:text-slate-200 transition-colors">{c.fullName}</p>
                     {c.phone && (
-                      <p className="text-xs text-slate-500 tabular-nums">{c.phone}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 tabular-nums transition-colors">{c.phone}</p>
                     )}
                   </div>
                   <Badge tone={cfg.tone} size="sm">{cfg.label}</Badge>
                 </div>
-                <div className="mt-3 flex items-end justify-between gap-2 border-t border-slate-100 pt-2 text-xs">
+                <div className="mt-3 flex items-end justify-between gap-2 border-t border-slate-100 dark:border-slate-800 pt-2 text-xs transition-colors">
                   <div>
-                    <p className="text-slate-400">Total gastado</p>
-                    <p className="text-base font-bold text-slate-800 tabular-nums">{formatCop(c.totalSpent)}</p>
+                    <p className="text-slate-400 dark:text-slate-500 transition-colors">Total gastado</p>
+                    <p className="text-base font-bold text-slate-800 dark:text-white tabular-nums transition-colors">{formatCop(c.totalSpent)}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-slate-400">{c.totalPurchases} compras</p>
-                    <p className="text-slate-500">
+                    <p className="text-slate-400 dark:text-slate-500 transition-colors">{c.totalPurchases} compras</p>
+                    <p className="text-slate-500 dark:text-slate-400 transition-colors">
                       {c.lastVisitAt ? `Hace ${c.daysSinceLastVisit}d` : 'Sin visitas'}
                     </p>
                   </div>
                 </div>
-                <div className="mt-3 flex gap-1.5 border-t border-slate-100 pt-2">
+                <div className="mt-3 flex gap-1.5 border-t border-slate-100 dark:border-slate-800 pt-2 transition-colors">
                   {waHref && (
                     <a
                       href={waHref}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-[#25D366]/10 px-2 py-1.5 text-xs font-semibold text-[#25D366]"
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-[#25D366]/10 dark:bg-[#25D366]/15 px-2 py-1.5 text-xs font-semibold text-[#25D366] hover:bg-[#25D366]/20 dark:hover:bg-[#25D366]/25 transition-colors"
                     >
                       <Icon.WhatsApp className="h-3.5 w-3.5" />
                       WhatsApp
@@ -250,10 +250,10 @@ export default function CustomersPage() {
 
       {/* Desktop / tablet: tabla */}
       {!isLoading && !isError && filtered.length > 0 && (
-        <Card padding="none" className="hidden md:block overflow-hidden">
+        <Card padding="none" className="hidden md:block overflow-hidden dark:bg-slate-900 dark:border-slate-800 transition-colors">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50/80 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+              <thead className="bg-slate-50/80 dark:bg-slate-800/50 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 transition-colors">
                 <tr>
                   <th className="px-5 py-3.5">Cliente</th>
                   <th className="px-5 py-3.5">Etiqueta</th>
@@ -263,22 +263,22 @@ export default function CustomersPage() {
                   <th className="px-5 py-3.5 text-right">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 transition-colors">
                 {filtered.map(c => {
                   const cfg = tagConfig[c.autoTag as TagKey]
                   return (
-                    <tr key={c.id} className="transition-colors hover:bg-slate-50/60">
+                    <tr key={c.id} className="transition-colors hover:bg-slate-50/60 dark:hover:bg-slate-800/50">
                       <td className="px-5 py-3">
-                        <div className="font-medium text-slate-800">{c.fullName}</div>
+                        <div className="font-medium text-slate-800 dark:text-slate-200 transition-colors">{c.fullName}</div>
                         {c.phone && (
-                          <div className="text-xs text-slate-400">{c.phone}</div>
+                          <div className="text-xs text-slate-400 dark:text-slate-500 transition-colors">{c.phone}</div>
                         )}
                         {c.manualTags.length > 0 && (
                           <div className="mt-1 flex flex-wrap gap-1">
                             {c.manualTags.map(t => (
                               <span
                                 key={t}
-                                className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] text-slate-500"
+                                className="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] text-slate-500 dark:text-slate-400 transition-colors"
                               >
                                 {t}
                               </span>
@@ -289,16 +289,16 @@ export default function CustomersPage() {
                       <td className="px-5 py-3">
                         <Badge tone={cfg.tone}>{cfg.label}</Badge>
                       </td>
-                      <td className="px-5 py-3 text-center tabular-nums text-slate-700">
+                      <td className="px-5 py-3 text-center tabular-nums text-slate-700 dark:text-slate-300 transition-colors">
                         {c.totalPurchases}
                       </td>
-                      <td className="px-5 py-3 font-medium tabular-nums text-slate-800">
+                      <td className="px-5 py-3 font-medium tabular-nums text-slate-800 dark:text-slate-200 transition-colors">
                         {formatCop(c.totalSpent)}
                       </td>
-                      <td className="px-5 py-3 text-xs text-slate-500">
+                      <td className="px-5 py-3 text-xs text-slate-500 dark:text-slate-400 transition-colors">
                         {c.lastVisitAt
                           ? `Hace ${c.daysSinceLastVisit} días`
-                          : <span className="text-slate-400">Sin visitas</span>}
+                          : <span className="text-slate-400 dark:text-slate-500">Sin visitas</span>}
                       </td>
                       <td className="px-5 py-3">
                         <div className="flex justify-end gap-1">
@@ -315,7 +315,7 @@ export default function CustomersPage() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 title="Escribir por WhatsApp"
-                                className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-[#25D366] hover:bg-[#25D366]/10 transition"
+                                className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-[#25D366] hover:bg-[#25D366]/10 dark:hover:bg-[#25D366]/20 transition-colors"
                               >
                                 <Icon.WhatsApp className="h-3.5 w-3.5" />
                                 <span className="hidden sm:inline">WhatsApp</span>
@@ -336,7 +336,7 @@ export default function CustomersPage() {
                               variant="ghost"
                               onClick={() => handleDelete(c)}
                               leftIcon={<Icon.Trash className="h-3.5 w-3.5" />}
-                              className="hover:bg-danger-50 hover:text-danger-600"
+                              className="hover:bg-danger-50 hover:text-danger-600 dark:hover:bg-danger-900/30 dark:hover:text-danger-400"
                             >
                               Quitar
                             </Button>

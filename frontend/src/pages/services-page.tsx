@@ -15,7 +15,7 @@ import {
 } from '@/hooks/use-services'
 import { useIsAdmin } from '@/hooks/use-account'
 import ServiceForm from '@/components/service-form'
-import { formatCop } from '@/lib/utils'
+import { cn, formatCop } from '@/lib/utils'
 import type { Service, CreateServiceRequest } from '@/types/service'
 
 export default function ServicesPage() {
@@ -56,10 +56,10 @@ export default function ServicesPage() {
     <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl transition-colors">
             Servicios
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 transition-colors">
             {services?.length ?? 0} servicios en catálogo
           </p>
         </div>
@@ -74,8 +74,8 @@ export default function ServicesPage() {
       </div>
 
       {showForm && (
-        <Card className="mb-6 animate-fade-in">
-          <h2 className="mb-4 text-lg font-semibold text-slate-800">
+        <Card className="mb-6 animate-fade-in dark:bg-slate-900 dark:border-slate-800 transition-colors">
+          <h2 className="mb-4 text-lg font-semibold text-slate-800 dark:text-white transition-colors">
             {editing ? 'Editar servicio' : 'Nuevo servicio'}
           </h2>
           <ServiceForm
@@ -88,7 +88,7 @@ export default function ServicesPage() {
       )}
 
       {isLoading && (
-        <Card padding="sm">
+        <Card padding="sm" className="dark:bg-slate-900 dark:border-slate-800 transition-colors">
           <SkeletonRows rows={4} cols={4} />
         </Card>
       )}
@@ -116,32 +116,35 @@ export default function ServicesPage() {
       {!isLoading && !isError && (services?.length ?? 0) > 0 && (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {services!.map(s => (
-            <Card key={s.id} className="flex flex-col gap-3 transition-all hover:shadow-soft-md">
+            <Card 
+              key={s.id} 
+              className="flex flex-col gap-3 transition-all hover:shadow-soft-md dark:bg-slate-900 dark:border-slate-800 dark:hover:border-slate-700"
+            >
               <div className="flex items-start gap-3">
                 <div
-                  className="h-12 w-12 flex-shrink-0 rounded-xl"
+                  className="h-12 w-12 flex-shrink-0 rounded-xl opacity-90"
                   style={{ backgroundColor: s.color }}
                 />
                 <div className="min-w-0 flex-1">
-                  <h3 className="truncate font-semibold text-slate-800">{s.name}</h3>
+                  <h3 className="truncate font-semibold text-slate-800 dark:text-slate-200 transition-colors">{s.name}</h3>
                   {s.description && (
-                    <p className="line-clamp-2 text-xs text-slate-500">{s.description}</p>
+                    <p className="line-clamp-2 text-xs text-slate-500 dark:text-slate-400 transition-colors">{s.description}</p>
                   )}
                 </div>
               </div>
 
-              <div className="flex items-center justify-between border-t border-slate-100 pt-3 text-sm">
-                <div className="flex items-center gap-1.5 text-slate-500">
+              <div className="flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-3 text-sm transition-colors">
+                <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 transition-colors">
                   <Icon.Clock className="h-4 w-4" />
                   <span>{s.durationMinutes} min</span>
                 </div>
-                <div className="font-semibold text-slate-800 tabular-nums">
+                <div className="font-semibold text-slate-800 dark:text-white tabular-nums transition-colors">
                   {formatCop(s.price)}
                 </div>
               </div>
 
               {isAdmin && (
-                <div className="flex gap-1 border-t border-slate-100 pt-2">
+                <div className="flex gap-1 border-t border-slate-100 dark:border-slate-800 pt-2 transition-colors">
                   <Button
                     size="sm"
                     variant="ghost"
@@ -156,7 +159,7 @@ export default function ServicesPage() {
                     variant="ghost"
                     onClick={() => handleDelete(s)}
                     leftIcon={<Icon.Trash className="h-3.5 w-3.5" />}
-                    className="hover:bg-danger-50 hover:text-danger-600"
+                    className="hover:bg-danger-50 hover:text-danger-600 dark:hover:bg-danger-900/30 dark:hover:text-danger-400"
                   >
                     Quitar
                   </Button>

@@ -13,6 +13,7 @@ import { useSettings, useUpdateSettings } from '@/hooks/use-settings'
 import { PALETTE_OPTIONS, applyPalette } from '@/lib/theme'
 import { cn } from '@/lib/utils'
 import type { PaletteKey } from '@/types/settings'
+import { useTheme } from '@/context/ThemeContext'
 
 // Genera un slug a partir del nombre del negocio (sin tildes, espacios → guiones)
 function slugify(value: string): string {
@@ -31,6 +32,7 @@ export default function SettingsPage() {
   const toast = useToast()
   const { data: settings, isLoading } = useSettings()
   const update = useUpdateSettings()
+  const { theme, setTheme } = useTheme()
 
   const [businessName, setBusinessName] = useState('')
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
@@ -130,12 +132,11 @@ export default function SettingsPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-          Personalización
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl transition-colors">
+          Configuración
         </h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Hazlo tuyo. Tu nombre, tu logo y tus colores aparecerán en toda la aplicación
-          y en los recibos que envíes a tus clientes.
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 transition-colors">
+          Personaliza la apariencia y el comportamiento de tu sistema.
         </p>
       </div>
 
@@ -143,16 +144,76 @@ export default function SettingsPage() {
 
       {settings && (
         <>
-          {/* Identidad */}
-          <Card className="mb-6">
+          {/* Apariencia (Tema) */}
+          <Card className="mb-6 dark:bg-slate-900 dark:border-slate-800 transition-colors">
             <CardHeader
               icon={
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-4 ring-brand-100">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600 ring-4 ring-slate-50 dark:bg-slate-800 dark:text-slate-400 dark:ring-slate-900/50 transition-colors">
+                  <Icon.Moon className="h-5 w-5" />
+                </div>
+              }
+              title={<span className="text-slate-800 dark:text-white">Apariencia</span>}
+              subtitle={<span className="text-slate-500 dark:text-slate-400">Elige el tema claro, oscuro o sincronízalo con tu sistema.</span>}
+            />
+            <div className="mt-5 grid grid-cols-3 gap-3">
+              <button
+                type="button"
+                onClick={() => setTheme('light')}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-2 rounded-xl border-2 p-4 transition-all",
+                  theme === 'light' 
+                    ? "border-brand-500 bg-brand-50 dark:border-brand-500/50 dark:bg-brand-500/10 shadow-soft" 
+                    : "border-slate-200 bg-white hover:border-slate-300 dark:border-slate-700/80 dark:bg-slate-800/50 dark:hover:border-slate-600 dark:hover:bg-slate-800"
+                )}
+              >
+                <Icon.Sun className={cn("h-6 w-6 transition-colors", theme === 'light' ? "text-brand-600 dark:text-brand-400" : "text-slate-500 dark:text-slate-400")} />
+                <span className={cn("text-sm font-medium transition-colors", theme === 'light' ? "text-brand-700 dark:text-brand-400" : "text-slate-700 dark:text-slate-300")}>
+                  Claro
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setTheme('dark')}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-2 rounded-xl border-2 p-4 transition-all",
+                  theme === 'dark' 
+                    ? "border-brand-500 bg-brand-50 dark:border-brand-500/50 dark:bg-brand-500/10 shadow-soft" 
+                    : "border-slate-200 bg-white hover:border-slate-300 dark:border-slate-700/80 dark:bg-slate-800/50 dark:hover:border-slate-600 dark:hover:bg-slate-800"
+                )}
+              >
+                <Icon.Moon className={cn("h-6 w-6 transition-colors", theme === 'dark' ? "text-brand-600 dark:text-brand-400" : "text-slate-500 dark:text-slate-400")} />
+                <span className={cn("text-sm font-medium transition-colors", theme === 'dark' ? "text-brand-700 dark:text-brand-400" : "text-slate-700 dark:text-slate-300")}>
+                  Oscuro
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setTheme('system')}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-2 rounded-xl border-2 p-4 transition-all",
+                  theme === 'system' 
+                    ? "border-brand-500 bg-brand-50 dark:border-brand-500/50 dark:bg-brand-500/10 shadow-soft" 
+                    : "border-slate-200 bg-white hover:border-slate-300 dark:border-slate-700/80 dark:bg-slate-800/50 dark:hover:border-slate-600 dark:hover:bg-slate-800"
+                )}
+              >
+                <Icon.Monitor className={cn("h-6 w-6 transition-colors", theme === 'system' ? "text-brand-600 dark:text-brand-400" : "text-slate-500 dark:text-slate-400")} />
+                <span className={cn("text-sm font-medium transition-colors", theme === 'system' ? "text-brand-700 dark:text-brand-400" : "text-slate-700 dark:text-slate-300")}>
+                  Sistema
+                </span>
+              </button>
+            </div>
+          </Card>
+
+          {/* Identidad */}
+          <Card className="mb-6 dark:bg-slate-900 dark:border-slate-800 transition-colors">
+            <CardHeader
+              icon={
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-4 ring-brand-100 dark:bg-brand-900/30 dark:text-brand-400 dark:ring-brand-900/50 transition-colors">
                   <Icon.Building className="h-5 w-5" />
                 </div>
               }
-              title="Identidad del negocio"
-              subtitle="Nombre y logo que verán tus clientes."
+              title={<span className="text-slate-800 dark:text-white">Identidad del negocio</span>}
+              subtitle={<span className="text-slate-500 dark:text-slate-400">Nombre y logo que verán tus clientes.</span>}
             />
             <div className="mt-5 space-y-4">
               <Input
@@ -172,15 +233,15 @@ export default function SettingsPage() {
           </Card>
 
           {/* Color de marca */}
-          <Card className="mb-6">
+          <Card className="mb-6 dark:bg-slate-900 dark:border-slate-800 transition-colors">
             <CardHeader
               icon={
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-4 ring-brand-100">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-4 ring-brand-100 dark:bg-brand-900/30 dark:text-brand-400 dark:ring-brand-900/50 transition-colors">
                   <Icon.Sparkles className="h-5 w-5" />
                 </div>
               }
-              title="Color de marca"
-              subtitle="Vista previa en vivo — los cambios se aplican al guardar."
+              title={<span className="text-slate-800 dark:text-white">Color de marca</span>}
+              subtitle={<span className="text-slate-500 dark:text-slate-400">Vista previa en vivo — los cambios se aplican al guardar.</span>}
             />
             <div className="mt-5">
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -194,22 +255,22 @@ export default function SettingsPage() {
                       className={cn(
                         'flex items-center gap-2 rounded-xl border-2 p-3 text-left text-sm transition-all',
                         active
-                          ? 'border-brand-500 bg-brand-50 shadow-soft'
-                          : 'border-slate-200 bg-white hover:border-slate-300'
+                          ? 'border-brand-500 bg-brand-50 shadow-soft dark:border-brand-500/50 dark:bg-brand-500/10'
+                          : 'border-slate-200 bg-white hover:border-slate-300 dark:border-slate-700/80 dark:bg-slate-800/50 dark:hover:border-slate-600 dark:hover:bg-slate-800'
                       )}
                     >
                       <span
-                        className="h-6 w-6 flex-shrink-0 rounded-full ring-2 ring-white"
+                        className="h-6 w-6 flex-shrink-0 rounded-full ring-2 ring-white dark:ring-slate-900"
                         style={{ backgroundColor: opt.swatch }}
                       />
                       <span className={cn(
-                        'font-medium',
-                        active ? 'text-brand-700' : 'text-slate-700'
+                        'font-medium transition-colors',
+                        active ? 'text-brand-700 dark:text-brand-400' : 'text-slate-700 dark:text-slate-300'
                       )}>
                         {opt.label}
                       </span>
                       {active && (
-                        <Icon.Check className="ml-auto h-4 w-4 text-brand-600" />
+                        <Icon.Check className="ml-auto h-4 w-4 text-brand-600 dark:text-brand-400" />
                       )}
                     </button>
                   )
@@ -222,32 +283,32 @@ export default function SettingsPage() {
                   className={cn(
                     'flex items-center gap-2 rounded-xl border-2 p-3 text-left text-sm transition-all',
                     primaryColor === 'custom'
-                      ? 'border-brand-500 bg-brand-50 shadow-soft'
-                      : 'border-slate-200 bg-white hover:border-slate-300'
+                      ? 'border-brand-500 bg-brand-50 shadow-soft dark:border-brand-500/50 dark:bg-brand-500/10'
+                      : 'border-slate-200 bg-white hover:border-slate-300 dark:border-slate-700/80 dark:bg-slate-800/50 dark:hover:border-slate-600 dark:hover:bg-slate-800'
                   )}
                 >
                   <span
-                    className="h-6 w-6 flex-shrink-0 rounded-full ring-2 ring-white"
+                    className="h-6 w-6 flex-shrink-0 rounded-full ring-2 ring-white dark:ring-slate-900"
                     style={{
                       background: 'conic-gradient(from 0deg, #f43f5e, #f59e0b, #10b981, #06b6d4, #6366f1, #ec4899, #f43f5e)'
                     }}
                   />
                   <span className={cn(
-                    'font-medium',
-                    primaryColor === 'custom' ? 'text-brand-700' : 'text-slate-700'
+                    'font-medium transition-colors',
+                    primaryColor === 'custom' ? 'text-brand-700 dark:text-brand-400' : 'text-slate-700 dark:text-slate-300'
                   )}>
                     Personalizado
                   </span>
                   {primaryColor === 'custom' && (
-                    <Icon.Check className="ml-auto h-4 w-4 text-brand-600" />
+                    <Icon.Check className="ml-auto h-4 w-4 text-brand-600 dark:text-brand-400" />
                   )}
                 </button>
               </div>
 
               {/* Picker de hex cuando se elige custom */}
               {primaryColor === 'custom' && (
-                <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
-                  <label className="mb-2 block text-sm font-medium text-slate-700">
+                <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900/50 p-4 transition-colors">
+                  <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors">
                     Color personalizado
                   </label>
                   <div className="flex items-center gap-3">
@@ -255,54 +316,54 @@ export default function SettingsPage() {
                       type="color"
                       value={customColor}
                       onChange={e => setCustomColor(e.target.value)}
-                      className="h-10 w-16 cursor-pointer rounded-lg border border-slate-300 bg-white"
+                      className="h-10 w-16 cursor-pointer rounded-lg border border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-800 transition-colors"
                     />
                     <input
                       type="text"
                       value={customColor}
                       onChange={e => setCustomColor(e.target.value)}
                       pattern="^#[0-9A-Fa-f]{6}$"
-                      className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 font-mono text-sm uppercase tabular-nums text-slate-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                      className="flex-1 rounded-lg border border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-800 dark:text-white px-3 py-2 font-mono text-sm uppercase tabular-nums text-slate-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 transition-colors"
                       placeholder="#6366F1"
                     />
                   </div>
-                  <p className="mt-2 text-xs text-slate-500">
+                  <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 transition-colors">
                     Generamos automáticamente toda la escala (50-900) a partir de este color.
                   </p>
                 </div>
               )}
 
               {/* Preview */}
-              <div className="mt-5 rounded-xl border border-slate-200 bg-white p-4">
-                <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
+              <div className="mt-5 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 transition-colors">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 transition-colors">
                   Vista previa
                 </p>
                 <div className="flex flex-wrap items-center gap-2">
                   <Button size="sm">Botón primario</Button>
                   <Button size="sm" variant="outline">Outline</Button>
                   <Button size="sm" variant="ghost">Ghost</Button>
-                  <span className="rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-semibold text-brand-700">
+                  <span className="rounded-full bg-brand-50 dark:bg-brand-900/30 px-2.5 py-0.5 text-xs font-semibold text-brand-700 dark:text-brand-400 transition-colors">
                     Badge
                   </span>
-                  <span className="text-sm text-brand-600">Texto en color de marca</span>
+                  <span className="text-sm text-brand-600 dark:text-brand-400 transition-colors">Texto en color de marca</span>
                 </div>
               </div>
             </div>
           </Card>
 
           {/* Mini-catálogo público */}
-          <Card className="mb-6">
+          <Card className="mb-6 dark:bg-slate-900 dark:border-slate-800 transition-colors">
             <CardHeader
               icon={
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-success-50 text-success-700 ring-4 ring-success-100">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-success-50 text-success-700 ring-4 ring-success-100 dark:bg-success-900/30 dark:text-success-400 dark:ring-success-900/50 transition-colors">
                   <Icon.WhatsApp className="h-5 w-5" />
                 </div>
               }
-              title="Mini-catálogo para WhatsApp"
-              subtitle="Comparte un link único con tus clientes para que vean tus productos y te envíen pedidos directo a tu WhatsApp."
+              title={<span className="text-slate-800 dark:text-white">Mini-catálogo para WhatsApp</span>}
+              subtitle={<span className="text-slate-500 dark:text-slate-400">Comparte un link único con tus clientes para que vean tus productos y te envíen pedidos directo a tu WhatsApp.</span>}
               action={
                 <label className="inline-flex cursor-pointer items-center gap-2">
-                  <span className="text-xs font-semibold text-slate-600">
+                  <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 transition-colors">
                     {catalogEnabled ? 'Activo' : 'Inactivo'}
                   </span>
                   <input
@@ -317,7 +378,7 @@ export default function SettingsPage() {
                     }}
                     className="peer sr-only"
                   />
-                  <span className="relative h-6 w-11 rounded-full bg-slate-300 transition peer-checked:bg-brand-600 peer-focus:ring-2 peer-focus:ring-brand-400/40">
+                  <span className="relative h-6 w-11 rounded-full bg-slate-300 dark:bg-slate-700 transition peer-checked:bg-brand-600 dark:peer-checked:bg-brand-500 peer-focus:ring-2 peer-focus:ring-brand-400/40">
                     <span className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition peer-checked:translate-x-5" />
                   </span>
                 </label>
@@ -338,11 +399,11 @@ export default function SettingsPage() {
                 />
 
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                  <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors">
                     URL pública del catálogo
                   </label>
-                  <div className="flex items-stretch overflow-hidden rounded-lg border border-slate-300 bg-white focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/20">
-                    <span className="flex items-center bg-slate-50 px-3 text-xs text-slate-500 border-r border-slate-200">
+                  <div className="flex items-stretch overflow-hidden rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus-within:border-brand-500 dark:focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/20 transition-colors">
+                    <span className="flex items-center bg-slate-50 dark:bg-slate-800 px-3 text-xs text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-700 transition-colors">
                       {window.location.origin}/c/
                     </span>
                     <input
@@ -350,29 +411,29 @@ export default function SettingsPage() {
                       value={publicSlug}
                       onChange={e => setPublicSlug(slugify(e.target.value))}
                       placeholder="mi-negocio"
-                      className="flex-1 bg-transparent px-3 py-2 text-sm font-mono text-slate-800 focus:outline-none"
+                      className="flex-1 bg-transparent px-3 py-2 text-sm font-mono text-slate-800 dark:text-white focus:outline-none transition-colors"
                     />
                     {businessName && !publicSlug && (
                       <button
                         type="button"
                         onClick={() => setPublicSlug(slugify(businessName))}
-                        className="px-3 text-xs font-semibold text-brand-600 hover:bg-brand-50 border-l border-slate-200"
+                        className="px-3 text-xs font-semibold text-brand-600 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-900/30 border-l border-slate-200 dark:border-slate-700 transition-colors"
                       >
                         Auto
                       </button>
                     )}
                   </div>
-                  <p className="mt-1 text-xs text-slate-500">
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 transition-colors">
                     Solo minúsculas, números y guiones. Debe ser único.
                   </p>
                 </div>
 
                 {catalogUrl && settings.publicSlug === publicSlug && settings.catalogEnabled && (
-                  <div className="rounded-xl border border-success-200 bg-success-50/40 p-4">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-success-700">
+                  <div className="rounded-xl border border-success-200 dark:border-success-900/50 bg-success-50/40 dark:bg-success-900/20 p-4 transition-colors">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-success-700 dark:text-success-400 transition-colors">
                       Tu link está activo
                     </p>
-                    <p className="mt-1 break-all font-mono text-sm font-bold text-slate-800">
+                    <p className="mt-1 break-all font-mono text-sm font-bold text-slate-800 dark:text-white transition-colors">
                       {catalogUrl}
                     </p>
                     <div className="mt-3 flex flex-wrap gap-2">
@@ -396,13 +457,13 @@ export default function SettingsPage() {
                         href={catalogUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                       >
                         <Icon.ChevronRight className="h-3.5 w-3.5" />
                         Ver mi catálogo
                       </a>
                     </div>
-                    <p className="mt-3 text-xs text-slate-600">
+                    <p className="mt-3 text-xs text-slate-600 dark:text-slate-400 transition-colors">
                       Pega este link en tu estado de WhatsApp, en Instagram o en tus tarjetas
                       de presentación. Cuando alguien lo abra y arme su pedido, lo recibirás
                       en tu WhatsApp con la lista lista para responder.
@@ -411,7 +472,7 @@ export default function SettingsPage() {
                 )}
 
                 {catalogUrl && (settings.publicSlug !== publicSlug || !settings.catalogEnabled) && (
-                  <p className="rounded-lg bg-warning-50 p-3 text-xs text-warning-700">
+                  <p className="rounded-lg bg-warning-50 dark:bg-warning-900/20 p-3 text-xs text-warning-700 dark:text-warning-400 transition-colors">
                     Guarda los cambios para que tu link <span className="font-mono font-semibold">{catalogUrl}</span> quede activo.
                   </p>
                 )}
@@ -419,7 +480,7 @@ export default function SettingsPage() {
             )}
 
             {!catalogEnabled && (
-              <p className="mt-4 text-sm text-slate-500">
+              <p className="mt-4 text-sm text-slate-500 dark:text-slate-400 transition-colors">
                 Activa el toggle para crear tu catálogo público. Tus clientes podrán ver tus
                 productos sin necesidad de cuenta y enviarte pedidos directo a tu WhatsApp.
               </p>

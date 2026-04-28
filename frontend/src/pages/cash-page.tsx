@@ -84,10 +84,10 @@ export default function CashPage() {
     <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl transition-colors">
           Caja diaria
         </h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 transition-colors">
           Controla el arqueo de efectivo al inicio y al cierre del día.
         </p>
       </div>
@@ -95,15 +95,15 @@ export default function CashPage() {
       {isLoading && <SkeletonCard />}
 
       {!isLoading && !current && (
-        <Card className="mb-6">
+        <Card className="mb-6 dark:bg-slate-900 dark:border-slate-800 transition-colors">
           <CardHeader
             icon={
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-4 ring-brand-100">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-4 ring-brand-100 dark:bg-brand-900/30 dark:text-brand-400 dark:ring-brand-900/50 transition-colors">
                 <Icon.Unlock className="h-5 w-5" />
               </div>
             }
-            title="Abrir caja"
-            subtitle="Ingresa el monto inicial en efectivo para comenzar el día."
+            title={<span className="text-slate-800 dark:text-white">Abrir caja</span>}
+            subtitle={<span className="text-slate-500 dark:text-slate-400">Ingresa el monto inicial en efectivo para comenzar el día.</span>}
           />
           <div className="mt-5 grid gap-3 sm:grid-cols-[1fr_auto]">
             <Input
@@ -156,12 +156,12 @@ export default function CashPage() {
           </div>
 
           {/* Info apertura */}
-          <Card className="mb-6" padding="sm">
-            <div className="flex items-center gap-2 text-sm text-slate-500">
+          <Card className="mb-6 dark:bg-slate-900 dark:border-slate-800 transition-colors" padding="sm">
+            <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 transition-colors">
               <Icon.Clock className="h-4 w-4" />
               <span>
                 Caja abierta el{' '}
-                <span className="font-semibold text-slate-700">
+                <span className="font-semibold text-slate-700 dark:text-slate-200 transition-colors">
                   {new Date(current.openedAt).toLocaleString('es-CO', {
                     day: '2-digit',
                     month: 'short',
@@ -174,15 +174,15 @@ export default function CashPage() {
           </Card>
 
           {/* Cerrar caja */}
-          <Card className="mb-6">
+          <Card className="mb-6 dark:bg-slate-900 dark:border-slate-800 transition-colors">
             <CardHeader
               icon={
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-warning-50 text-warning-700 ring-4 ring-warning-100">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-warning-50 text-warning-700 ring-4 ring-warning-100 dark:bg-warning-900/30 dark:text-warning-400 dark:ring-warning-900/50 transition-colors">
                   <Icon.Lock className="h-5 w-5" />
                 </div>
               }
-              title="Cerrar caja"
-              subtitle="Cuenta el efectivo físicamente y registra el monto real para detectar diferencias."
+              title={<span className="text-slate-800 dark:text-white">Cerrar caja</span>}
+              subtitle={<span className="text-slate-500 dark:text-slate-400">Cuenta el efectivo físicamente y registra el monto real para detectar diferencias.</span>}
             />
             <div className="mt-5 grid gap-3 md:grid-cols-2">
               <Input
@@ -222,7 +222,7 @@ export default function CashPage() {
 
       {/* Historial */}
       <div className="mt-8">
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-500">
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 transition-colors">
           Historial de cajas
         </h2>
         {(!history || history.length === 0) && (
@@ -233,10 +233,10 @@ export default function CashPage() {
           />
         )}
         {history && history.length > 0 && (
-          <Card padding="none" className="overflow-hidden">
+          <Card padding="none" className="overflow-hidden dark:bg-slate-900 dark:border-slate-800 transition-colors">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-slate-50/80 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                <thead className="bg-slate-50/80 dark:bg-slate-800/50 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 transition-colors">
                   <tr>
                     <th className="px-5 py-3.5">Apertura</th>
                     <th className="px-5 py-3.5">Cierre</th>
@@ -247,7 +247,7 @@ export default function CashPage() {
                     <th className="px-5 py-3.5">Estado</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 transition-colors">
                   {history.map(s => (
                     <HistoryRow key={s.id} s={s} />
                   ))}
@@ -282,24 +282,24 @@ function StatCard({
   highlight?: boolean
 }) {
   const toneMap = {
-    brand: 'bg-brand-50 text-brand-600',
-    success: 'bg-success-50 text-success-700',
-    slate: 'bg-slate-100 text-slate-600'
+    brand: 'bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400',
+    success: 'bg-success-50 text-success-700 dark:bg-success-500/10 dark:text-success-400',
+    slate: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
   }
   return (
     <Card
       className={cn(
-        'relative overflow-hidden',
-        highlight && 'ring-2 ring-brand-400/40'
+        'relative overflow-hidden dark:bg-slate-900 dark:border-slate-800 transition-colors',
+        highlight && 'ring-2 ring-brand-400/40 dark:ring-brand-500/50'
       )}
     >
       <div className="flex items-start justify-between">
-        <p className="text-sm font-medium text-slate-500">{label}</p>
-        <div className={cn('flex h-9 w-9 items-center justify-center rounded-lg', toneMap[tone])}>
+        <p className="text-sm font-medium text-slate-500 dark:text-slate-400 transition-colors">{label}</p>
+        <div className={cn('flex h-9 w-9 items-center justify-center rounded-lg transition-colors', toneMap[tone])}>
           {icon}
         </div>
       </div>
-      <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900 tabular-nums">
+      <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900 dark:text-white tabular-nums transition-colors">
         {value}
       </p>
     </Card>
@@ -310,8 +310,8 @@ function HistoryRow({ s }: { s: CashSession }) {
   const isOpen = s.status === 'ABIERTA'
   const diff = Number(s.difference ?? 0)
   return (
-    <tr className="transition-colors hover:bg-slate-50/60">
-      <td className="px-5 py-3 text-xs text-slate-500">
+    <tr className="transition-colors hover:bg-slate-50/60 dark:hover:bg-slate-800/50">
+      <td className="px-5 py-3 text-xs text-slate-500 dark:text-slate-400">
         {new Date(s.openedAt).toLocaleString('es-CO', {
           day: '2-digit',
           month: 'short',
@@ -319,7 +319,7 @@ function HistoryRow({ s }: { s: CashSession }) {
           minute: '2-digit'
         })}
       </td>
-      <td className="px-5 py-3 text-xs text-slate-500">
+      <td className="px-5 py-3 text-xs text-slate-500 dark:text-slate-400">
         {s.closedAt
           ? new Date(s.closedAt).toLocaleString('es-CO', {
               day: '2-digit',
@@ -327,19 +327,25 @@ function HistoryRow({ s }: { s: CashSession }) {
               hour: '2-digit',
               minute: '2-digit'
             })
-          : <span className="text-slate-400">—</span>}
+          : <span className="text-slate-400 dark:text-slate-500">—</span>}
       </td>
-      <td className="px-5 py-3 tabular-nums text-slate-700">{formatCop(s.openingAmount)}</td>
-      <td className="px-5 py-3 tabular-nums text-slate-700">
+      <td className="px-5 py-3 tabular-nums text-slate-700 dark:text-slate-300">{formatCop(s.openingAmount)}</td>
+      <td className="px-5 py-3 tabular-nums text-slate-700 dark:text-slate-300">
         {s.expectedAmount != null ? formatCop(s.expectedAmount) : '—'}
       </td>
-      <td className="px-5 py-3 tabular-nums text-slate-700">
+      <td className="px-5 py-3 tabular-nums text-slate-700 dark:text-slate-300">
         {s.countedAmount != null ? formatCop(s.countedAmount) : '—'}
       </td>
       <td
         className={cn(
-          'px-5 py-3 tabular-nums font-semibold',
-          s.difference == null ? 'text-slate-400' : diff === 0 ? 'text-success-700' : diff > 0 ? 'text-brand-600' : 'text-danger-600'
+          'px-5 py-3 tabular-nums font-semibold transition-colors',
+          s.difference == null 
+            ? 'text-slate-400 dark:text-slate-500' 
+            : diff === 0 
+              ? 'text-success-700 dark:text-success-400' 
+              : diff > 0 
+                ? 'text-brand-600 dark:text-brand-400' 
+                : 'text-danger-600 dark:text-danger-400'
         )}
       >
         {s.difference == null ? '—' : diff === 0 ? formatCop(0) : `${diff > 0 ? '+' : ''}${formatCop(diff)}`}

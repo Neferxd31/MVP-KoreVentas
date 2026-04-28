@@ -113,10 +113,10 @@ export default function TeamPage() {
     <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl transition-colors">
             Equipo
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 transition-colors">
             {team?.length ?? 0} miembros en tu negocio.
           </p>
         </div>
@@ -132,40 +132,40 @@ export default function TeamPage() {
 
       {/* Resultado de invitación: contraseña temporal */}
       {lastInvite && (
-        <Card className="mb-6 border-success-300 bg-success-50/40">
+        <Card className="mb-6 border-success-300 bg-success-50/40 dark:border-success-900/50 dark:bg-success-900/10 transition-colors">
           <CardHeader
             icon={
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-success-100 text-success-700 ring-4 ring-success-50">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-success-100 text-success-700 ring-4 ring-success-50 dark:bg-success-900/30 dark:text-success-400 dark:ring-success-900/50 transition-colors">
                 <Icon.Check className="h-5 w-5" />
               </div>
             }
-            title={`${lastInvite.user.fullName} ya tiene acceso`}
-            subtitle="Comparte esta contraseña temporal — solo se muestra una vez."
+            title={<span className="text-slate-800 dark:text-slate-200">{lastInvite.user.fullName} ya tiene acceso</span>}
+            subtitle={<span className="text-slate-600 dark:text-slate-400">Comparte esta contraseña temporal — solo se muestra una vez.</span>}
             action={
               <button
                 onClick={() => setLastInvite(null)}
-                className="rounded-lg p-1.5 text-slate-400 hover:bg-white hover:text-slate-600"
+                className="rounded-lg p-1.5 text-slate-400 hover:bg-white hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300 transition-colors"
               >
                 <Icon.X className="h-4 w-4" />
               </button>
             }
           />
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-lg border border-slate-200 bg-white p-3">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Correo</p>
-              <p className="mt-1 font-mono text-sm text-slate-800 break-all">{lastInvite.user.email}</p>
+            <div className="rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-700/50 dark:bg-slate-800/50 transition-colors">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Correo</p>
+              <p className="mt-1 font-mono text-sm text-slate-800 dark:text-slate-200 break-all transition-colors">{lastInvite.user.email}</p>
             </div>
-            <div className="rounded-lg border border-slate-200 bg-white p-3">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <div className="rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-700/50 dark:bg-slate-800/50 transition-colors">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Contraseña temporal
               </p>
               <div className="mt-1 flex items-center gap-2">
-                <p className="flex-1 font-mono text-sm font-bold text-slate-800 tracking-wider">
+                <p className="flex-1 font-mono text-sm font-bold text-slate-800 dark:text-slate-200 tracking-wider transition-colors">
                   {lastInvite.temporaryPassword}
                 </p>
                 <button
                   onClick={copyTempPassword}
-                  className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                  className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-700 dark:hover:text-slate-300 transition-colors"
                   title="Copiar"
                 >
                   <Icon.Receipt className="h-3.5 w-3.5" />
@@ -173,18 +173,18 @@ export default function TeamPage() {
               </div>
             </div>
           </div>
-          <p className="mt-3 text-xs text-slate-600">
-            Recomienda al nuevo miembro cambiarla apenas inicie sesión, en <strong>Mi cuenta → Cambiar contraseña</strong>.
+          <p className="mt-3 text-xs text-slate-600 dark:text-slate-400 transition-colors">
+            Recomienda al nuevo miembro cambiarla apenas inicie sesión, en <strong className="dark:text-slate-300">Mi cuenta → Cambiar contraseña</strong>.
           </p>
         </Card>
       )}
 
       {/* Formulario de invitación */}
       {showForm && (
-        <Card className="mb-6 animate-fade-in">
+        <Card className="mb-6 animate-fade-in dark:bg-slate-900 dark:border-slate-800 transition-colors">
           <CardHeader
-            title="Invitar nuevo miembro"
-            subtitle="Generamos una contraseña temporal que se la entregas tú."
+            title={<span className="text-slate-800 dark:text-white">Invitar nuevo miembro</span>}
+            subtitle={<span className="text-slate-500 dark:text-slate-400">Generamos una contraseña temporal que se la entregas tú.</span>}
           />
           <div className="mt-5 grid gap-3 md:grid-cols-2">
             <Input
@@ -201,7 +201,7 @@ export default function TeamPage() {
               placeholder="carlos@negocio.com"
             />
             <div className="md:col-span-2">
-              <label className="mb-1.5 block text-sm font-medium text-slate-700">Rol</label>
+              <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors">Rol</label>
               <div className="grid grid-cols-2 gap-2">
                 {(['ADMIN', 'SELLER'] as UserRole[]).map(r => {
                   const active = newRole === r
@@ -211,19 +211,19 @@ export default function TeamPage() {
                       type="button"
                       onClick={() => setNewRole(r)}
                       className={cn(
-                        'rounded-xl border-2 p-3 text-left text-sm transition',
+                        'rounded-xl border-2 p-3 text-left text-sm transition-all',
                         active
-                          ? 'border-brand-500 bg-brand-50'
-                          : 'border-slate-200 bg-white hover:border-slate-300'
+                          ? 'border-brand-500 bg-brand-50 dark:border-brand-500/50 dark:bg-brand-500/10'
+                          : 'border-slate-200 bg-white hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-slate-600'
                       )}
                     >
                       <p className={cn(
-                        'font-semibold',
-                        active ? 'text-brand-700' : 'text-slate-800'
+                        'font-semibold transition-colors',
+                        active ? 'text-brand-700 dark:text-brand-400' : 'text-slate-800 dark:text-slate-200'
                       )}>
                         {ROLE_LABEL[r]}
                       </p>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-slate-500 dark:text-slate-400 transition-colors">
                         {r === 'ADMIN'
                           ? 'Acceso total + gestión del equipo'
                           : 'Vender y gestionar inventario'}
@@ -252,7 +252,8 @@ export default function TeamPage() {
             const isMe = member.id === me?.id
             return (
               <Card key={member.id} padding="sm" className={cn(
-                !member.enabled && 'opacity-60'
+                'dark:bg-slate-900 dark:border-slate-800 transition-colors',
+                !member.enabled && 'opacity-60 grayscale-[50%]'
               )}>
                 <div className="flex items-center gap-3">
                   {member.avatarUrl ? (
@@ -262,19 +263,19 @@ export default function TeamPage() {
                       className="h-10 w-10 flex-shrink-0 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-bold text-slate-500">
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-sm font-bold text-slate-500 dark:text-slate-400 transition-colors">
                       {member.fullName.charAt(0).toUpperCase()}
                     </div>
                   )}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <p className="truncate font-semibold text-slate-800">
+                      <p className="truncate font-semibold text-slate-800 dark:text-slate-200 transition-colors">
                         {member.fullName}
                       </p>
                       {isMe && <Badge tone="info" size="sm">Tú</Badge>}
                       {!member.enabled && <Badge tone="danger" size="sm">Inactivo</Badge>}
                     </div>
-                    <p className="truncate text-xs text-slate-500">{member.email}</p>
+                    <p className="truncate text-xs text-slate-500 dark:text-slate-400 transition-colors">{member.email}</p>
                   </div>
 
                   {/* Selector rol */}
@@ -282,7 +283,7 @@ export default function TeamPage() {
                     value={member.role}
                     onChange={e => handleChangeRole(member, e.target.value as UserRole)}
                     disabled={!member.enabled}
-                    className="rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs font-medium text-slate-700 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 disabled:opacity-50"
+                    className="rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs font-medium text-slate-700 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 transition-colors"
                   >
                     <option value="ADMIN">Administrador</option>
                     <option value="SELLER">Vendedor</option>
@@ -294,7 +295,7 @@ export default function TeamPage() {
                       size="sm"
                       variant="ghost"
                       onClick={() => handleToggleEnabled(member)}
-                      className={member.enabled ? 'hover:bg-danger-50 hover:text-danger-600' : ''}
+                      className={member.enabled ? 'hover:bg-danger-50 hover:text-danger-600 dark:hover:bg-danger-900/30 dark:hover:text-danger-400' : ''}
                     >
                       {member.enabled ? 'Desactivar' : 'Reactivar'}
                     </Button>

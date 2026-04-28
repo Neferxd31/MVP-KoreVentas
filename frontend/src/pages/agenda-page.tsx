@@ -162,10 +162,10 @@ export default function AgendaPage() {
       {/* Header */}
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl transition-colors">
             Agenda
           </h1>
-          <p className="mt-1 text-sm text-slate-500">{weekLabel}</p>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 transition-colors">{weekLabel}</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={() => setWeekStart(addDays(weekStart, -7))}>
@@ -189,12 +189,12 @@ export default function AgendaPage() {
       {/* Formulario modal */}
       {showForm && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm animate-fade-in">
-          <Card className="w-full max-w-lg max-h-[90vh] overflow-y-auto">
+          <Card className="w-full max-w-lg max-h-[90vh] overflow-y-auto dark:bg-slate-900 dark:border-slate-800 transition-colors">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-slate-800">Nueva cita</h2>
+              <h2 className="text-lg font-semibold text-slate-800 dark:text-white">Nueva cita</h2>
               <button
                 onClick={() => { setShowForm(false); setSelectedSlot(undefined) }}
-                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300 transition-colors"
               >
                 <Icon.X className="h-5 w-5" />
               </button>
@@ -212,13 +212,13 @@ export default function AgendaPage() {
       {/* Modal detalle cita */}
       {selectedAppt && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm animate-fade-in">
-          <Card className="w-full max-w-md">
+          <Card className="w-full max-w-md dark:bg-slate-900 dark:border-slate-800 transition-colors">
             <div className="mb-4 flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <h2 className="truncate text-lg font-semibold text-slate-800">
+                <h2 className="truncate text-lg font-semibold text-slate-800 dark:text-white">
                   {selectedAppt.serviceName}
                 </h2>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-slate-500 dark:text-slate-400">
                   {new Date(selectedAppt.startAt).toLocaleString('es-CO', {
                     weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit'
                   })}
@@ -226,43 +226,43 @@ export default function AgendaPage() {
               </div>
               <button
                 onClick={() => setSelectedAppt(null)}
-                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300 transition-colors"
               >
                 <Icon.X className="h-5 w-5" />
               </button>
             </div>
 
-            <div className="space-y-3 border-y border-slate-100 py-4 text-sm">
+            <div className="space-y-3 border-y border-slate-100 dark:border-slate-800 py-4 text-sm transition-colors">
               <div className="flex justify-between">
-                <span className="text-slate-500">Estado</span>
+                <span className="text-slate-500 dark:text-slate-400">Estado</span>
                 <Badge tone={statusConfig[selectedAppt.status].tone}>
                   {statusConfig[selectedAppt.status].label}
                 </Badge>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Duración</span>
-                <span className="font-medium text-slate-700">{selectedAppt.durationMinutes} min</span>
+                <span className="text-slate-500 dark:text-slate-400">Duración</span>
+                <span className="font-medium text-slate-700 dark:text-slate-300">{selectedAppt.durationMinutes} min</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Precio</span>
-                <span className="font-semibold tabular-nums text-slate-800">{formatCop(selectedAppt.price)}</span>
+                <span className="text-slate-500 dark:text-slate-400">Precio</span>
+                <span className="font-semibold tabular-nums text-slate-800 dark:text-slate-200">{formatCop(selectedAppt.price)}</span>
               </div>
               {selectedAppt.customerName && (
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Cliente</span>
-                  <span className="font-medium text-slate-700">{selectedAppt.customerName}</span>
+                  <span className="text-slate-500 dark:text-slate-400">Cliente</span>
+                  <span className="font-medium text-slate-700 dark:text-slate-300">{selectedAppt.customerName}</span>
                 </div>
               )}
               {selectedAppt.customerPhone && (
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Teléfono</span>
-                  <span className="font-mono text-slate-700">{selectedAppt.customerPhone}</span>
+                  <span className="text-slate-500 dark:text-slate-400">Teléfono</span>
+                  <span className="font-mono text-slate-700 dark:text-slate-300">{selectedAppt.customerPhone}</span>
                 </div>
               )}
               {selectedAppt.notes && (
                 <div>
-                  <p className="text-slate-500">Notas</p>
-                  <p className="mt-1 text-slate-700">{selectedAppt.notes}</p>
+                  <p className="text-slate-500 dark:text-slate-400">Notas</p>
+                  <p className="mt-1 text-slate-700 dark:text-slate-300">{selectedAppt.notes}</p>
                 </div>
               )}
             </div>
@@ -314,7 +314,7 @@ export default function AgendaPage() {
                     variant="outline"
                     fullWidth
                     onClick={() => handleCancel(selectedAppt)}
-                    className="hover:bg-danger-50 hover:text-danger-600"
+                    className="hover:bg-danger-50 hover:text-danger-600 dark:hover:bg-danger-900/30 dark:hover:text-danger-400"
                   >
                     Cancelar
                   </Button>
@@ -327,7 +327,9 @@ export default function AgendaPage() {
 
       {/* Grid semanal */}
       {isLoading ? (
-        <Card><p className="text-center text-sm text-slate-500">Cargando agenda...</p></Card>
+        <Card className="dark:bg-slate-900 dark:border-slate-800">
+          <p className="text-center text-sm text-slate-500 dark:text-slate-400">Cargando agenda...</p>
+        </Card>
       ) : (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-7">
           {days.map((day, i) => {
@@ -340,25 +342,25 @@ export default function AgendaPage() {
                 key={i}
                 padding="sm"
                 className={cn(
-                  'flex min-h-[200px] flex-col',
-                  isToday && 'ring-2 ring-brand-400'
+                  'flex min-h-[200px] flex-col transition-colors dark:bg-slate-900 dark:border-slate-800',
+                  isToday && 'ring-2 ring-brand-400 dark:ring-brand-500'
                 )}
               >
-                <div className="mb-2 flex items-baseline justify-between border-b border-slate-100 pb-2">
+                <div className="mb-2 flex items-baseline justify-between border-b border-slate-100 dark:border-slate-800 pb-2 transition-colors">
                   <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                       {dayNames[i]}
                     </p>
                     <p className={cn(
-                      'text-xl font-bold tabular-nums',
-                      isToday ? 'text-brand-600' : 'text-slate-800'
+                      'text-xl font-bold tabular-nums transition-colors',
+                      isToday ? 'text-brand-600 dark:text-brand-400' : 'text-slate-800 dark:text-slate-200'
                     )}>
                       {day.getDate()}
                     </p>
                   </div>
                   <button
                     onClick={() => openNewAt(day)}
-                    className="rounded-lg p-1 text-slate-300 hover:bg-slate-100 hover:text-brand-600"
+                    className="rounded-lg p-1 text-slate-300 hover:bg-slate-100 hover:text-brand-600 dark:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-brand-400 transition-colors"
                     aria-label="Agregar cita"
                   >
                     <Icon.Plus className="h-4 w-4" />
@@ -367,7 +369,7 @@ export default function AgendaPage() {
 
                 <div className="flex-1 space-y-1.5 overflow-y-auto">
                   {dayAppts.length === 0 && (
-                    <p className="mt-6 text-center text-xs text-slate-300">Sin citas</p>
+                    <p className="mt-6 text-center text-xs text-slate-300 dark:text-slate-600">Sin citas</p>
                   )}
                   {dayAppts.map(appt => {
                     const color = getServiceColor(appt.serviceId)
@@ -382,19 +384,21 @@ export default function AgendaPage() {
                         className={cn(
                           'w-full rounded-lg border-l-4 p-2 text-left text-xs transition-all hover:shadow-soft',
                           isCancelled && 'opacity-50 line-through',
-                          isCompleted ? 'bg-success-50' : 'bg-slate-50 hover:bg-slate-100'
+                          isCompleted 
+                            ? 'bg-success-50 dark:bg-success-900/20' 
+                            : 'bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/40 dark:hover:bg-slate-800/80'
                         )}
                         style={{ borderLeftColor: color }}
                       >
-                        <div className="flex items-center gap-1 font-mono font-semibold text-slate-600">
+                        <div className="flex items-center gap-1 font-mono font-semibold text-slate-600 dark:text-slate-400">
                           <Icon.Clock className="h-3 w-3" />
                           {hhmm}
                         </div>
-                        <p className="mt-0.5 truncate font-medium text-slate-800">
+                        <p className="mt-0.5 truncate font-medium text-slate-800 dark:text-slate-200">
                           {appt.serviceName}
                         </p>
                         {appt.customerName && (
-                          <p className="truncate text-slate-500">{appt.customerName}</p>
+                          <p className="truncate text-slate-500 dark:text-slate-500">{appt.customerName}</p>
                         )}
                       </button>
                     )
