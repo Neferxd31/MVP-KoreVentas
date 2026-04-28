@@ -324,10 +324,5 @@ export const Icon = {
   AlertTriangle, TrendingUp, TrendingDown, Cake, Star, Edit, Trash,
   Phone, Menu, Building, Receipt, Sparkles, Calendar, Clock, Scissors,
   UserCheck, ChevronLeft, ChevronRight, WhatsApp,
-<<<<<<< Updated upstream
-  DollarSign, Lock, Unlock, PieChart, BarChart
-}
-=======
   DollarSign, Lock, Unlock, PieChart, BarChart, Moon, Sun, Monitor
 }
->>>>>>> Stashed changes
